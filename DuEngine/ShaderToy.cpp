@@ -199,11 +199,14 @@ void ShaderToy::ShaderToyUniforms::update(int numVideoFrame) {
 }
 
 void ShaderToy::ShaderToyUniforms::onMouseMove(float x, float y) {
-	iMouse.x = x;
-	iMouse.y = iResolution.y - y;
+	if (mouseDown) {
+		iMouse.x = x;
+		iMouse.y = iResolution.y - y;
+	}
 }
 
 void ShaderToy::ShaderToyUniforms::onMouseDown(float x, float y) {
+	mouseDown = true; 
 	iMouse.x = x;
 	iMouse.y = iResolution.y - y;
 	iMouse.z = x;
@@ -212,10 +215,11 @@ void ShaderToy::ShaderToyUniforms::onMouseDown(float x, float y) {
 
 
 void ShaderToy::ShaderToyUniforms::onMouseUp(float x, float y) {
+	mouseDown = false; 
 	iMouse.x = x;
 	iMouse.y = iResolution.y - y;
-	iMouse.z = 0;
-	iMouse.w = 0;
+	//iMouse.z = 0;
+	//iMouse.w = 0;
 }
 
 string ShaderToy::ShaderToyUniforms::getMouseString() {

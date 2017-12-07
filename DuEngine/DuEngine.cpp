@@ -118,13 +118,28 @@ void DuEngine::start(int argc, char* argv[]) {
 	if (argc > 1) {
 		configName = std::string(argv[1]);
 		config = new DuConfig(configName);
+		m_sceneName = configName.substr(0, configName.size() - 4);
 	} else {
 		config = new DuConfig(DuConfig::DefaultName);
+		m_sceneName = "default";
+	}
+
+	m_relativePath = std::string(argv[0]);
+	if (m_relativePath.find("../../DuEngine/") != std::string::npos) {
+		m_relativePath = "../../DuEngine/";
+	} else if (m_relativePath.find("../DuEngine/") != std::string::npos) {
+		m_relativePath = "../DuEngine/";
+	} else {
+		m_relativePath = ""; 
+	}
+	m_relativePath = config->GetStringWithDefault("shader_default", m_relativePath);
+	if (m_relativePath.size() > 0) {
+		cout << "* Relative Path: " << m_relativePath << endl;
 	}
 
 	m_defaultWidth = config->GetIntWithDefault("window_width", m_defaultWidth);
 	m_defaultHeight = config->GetIntWithDefault("window_height", m_defaultHeight);
-	string _windowTitle = config->GetStringWithDefault("window_title", "DuRenderer");
+	string _windowTitle = config->GetStringWithDefault("window_title", "DuRenderer | " + m_sceneName);
 	window->init(argc, argv, m_defaultWidth, m_defaultHeight, _windowTitle);
 
 	m_recording = config->GetBoolWithDefault("recording", m_recording);
@@ -286,7 +301,7 @@ string DuEngine::readTextFromFile(string filename) {
 		//    cout << "Shader below\n" << ret << "\n"; 
 		return ret;
 	} else {
-		cout << "Unable to Open File " << filename << "\n";
+		cout << "Unable to open file " << filename << "\n";
 		throw 2;
 	}
 }

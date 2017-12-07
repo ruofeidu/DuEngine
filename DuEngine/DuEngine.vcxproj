@@ -135,26 +135,32 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DebugTimer.h" />
+    <ClInclude Include="dirent.h" />
     <ClInclude Include="DuConfig.h" />
     <ClInclude Include="DuEngine.h" />
+    <ClInclude Include="DuUtils.h" />
     <ClInclude Include="HashVec2b.h" />
     <ClInclude Include="ShaderToy.h" />
     <ClInclude Include="SHUtils.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shadertoy.default.glsl">
+    <Text Include="shadertoy.default.glsl">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
-    <None Include="shadertoy.main.glsl">
+      <FileType>Document</FileType>
+    </Text>
+    <Text Include="shadertoy.main.glsl">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
-    <None Include="shadertoy.uniforms.glsl">
+      <FileType>Document</FileType>
+    </Text>
+    <Text Include="shadertoy.uniforms.glsl">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
-    <None Include="shadertoy.vert.glsl">
+      <FileType>Document</FileType>
+    </Text>
+    <Text Include="shadertoy.vert.glsl">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
+      <FileType>Document</FileType>
+    </Text>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

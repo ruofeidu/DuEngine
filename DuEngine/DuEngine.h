@@ -175,13 +175,17 @@ private:
 	ShaderToy* shadertoy;
 	DuConfig* config;
 	string configName;
+	string m_sceneName;
 	bool m_fullscreen = false;
 	bool m_recording = false;
 	string m_recordPath = "";
+	string m_relativePath = "";
+
 	int m_recordStart = 0;
 	int m_recordEnd = 100;
-	int m_defaultWidth = 1280;
-	int m_defaultHeight = 720;
+	int m_defaultWidth = 1920;
+	int m_defaultHeight = 1080;
+	unordered_set<string> m_is_created; 
 
 	int getNumFrameFromVideos();
 

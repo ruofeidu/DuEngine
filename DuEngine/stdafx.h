@@ -37,6 +37,11 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 
+#if _WIN64 | _WIN32
+#include "windows.h"
+#include "dirent.h"
+#endif
+
 #define COMPILE_WITH_SH 1
 #define COMPILE_WITH_TIMER 1
 #define DEBUG_KEYBOARD 0

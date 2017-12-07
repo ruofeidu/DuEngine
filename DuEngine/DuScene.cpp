@@ -8,10 +8,13 @@ void DuEngine::initScene() {
 
 	shadertoy = new ShaderToy(DuEngine::GetInstance());
 
-	auto vertexShaderName = config->GetStringWithDefault("shader_vert", "shadertoy.vert.glsl");
-	auto fragmentShaderName = config->GetStringWithDefault("shader_frag", "shadertoy.default.glsl");
-	auto uniformShaderName = config->GetStringWithDefault("shader_uniform", "shadertoy.uniforms.glsl");
-	auto mainShaderName = config->GetStringWithDefault("shader_main", "shadertoy.main.glsl");
+	auto vertexShaderName = config->GetStringWithDefault("shader_vert", m_relativePath + "shadertoy.vert.glsl");
+	auto fragmentShaderName = config->GetStringWithDefault("shader_frag", m_relativePath + "shadertoy.default.glsl");
+	auto uniformShaderName = config->GetStringWithDefault("shader_uniform", m_relativePath + "shadertoy.uniforms.glsl");
+	auto mainShaderName = config->GetStringWithDefault("shader_main", m_relativePath + "shadertoy.main.glsl");
+	if (fragmentShaderName.find("$Name") != string::npos) {
+		fragmentShaderName.replace(fragmentShaderName.find("$Name"), 5, m_sceneName); 
+	}
 	shadertoy->loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
 
 	auto channels_count = config->GetIntWithDefault("channels_count", 0);
@@ -23,27 +26,28 @@ void DuEngine::initScene() {
 		cout << fileName << endl;
 		s = "iChannel" + to_string(i) + "_mm";
 		auto filter = config->GetStringWithDefault(s, "linear");
+
 		if (!type.compare("rgb")) {
 			auto t = filter == "mipmap" ? new Texture(fileName, true, TextureFilter::MIPMAP, TextureWrap::REPEAT) : new Texture(fileName);
 			shadertoy->uniforms->bindTexture2D(t->id, i);
 		} else
-			if (!type.compare("video")) {
-				auto t = new VideoTexture(fileName);
-				videoTextures.push_back(t);
-				shadertoy->uniforms->bindTexture2D(t->GetTextureID(), i);
-			} else
-				if (!type.compare("key")) {
-					if (!keyboardTexture) {
-						keyboardTexture = new KeyboardTexture();
-					}
-					shadertoy->uniforms->bindTexture2D(keyboardTexture->GetTextureID(), i);
-				} else
-					if (!type.compare("font")) {
-						if (!fontTexture) {
-							fontTexture = new Texture("textures/font.png", true, TextureFilter::MIPMAP, TextureWrap::REPEAT);
-						}
-						shadertoy->uniforms->bindTexture2D(fontTexture->GetTextureID(), i);
-					}
+		if (!type.compare("video")) {
+			auto t = new VideoTexture(fileName);
+			videoTextures.push_back(t);
+			shadertoy->uniforms->bindTexture2D(t->GetTextureID(), i);
+		} else
+		if (!type.compare("key")) {
+			if (!keyboardTexture) {
+				keyboardTexture = new KeyboardTexture();
+			}
+			shadertoy->uniforms->bindTexture2D(keyboardTexture->GetTextureID(), i);
+		} else
+		if (!type.compare("font")) {
+			if (!fontTexture) {
+				fontTexture = new Texture(m_relativePath + "presets/tex21.png", true, TextureFilter::MIPMAP, TextureWrap::REPEAT);
+			}
+			shadertoy->uniforms->bindTexture2D(fontTexture->GetTextureID(), i);
+		}
 	}
 
 	auto vec2_buffers_count = config->GetIntWithDefault("vec2_buffers_count", 0);
@@ -86,6 +90,10 @@ void DuEngine::render() {
 }
 
 void DuEngine::takeScreenshot(string folderName) {
+	if (m_is_created.find(folderName) == m_is_created.end()) {
+		CreateDirectory(folderName.c_str(), NULL);
+		m_is_created.insert(folderName); 
+	}
 	cv::Mat img(window->height, window->width, CV_8UC3);
 	glPixelStorei(GL_PACK_ALIGNMENT, (img.step & 3) ? 1 : 4);
 	glPixelStorei(GL_PACK_ROW_LENGTH, (GLint)img.step / (GLint)img.elemSize());

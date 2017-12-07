@@ -79,6 +79,9 @@ class ShaderToy
 		float secondsOnStart;
 
 	private:
+		bool mouseDown = false; 
+
+	private:
 		vector<vector<vec2>> vec2_buffers;
 
 	public:

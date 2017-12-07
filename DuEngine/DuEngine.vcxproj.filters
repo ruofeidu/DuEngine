@@ -19,9 +19,6 @@
     <Filter Include="Resource Files\shaders">
       <UniqueIdentifier>{b91b7c08-5167-4510-8eaa-16939d204d46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\presets">
-      <UniqueIdentifier>{1e7edb5c-9883-42e5-be20-9ac88ce5096b}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DuEngine.cpp">
@@ -66,6 +63,12 @@
       <Filter>Source Files\SH</Filter>
     </ClInclude>
     <ClInclude Include="ShaderToy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DuUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
