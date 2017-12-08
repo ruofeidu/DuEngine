@@ -150,6 +150,7 @@ void ShaderToy::ShaderToyUniforms::linkShader(GLuint shaderProgram) {
 
 void ShaderToy::ShaderToyUniforms::bindTexture2D(GLuint tex, GLuint channel) {
 	if (uChannels[channel] >= 0) {
+		iChannels[channel] = tex; 
 		glActiveTexture(GL_TEXTURE0 + tex);
 		glBindTexture(GL_TEXTURE_2D, tex);
 		glUniform1i(uChannels[channel], tex);
@@ -198,6 +199,10 @@ void ShaderToy::ShaderToyUniforms::update() {
 	if (uFrame >= 0) glUniform1i(uFrame, iFrame);
 	if (uMouse >= 0) glUniform4f(uMouse, iMouse.x, iMouse.y, iMouse.z, iMouse.w);
 	if (uDate >= 0) glUniform4f(uDate, iDate.x, iDate.y, iDate.z, iDate.w);
+	for (int i = 0; i < iChannels.size(); ++i) {
+		glUniform1i(uChannels[i], iChannels[i]);
+	}
+
 	for (int i = 0; i < vec2_buffers.size(); ++i) if (uVec2Buffers[i] >= 0) {
 		auto &v2 = vec2_buffers[i][iFrame % vec2_buffers[i].size()];
 		glUniform2f(uVec2Buffers[i], v2.x, v2.y);

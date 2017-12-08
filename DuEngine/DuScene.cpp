@@ -9,62 +9,76 @@ void DuEngine::initScene() {
 
 	shadertoy = new ShaderToy(DuEngine::GetInstance());
 
-	auto vertexShaderName = config->GetStringWithDefault("shader_vert", m_relativePath + "shadertoy.vert.glsl");
-	auto fragmentShaderName = config->GetStringWithDefault("shader_frag", m_relativePath + "shadertoy.default.glsl");
-	auto uniformShaderName = config->GetStringWithDefault("shader_uniform", m_relativePath + "shadertoy.uniforms.glsl");
-	auto mainShaderName = config->GetStringWithDefault("shader_main", m_relativePath + "shadertoy.main.glsl");
-	if (fragmentShaderName.find("$Name") != string::npos) {
-		fragmentShaderName.replace(fragmentShaderName.find("$Name"), 5, m_sceneName); 
-	}
-	shadertoy->loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
+	for (int buffer = 0; buffer < 1 + shadertoy->m_frameBuffers.size(); ++buffer) {
+		auto suffix = buffer == 0 ? "" : string(1, char('A' + buffer - 1));
+		auto prefix = buffer == 0 ? "" : suffix + "_";
+		auto uniforms = buffer == 0 ? shadertoy->uniforms : shadertoy->m_frameBuffers[buffer - 1].uniforms; 
+		auto vertexShaderName = config->GetStringWithDefault("shader_vert", m_relativePath + "shadertoy.vert.glsl");
+		auto fragmentShaderName = config->GetStringWithDefault("shader_frag", m_relativePath + "shadertoy.default.glsl");
+		auto uniformShaderName = config->GetStringWithDefault("shader_uniform", m_relativePath + "shadertoy.uniforms.glsl");
+		auto mainShaderName = config->GetStringWithDefault("shader_main", m_relativePath + "shadertoy.main.glsl");
 
-	auto channels_count = config->GetIntWithDefault("channels_count", 0);
-	for (int i = 0; i < channels_count; ++i) {
-		string s = "iChannel" + to_string(i) + "_type";
-		auto type = config->GetStringWithDefault(s, "rgb");
-		s = "iChannel" + to_string(i) + "_tex";
-		auto fileName = m_relativePath + config->GetStringWithDefault(s, "");
-
-		// replace the common textures into the true file names
-		for (const auto& key : m_common_tex) {
-			if (!type.compare(key.first)) {
-				type = "rgb";
-				fileName = m_relativePath + "presets/" + key.second;
-				break; 
-			}
+		// replace the fragment shader name with $Name and buffer prefix / suffix
+		if (fragmentShaderName.find("$Name") != string::npos) {
+			fragmentShaderName.replace(fragmentShaderName.find("$Name"), 5, m_sceneName); 
 		}
+		if (fragmentShaderName.find(".glsl") != string::npos) {
+			fragmentShaderName.replace(fragmentShaderName.find(".glsl"), 5, suffix + ".glsl");
+		} else {
+			fragmentShaderName += suffix + ".glsl";
+		}
+		shadertoy->loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
 
-		s = "iChannel" + to_string(i) + "_filter";
-		auto filter = config->GetStringWithDefault(s, "mipmap");
-		auto textureFilter = filter == "linear" ? TextureFilter::LINEAR : ((filter == "nearest") ? TextureFilter::NEAREST : TextureFilter::MIPMAP); 
+		auto channels_count = config->GetIntWithDefault(prefix + "channels_count", 0);
+		for (int i = 0; i < channels_count; ++i) {
+			string iPrefix = prefix + "iChannel" + to_string(i);
+			auto type = config->GetStringWithDefault(iPrefix + "_type", "rgb");
+			auto fileName = m_relativePath + config->GetStringWithDefault(iPrefix + "_tex", "");
 
-		s = "iChannel" + to_string(i) + "_wrap";
-		auto wrap = config->GetStringWithDefault(s, "repeat");
-		auto textureWrap = !wrap.compare("repeat") ? TextureWrap::REPEAT : TextureWrap::CLAMP;
-
-		s = "iChannel" + to_string(i) + "_vflip";
-		auto vFlip = config->GetBoolWithDefault(s, true); 
-		if (!type.compare("rgb")) {
-			info(fileName);
-			auto t = filter == "linear" ? new Texture(fileName) : new Texture(fileName, vFlip, textureFilter, textureWrap);
-			shadertoy->uniforms->bindTexture2D(t->id, i);
-		} else
-		if (!type.compare("video")) {
-			auto t = new VideoTexture(fileName, vFlip, textureFilter, textureWrap);
-			videoTextures.push_back(t);
-			shadertoy->uniforms->bindTexture2D(t->GetTextureID(), i);
-		} else
-		if (!type.compare("key")) {
-			if (!keyboardTexture) {
-				keyboardTexture = new KeyboardTexture();
+			// replace the common textures into the true file names
+			for (const auto& key : m_common_tex) {
+				if (!type.compare(key.first)) {
+					type = "rgb";
+					fileName = m_relativePath + "presets/" + key.second;
+					break;
+				}
 			}
-			shadertoy->uniforms->bindTexture2D(keyboardTexture->GetTextureID(), i);
-		} else
-		if (!type.compare("font")) {
-			if (!fontTexture) {
-				fontTexture = new Texture(m_relativePath + "presets/tex21.png", true, textureFilter, textureWrap);
+
+			// texture filters
+			auto filter = config->GetStringWithDefault(iPrefix + "_filter", "mipmap");
+			auto textureFilter = filter == "linear" ? TextureFilter::LINEAR : ((filter == "nearest") ? TextureFilter::NEAREST : TextureFilter::MIPMAP);
+
+			// texture wrappers
+			auto wrap = config->GetStringWithDefault(iPrefix + "_wrap", "repeat");
+			auto textureWrap = !wrap.compare("repeat") ? TextureWrap::REPEAT : TextureWrap::CLAMP;
+
+			auto vFlip = config->GetBoolWithDefault(iPrefix + "_vflip", true);
+			if (!type.compare("rgb")) {
+				info("Reading texture " + fileName);
+				auto t = filter == "linear" ? new Texture(fileName) : new Texture(fileName, vFlip, textureFilter, textureWrap);
+				uniforms->bindTexture2D(t->id, i);
+			} else
+			if (!type.compare("video")) {
+				auto t = new VideoTexture(fileName, vFlip, textureFilter, textureWrap);
+				videoTextures.push_back(t);
+				uniforms->bindTexture2D(t->GetTextureID(), i);
+			} else
+			if (!type.compare("key")) {
+				if (!keyboardTexture) {
+					keyboardTexture = new KeyboardTexture();
+				}
+				uniforms->bindTexture2D(keyboardTexture->GetTextureID(), i);
+			} else
+			if (!type.compare("font")) {
+				if (!fontTexture) {
+					fontTexture = new Texture(m_relativePath + "presets/tex21.png", true, textureFilter, textureWrap);
+				}
+				uniforms->bindTexture2D(fontTexture->GetTextureID(), i);
+			} else
+			if (type.size() == 1) {
+				int bufferID = (int)(type[0] - 'A');
+				uniforms->bindTexture2D(shadertoy->m_frameBuffers[i].textureID, i);
 			}
-			shadertoy->uniforms->bindTexture2D(fontTexture->GetTextureID(), i);
 		}
 	}
 

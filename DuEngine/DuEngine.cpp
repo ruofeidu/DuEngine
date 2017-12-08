@@ -1,7 +1,7 @@
 /**
-* Thelia Renderer is a basic OpenGL-based renderer which implements most of the ShaderToy functionality
+* DuRenderer is a basic OpenGL-based renderer which implements most of the ShaderToy functionality
 * Ruofei Du | Augmentarium Lab
-* 5/9/2017
+* 12/1/2017
 */
 #include "stdafx.h"
 #include <iostream>
@@ -307,7 +307,8 @@ string DuEngine::readTextFromFile(string filename) {
 		return ret;
 	} else {
 		warning("Unable to open file " + filename);
-		throw 2;
+		system("pause"); 
+		exit(EXIT_FAILURE); 
 	}
 }
 
@@ -318,8 +319,10 @@ void DuEngine::reportShaderErrors(const GLint shader) {
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 	log = new GLchar[length + 1];
 	glGetShaderInfoLog(shader, length, &length, log);
-	cout << "Compile Error,Log Below\n" << log << "\n";
+	cout << "Shader syntax error, see log below\n" << log << "\n";
 	delete[] log;
+	system("pause");
+	exit(EXIT_FAILURE);
 }
 
 
@@ -330,8 +333,10 @@ void DuEngine::reportProgramErrors(const GLint program) {
 	log = new GLchar[length + 1];
 	glGetProgramInfoLog(program, length, &length, log);
 	string s(log);
-	error("Compile Error, see log Below\n" + s + "\n");
+	error("Program compile error, see log Below\n" + s + "\n");
 	delete[] log;
+	system("pause");
+	exit(EXIT_FAILURE);
 }
 
 GLuint DuEngine::initShaders(GLenum type, string filename, string uniformFileName, string mainFileName) {

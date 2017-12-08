@@ -199,6 +199,9 @@ public:
 
 	void render();
 
+public:
+
+
 private:
 	int numChannels;
 };
