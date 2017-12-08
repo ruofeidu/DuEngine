@@ -125,6 +125,8 @@ void ShaderToy::ShaderToyUniforms::linkShader(GLuint shaderProgram) {
 	uMouse = glGetUniformLocation(shaderProgram, "iMouse");
 	uDate = glGetUniformLocation(shaderProgram, "iDate");
 	uResolution = glGetUniformLocation(shaderProgram, "iResolution");
+	uFrameRate = glGetUniformLocation(shaderProgram, "iFrameRate");
+	uTimeDelta = glGetUniformLocation(shaderProgram, "iTimeDelta");
 	for (int i = 0; i < iChannels.size(); ++i) {
 		string uName = "iChannel" + to_string(i);
 		uChannels[i] = glGetUniformLocation(shaderProgram, uName.c_str());
@@ -186,6 +188,8 @@ void ShaderToy::ShaderToyUniforms::update(int numVideoFrame) {
 	iDate.w = secondsOnStart + iGlobalTime; // being lazy here, suppose that the month and day does not change
 	if (uResolution >= 0) glUniform3f(uResolution, iResolution.x, iResolution.y, iResolution.z);
 	if (uGlobalTime >= 0) glUniform1f(uGlobalTime, iGlobalTime);
+	if (uTimeDelta >= 0) glUniform1f(uTimeDelta, iTimeDelta);
+	if (uFrameRate >= 0) glUniform1i(uFrameRate, iFrameRate);
 	if (uFrame >= 0) glUniform1i(uFrame, iFrame);
 	if (uMouse >= 0) glUniform4f(uMouse, iMouse.x, iMouse.y, iMouse.z, iMouse.w);
 	if (uDate >= 0) glUniform4f(uDate, iDate.x, iDate.y, iDate.z, iDate.w);
@@ -196,6 +200,15 @@ void ShaderToy::ShaderToyUniforms::update(int numVideoFrame) {
 		glUniform2f(uVec2Buffers[i], v2.x, v2.y);
 	}
 	//cout << numVideoFrame << endl; 
+}
+
+void ShaderToy::ShaderToyUniforms::updateFPS(float timeDelta, float averageTimeDelta) {
+	iTimeDelta = timeDelta / 1e3f;
+	if (averageTimeDelta > 0)
+		iFrameRate = int(1000.0f / averageTimeDelta);
+	if (averageTimeDelta > 0)
+		cout << averageTimeDelta << endl; 
+	//cout << iTimeDelta << "\t" << averageTimeDelta << "\t" << iFrameRate << endl;
 }
 
 void ShaderToy::ShaderToyUniforms::onMouseMove(float x, float y) {

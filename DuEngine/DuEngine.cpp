@@ -94,11 +94,14 @@ void g_timer(int id) {
 void g_render() {
 	Sleep(1);
 #if COMPILE_WITH_TIMER
+	DebugTimer::Start("timeDelta");
 	DebugTimer::StartAverageWindow("Render");
 #endif
 	DuEngine::GetInstance()->render();
 #if COMPILE_WITH_TIMER
-	DebugTimer::EndAverageWindow("Render");
+	auto timeDelta = DebugTimer::End("timeDelta", true);
+	auto averageTimeDelta = DebugTimer::EndAverageWindow("Render");
+	DuEngine::GetInstance()->updateFPS(timeDelta, averageTimeDelta); 
 #endif
 };
 

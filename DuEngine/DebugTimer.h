@@ -25,10 +25,10 @@ public:
 	// Start a single timer 
 	static void Start(string label = "-");
 	// End a single timer
-	static double End(string label = "-");
+	static double End(string label = "-", bool silence = false);
 
 	// Start a timer with average window of size AVERAGE_WINDOW_SIZE
 	static void StartAverageWindow(string label = "-");
 	// End a timer with average window of size AVERAGE_WINDOW_SIZE
-	static double EndAverageWindow(string label = "-");
+	static double EndAverageWindow(string label = "-", bool silence = false);
 };

@@ -58,25 +58,54 @@ class ShaderToy
 	class ShaderToyUniforms
 	{
 	public:
+		// viewport resolution (in pixels)
 		vec3 iResolution;
+		// shader playback time (in seconds)
 		float iGlobalTime;
+		// shader playback frame
 		int iFrame;
+		// mouse pixel coords. xy: current (if MLB down), zw: click
 		vec4 iMouse;
+		// (year, month, day, time in seconds)
 		vec4 iDate;
+		// render time (in seconds)
+		float iTimeDelta = 1000.0f / 60.0f;
+		// the frame rate as int
+		int iFrameRate = 60;
+		// input channel. XX = 2D/Cube
 		vector<GLuint> iChannels;
+		// buffers of vector2
 		vector<GLuint> iVec2Buffers;
 
 	private:
 		clock_t startTime;
 		GLint linkedProgram;
-		GLint uResolution;
-		GLint uGlobalTime;
-		GLint uFrame;
-		GLint uMouse;
-		GLint uDate;
-		vector<GLint> uChannels;
-		vector<GLint> uVec2Buffers;
 		float secondsOnStart;
+		
+		// location of uniforms
+	private:
+		// viewport resolution (in pixels)
+		GLint uResolution;    
+		// shader playback time (in seconds)
+		GLint uGlobalTime;
+		// shader playback frame
+		GLint uFrame;
+		// mouse pixel coords. xy: current (if MLB down), zw: click
+		GLint uMouse;
+		// (year, month, day, time in seconds)
+		GLint uDate;
+		// render time (in seconds)
+		GLint uTimeDelta;
+		// the frame rate as int
+		GLint uFrameRate;
+		// input channel. XX = 2D/Cube
+		vector<GLint> uChannels;
+		// channel resolution (in pixels)
+		vector<GLint> uChannelResolution;
+		// channel playback time (in seconds)
+		vector<GLint> uChannelTimes;
+		// buffers of vector2
+		vector<GLint> uVec2Buffers;
 
 	private:
 		bool mouseDown = false; 
@@ -99,6 +128,8 @@ class ShaderToy
 		void intVec2Buffers(int numBuffers);
 
 		void update(int numVideoFrame = 0);
+
+		void updateFPS(float timeDelta, float averageTimeDelta); 
 
 		void onMouseMove(float x, float y);
 

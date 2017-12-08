@@ -157,6 +157,7 @@ protected:
 
 public:
 	void render();
+	void updateFPS(float timeDelta, float averageTimeDelta);
 	void takeScreenshot(string folderName = "snapshots");
 	void keyboard(unsigned char key, int x, int y, bool up = false);
 	void special(int key, int x, int y, bool up = false);

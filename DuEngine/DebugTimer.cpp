@@ -9,12 +9,14 @@ void DebugTimer::Start(string label) {
 #endif // DEBUG_TIMER_ON
 }
 
-double DebugTimer::End(string label) {
+double DebugTimer::End(string label, bool silence) {
 #ifdef DEBUG_TIMER_ON
 	auto end = steady_clock::now();
 	auto diff = end - Map[label];
 	double duration = chrono::duration <double, milli>(diff).count();
-	printf("[%s]\t%.4f %s\r\n", label.c_str(), (duration > 1000) ? duration / 1000 : duration, (duration > 1000) ? "s" : "ms");
+	if (!silence) {
+		printf("[%s]\t%.4f %s\r\n", label.c_str(), (duration > 1000) ? duration / 1000 : duration, (duration > 1000) ? "s" : "ms");
+	}
 	return duration;
 #endif // DEBUG_TIMER_ON
 }
@@ -24,7 +26,7 @@ void DebugTimer::StartAverageWindow(string label) {
 	AverageWindowMap[label].startTime = chrono::steady_clock::now();
 #endif // DEBUG_TIMER_ON
 }
-double DebugTimer::EndAverageWindow(string label) {
+double DebugTimer::EndAverageWindow(string label, bool silence) {
 #ifdef DEBUG_TIMER_ON
 	SingleTimePoint* t = &AverageWindowMap[label];
 	auto end = chrono::steady_clock::now();
@@ -34,13 +36,15 @@ double DebugTimer::EndAverageWindow(string label) {
 
 	if (t->counter >= AVERAGE_WINDOW_SIZE - 1) {
 		double duration = t->totalTime / AVERAGE_WINDOW_SIZE;
-		printf("[%s]\t%.4f %s\r\n", label.c_str(), (duration > 1000) ? duration / 1000 : duration, (duration > 1000) ? "s" : "ms");
+		if (!silence) {
+			printf("[%s]\t%.4f %s\r\n", label.c_str(), (duration > 1000) ? duration / 1000 : duration, (duration > 1000) ? "s" : "ms");
+		}
 		t->counter = 0;
 		t->totalTime = 0;
 		return duration;
 	} else {
 		t->counter++;
-		return -1;
+		return -1; 
 	}
 #endif // DEBUG_TIMER_ON
 }

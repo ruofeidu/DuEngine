@@ -155,7 +155,10 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 	// Draw Resolution
 	vColour = mix(vColour, vec3(0.867, 0.910, 0.247), PrintValue(fragCoord, grid(35, 0), fontSize, iResolution.x, 2.0, 0.0));
 	vColour = mix(vColour, vec3(0.867, 0.910, 0.247), PrintValue(fragCoord, grid(40, 0), fontSize, iResolution.y, 2.0, 0.0));
-	vColour = mix(vColour, vec3(0.867, 0.910, 0.247), PrintValue(fragCoord, grid(45, 0), fontSize, iFrame, 2.0, 0.0));
+	vColour = mix(vColour, vec3(0.867, 0.910, 0.247), PrintValue(fragCoord, grid(50, 0), fontSize, iFrame, 2.0, 0.0));
+	// Frame Rate
+	vColour = mix(vColour, vec3(0.216, 0.471, 0.698), PrintValue(fragCoord, grid(60, 0), fontSize, float(iFrameRate), 2.0, 4.0));
+	vColour = mix(vColour, vec3(0.216, 0.471, 0.698), PrintValue(fragCoord, grid(70, 0), fontSize, iTimeDelta * 1000, 2.0, 4.0));
 
 	if (mouse.x >= 0.0) {
 		// Print Mouse X

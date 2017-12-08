@@ -23,7 +23,6 @@ void DuEngine::initScene() {
 		auto type = config->GetStringWithDefault(s, "rgb");
 		s = "iChannel" + to_string(i) + "_tex";
 		auto fileName = config->GetStringWithDefault(s, "");
-		cout << fileName << endl;
 		s = "iChannel" + to_string(i) + "_mm";
 		auto filter = config->GetStringWithDefault(s, "linear");
 
@@ -74,7 +73,7 @@ void DuEngine::render() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	for (int i = 0; i < videoTextures.size(); ++i) videoTextures[i]->update();
+	for (const auto& v : videoTextures) v->update(); 
 	shadertoy->uniforms->update(getNumFrameFromVideos());
 
 	shadertoy->render();
@@ -82,11 +81,14 @@ void DuEngine::render() {
 
 	glutPostRedisplay();
 
-
 	if (m_recording && m_recordStart + 1 <= getFrameNumber() && getFrameNumber() <= m_recordEnd + 1) {
 		this->takeScreenshot(m_recordPath);
 	}
 	// glutTimerFunc(40, g_timer, 0);
+}
+
+void DuEngine::updateFPS(float timeDelta, float averageTimeDelta) {
+	shadertoy->uniforms->updateFPS(timeDelta, averageTimeDelta);
 }
 
 void DuEngine::takeScreenshot(string folderName) {
