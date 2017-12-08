@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ShaderToy.h"
+#include "DuUtils.h"
 
 ShaderToy::ShaderToy(DuEngine * _renderer, double _width, double _height, int _x0, double _y0) {
 	renderer = _renderer;
@@ -10,7 +11,7 @@ ShaderToy::ShaderToy(DuEngine * _renderer, double _width, double _height, int _x
 	numChannels = 4;
 	uniforms = new ShaderToyUniforms(geometry, numChannels);
 
-	std::cout << "* ShaderToy inited" << std::endl;
+	info("ShaderToy is inited.");
 }
 
 ShaderToy::ShaderToy(DuEngine * _renderer) : ShaderToy(_renderer, _renderer->window->width, _renderer->window->height, 0, 0) {

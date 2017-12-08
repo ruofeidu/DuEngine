@@ -96,6 +96,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,6 +130,7 @@
     <ClCompile Include="DuConfig.cpp" />
     <ClCompile Include="DuEngine.cpp" />
     <ClCompile Include="DuScene.cpp" />
+    <ClCompile Include="DuUtils.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ShaderToy.cpp" />
     <ClCompile Include="SHUtils.cpp" />

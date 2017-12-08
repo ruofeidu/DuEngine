@@ -188,6 +188,31 @@ private:
 	int m_defaultHeight = 1080;
 	unordered_set<string> m_is_created; 
 
+	unordered_map<string, string> m_common_tex {
+		{ "pano", "panorama.png" },
+		{ "abstract1", "tex07.jpg" },
+		{ "abstract2", "tex08.jpg" },
+		{ "abstract3", "tex20.jpg" },
+		{ "bayer", "tex15.png" },
+		{ "gnm", "tex12.png" },
+		{ "gns", "tex10.png" },
+		{ "lichen", "tex06.png" },
+		{ "london", "tex04.jpg" },
+		{ "nyancat", "tex14.png" },
+		{ "organic1", "tex01.jpg" },
+		{ "organic2", "tex03.jpg" },
+		{ "organic3", "tex18.jpg" },
+		{ "organic4", "tex17.jpg" },
+		{ "pebbles", "tex19.png" },
+		{ "rgbanm", "tex16.png" },
+		{ "rgbans", "tex11.png" },
+		{ "rocktiles", "tex00.jpg" },
+		{ "rustymetal", "tex02.jpg" },
+		{ "stars", "tex03.jpg" },
+		{ "wood", "tex05.jpg" },
+		//{ "font", "tex21.png" },
+	};
+
 	int getNumFrameFromVideos();
 
 	string readTextFromFile(string filename);

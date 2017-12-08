@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "DuConfig.h"
-#include <fstream>
-#include <algorithm>
+#include "DuUtils.h"
 using namespace std;
 
 std::string DuConfig::DefaultName = "config.ini";
@@ -29,7 +28,7 @@ bool DuConfig::Load(const string &filename) {
 	// Open file.
 	ifstream in(filename.c_str());
 	if (!in.is_open()) {
-		cout << "! Failed to open " << filename.c_str() << ", use default parameters instead."<< endl;
+		warning("! Failed to open " + filename + ", using default parameters instead.");
 		return false;
 	}
 
@@ -65,7 +64,7 @@ string DuConfig::GetString(const string &name) const {
 	map<string, string>::const_iterator iter = m_mEntries.find(name);
 	if (iter == m_mEntries.end()) {
 		if (m_bErrorIfNameNotFound)
-			cout << "Failed to lookup '" << name << "'." << std::endl;
+			warning("Failed to lookup '" + name + "'.");
 		return "";
 	}
 	return iter->second;

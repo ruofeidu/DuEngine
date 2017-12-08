@@ -10,7 +10,7 @@
 #include <thread>
 #include "DuEngine.h"
 #include "ShaderToy.h"
-
+#include "DuUtils.h"
 using namespace std;
 
 Singleton *Singleton::s_Instance = new Singleton();
@@ -58,7 +58,7 @@ void Window::init(int argc, char* argv[], int _width, int _height, string _windo
 	if (GLEW_OK != err) {
 		std::cerr << "Error: " << glewGetString(err) << std::endl;
 	}
-	std::cout << "* Window Creation costs: " << float(clock() - beginTime) / CLOCKS_PER_SEC << " s" << std::endl;
+	info("Window Creation costs: " + to_string(float(clock() - beginTime) / CLOCKS_PER_SEC) + " s");
 }
 
 void Window::reshape(int _width, int _height) {
@@ -101,7 +101,7 @@ void g_render() {
 #if COMPILE_WITH_TIMER
 	auto timeDelta = DebugTimer::End("timeDelta", true);
 	auto averageTimeDelta = DebugTimer::EndAverageWindow("Render");
-	DuEngine::GetInstance()->updateFPS(timeDelta, averageTimeDelta); 
+	DuEngine::GetInstance()->updateFPS((float)timeDelta, (float)averageTimeDelta);
 #endif
 };
 
@@ -137,7 +137,7 @@ void DuEngine::start(int argc, char* argv[]) {
 	}
 	m_relativePath = config->GetStringWithDefault("shader_default", m_relativePath);
 	if (m_relativePath.size() > 0) {
-		cout << "* Relative Path: " << m_relativePath << endl;
+		info("Relative Path: " + m_relativePath);
 	}
 
 	m_defaultWidth = config->GetIntWithDefault("window_width", m_defaultWidth);
@@ -236,7 +236,7 @@ void DuEngine::special(int key, int x, int y, bool up) {
 			}
 		case GLUT_KEY_F10:
 			// Debug Mouse
-			cout << this->shadertoy->uniforms->getMouseString() << endl;
+			debug(this->shadertoy->uniforms->getMouseString());
 			break;
 
 		case GLUT_KEY_F11:
@@ -304,7 +304,7 @@ string DuEngine::readTextFromFile(string filename) {
 		//    cout << "Shader below\n" << ret << "\n"; 
 		return ret;
 	} else {
-		cout << "Unable to open file " << filename << "\n";
+		warning("Unable to open file " + filename);
 		throw 2;
 	}
 }
@@ -327,7 +327,8 @@ void DuEngine::reportProgramErrors(const GLint program) {
 	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
 	log = new GLchar[length + 1];
 	glGetProgramInfoLog(program, length, &length, log);
-	cout << "Compile Error,Log Below\n" << log << "\n";
+	string s(log);
+	error("Compile Error, see log Below\n" + s + "\n");
 	delete[] log;
 }
 
@@ -393,7 +394,7 @@ GLuint DuEngine::matToTexture2D(cv::Mat &mat, GLuint format, GLenum minFilter, G
 		magFilter == GL_LINEAR_MIPMAP_NEAREST ||
 		magFilter == GL_NEAREST_MIPMAP_LINEAR ||
 		magFilter == GL_NEAREST_MIPMAP_NEAREST) {
-		cout << "! You can't use MIPMAPs for magnification - setting filter to GL_LINEAR" << endl;
+		warning("! You can't use MIPMAPs for magnification - setting filter to GL_LINEAR"); 
 		magFilter = GL_LINEAR;
 	}
 
@@ -432,7 +433,7 @@ GLuint DuEngine::matToTexture2D(cv::Mat &mat, GLuint format, GLenum minFilter, G
 		minFilter == GL_NEAREST_MIPMAP_LINEAR ||
 		minFilter == GL_NEAREST_MIPMAP_NEAREST)) {
 		glGenerateMipmap(GL_TEXTURE_2D);
-		cout << "* Mipmap generated for " << textureID << endl;
+		info("Mipmap generated for " + textureID);
 	}
 
 	GLenum err = glGetError();
@@ -488,12 +489,13 @@ VideoTexture::VideoTexture(string filename, bool vflip, TextureFilter filter, Te
 	cap.open(filename);
 	_vflip = vflip;
 	if (!cap.isOpened()) {
-		cout << "! Cannot open the video texture." << endl;
+		error("Cannot open the video texture."); 
 		return;
 	}
 	cap >> mat;
 	if (mat.empty()) {
-		cout << "! Cannot open the video texture." << endl;
+		error("Cannot open the video texture.");
+		return; 
 	}
 	if (_vflip) flip(mat, mat, 0);
 	frames = 0;
@@ -512,7 +514,7 @@ VideoTexture::VideoTexture(string filename, bool vflip, TextureFilter filter, Te
 		id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, warpFilter);
 		break;
 	default:
-		cout << "Cannot set filters, use linear instead" << endl;
+		error("Cannot set unknown filters, use linear instead");
 		id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_LINEAR, GL_LINEAR, warpFilter);
 		//setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_NEAREST_MIPMAP);
 		break;
@@ -562,7 +564,7 @@ void VideoTexture::update() {
 		GL_UNSIGNED_BYTE,    // GLenum type,
 		mat.ptr()            // const GLvoid * pixels
 		);
-	// cout << "video texture " << id << " updated for the frame #" << frames << endl; 
+	// info("video texture " + to_string(id) + " updated for the frame #" + to_string(frames)); 
 }
 
 void VideoTexture::resetTime() {
@@ -629,7 +631,8 @@ SHTexture::SHTexture(int numBands, int numCoefs) {
 	mat = Mat::zeros(m_numBands, m_numBands, CV_32FC3);
 	id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_NEAREST, GL_NEAREST, GL_CLAMP, GL_FLOAT);
 	GLenum err = glGetError();
-	if (err != GL_NO_ERROR) cout << "SHTexture Error:" << err << endl;
+	if (err != GL_NO_ERROR) 
+		error("SH Texture Error:" + to_string(err));
 }
 
 void SHTexture::update(float coef[NUM_COEF]) {

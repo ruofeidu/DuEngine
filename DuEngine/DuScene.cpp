@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "DuEngine.h"
+#include "DuUtils.h"
 using namespace std;
 using namespace cv;
 
@@ -22,12 +23,24 @@ void DuEngine::initScene() {
 		string s = "iChannel" + to_string(i) + "_type";
 		auto type = config->GetStringWithDefault(s, "rgb");
 		s = "iChannel" + to_string(i) + "_tex";
-		auto fileName = config->GetStringWithDefault(s, "");
-		s = "iChannel" + to_string(i) + "_mm";
-		auto filter = config->GetStringWithDefault(s, "linear");
+		auto fileName = m_relativePath + config->GetStringWithDefault(s, "");
 
+		// replace the common textures into the true file names
+		for (const auto& key : m_common_tex) {
+			if (!type.compare(key.first)) {
+				type = "rgb";
+				fileName = m_relativePath + "presets/" + key.second;
+				break; 
+			}
+		}
+
+		s = "iChannel" + to_string(i) + "_mm";
+		auto filter = config->GetStringWithDefault(s, "mipmap");
+		s = "iChannel" + to_string(i) + "_vflip";
+		auto vFlip = config->GetBoolWithDefault(s, true); 
 		if (!type.compare("rgb")) {
-			auto t = filter == "mipmap" ? new Texture(fileName, true, TextureFilter::MIPMAP, TextureWrap::REPEAT) : new Texture(fileName);
+			info(fileName);
+			auto t = filter == "linear" ? new Texture(fileName) : new Texture(fileName, vFlip, TextureFilter::MIPMAP, TextureWrap::REPEAT);
 			shadertoy->uniforms->bindTexture2D(t->id, i);
 		} else
 		if (!type.compare("video")) {
@@ -58,7 +71,7 @@ void DuEngine::initScene() {
 		shadertoy->uniforms->bindVec2Buffer(i, fileName);
 	}
 
-	std::cout << "* Initialization scene costs: " << float(clock() - begin_time) / CLOCKS_PER_SEC << " s" << std::endl;
+	info("Initialization scene costs: " + to_string(float(clock() - begin_time) / CLOCKS_PER_SEC) + " s");
 }
 
 int DuEngine::getFrameNumber() {
