@@ -127,7 +127,7 @@ class ShaderToy
 
 		void intVec2Buffers(int numBuffers);
 
-		void update(int numVideoFrame = 0);
+		void update();
 
 		void updateFPS(float timeDelta, float averageTimeDelta); 
 
@@ -161,11 +161,31 @@ class ShaderToy
 
 	friend class DuEngine;
 
+	class ShaderToyFrameBuffer
+	{
+	public:
+		DuEngine* renderer;
+		ShaderToyUniforms* uniforms;
+		ShaderToyGeometry* geometry;
+		GLuint vertexShader, fragmentShader, shaderProgram;
+		// FBO, frame buffer object ID
+		GLuint id; 
+		// texture object
+		GLuint textureID;
+
+	public:
+		ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels);
+		void loadShaders(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName);
+		GLuint getID() const;
+		void render() const;
+	};
+
 public:
 	DuEngine* renderer;
 	ShaderToyUniforms* uniforms;
 	ShaderToyGeometry* geometry;
 	GLuint vertexShader, fragmentShader, shaderProgram;
+	vector<ShaderToyFrameBuffer> m_frameBuffers;
 
 	ShaderToy(DuEngine* _renderer, double _width, double _height, int _x0, double _y0);
 

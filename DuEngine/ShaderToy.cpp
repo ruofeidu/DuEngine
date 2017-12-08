@@ -10,7 +10,13 @@ ShaderToy::ShaderToy(DuEngine * _renderer, double _width, double _height, int _x
 	shaderProgram = 0;
 	numChannels = 4;
 	uniforms = new ShaderToyUniforms(geometry, numChannels);
+	
+//	auto buffers_count = 
 
+	auto buffers_count = _renderer->config->GetIntWithDefault("buffers_count", 0); 
+	for (int i = 0; i < buffers_count; ++i) {
+		m_frameBuffers.push_back(ShaderToyFrameBuffer(renderer, geometry, numChannels));
+	}
 	info("ShaderToy is inited.");
 }
 
@@ -81,8 +87,6 @@ void ShaderToy::ShaderToyGeometry::reset(double _width, double _height, double _
 
 void ShaderToy::ShaderToyGeometry::render() {
 	glBindVertexArray(VAO);
-	// If don't use EBO, can directly draw rectangle by using gl-triangle-fan
-	// glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -182,7 +186,7 @@ void ShaderToy::ShaderToyUniforms::bindVec2Buffer(GLuint channel, string fileNam
 	}
 }
 
-void ShaderToy::ShaderToyUniforms::update(int numVideoFrame) {
+void ShaderToy::ShaderToyUniforms::update() {
 	glUseProgram(linkedProgram);
 	iFrame++;
 	iGlobalTime = float(clock() - startTime) / CLOCKS_PER_SEC;
@@ -195,21 +199,15 @@ void ShaderToy::ShaderToyUniforms::update(int numVideoFrame) {
 	if (uMouse >= 0) glUniform4f(uMouse, iMouse.x, iMouse.y, iMouse.z, iMouse.w);
 	if (uDate >= 0) glUniform4f(uDate, iDate.x, iDate.y, iDate.z, iDate.w);
 	for (int i = 0; i < vec2_buffers.size(); ++i) if (uVec2Buffers[i] >= 0) {
-		//auto &v2 = vec2_buffers[i][numVideoFrame % vec2_buffers[i].size()];
 		auto &v2 = vec2_buffers[i][iFrame % vec2_buffers[i].size()];
-		//cout << v2.x << " " << v2.y << endl; 
 		glUniform2f(uVec2Buffers[i], v2.x, v2.y);
 	}
-	//cout << numVideoFrame << endl; 
 }
 
 void ShaderToy::ShaderToyUniforms::updateFPS(float timeDelta, float averageTimeDelta) {
 	iTimeDelta = timeDelta / 1e3f;
 	if (averageTimeDelta > 0)
 		iFrameRate = int(1000.0f / averageTimeDelta);
-	if (averageTimeDelta > 0)
-		cout << averageTimeDelta << endl; 
-	//cout << iTimeDelta << "\t" << averageTimeDelta << "\t" << iFrameRate << endl;
 }
 
 void ShaderToy::ShaderToyUniforms::onMouseMove(float x, float y) {
@@ -241,5 +239,67 @@ string ShaderToy::ShaderToyUniforms::getMouseString() {
 }
 
 void ShaderToy::render() {
-	glRectf(-1.0, -1.0, 1.0, 1.0);
+	for (const auto& frameBuffer : m_frameBuffers) {
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer.getID());
+		frameBuffer.render(); 
+	}
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	uniforms->update();
+	geometry->render(); 
+}
+
+ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels) {
+	renderer = _renderer;
+	geometry = _geometry;
+	uniforms = new ShaderToyUniforms(_geometry, numChannels);
+
+	glGenFramebuffers(1, &id); 
+	glBindFramebuffer(GL_FRAMEBUFFER, id);
+
+	glGenTextures(1, &textureID);
+	glActiveTexture(GL_TEXTURE0 + textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	GLenum minFilter = GL_LINEAR_MIPMAP_LINEAR;
+	GLenum magFilter = GL_LINEAR;
+	GLenum wrapFilter = GL_REPEAT;
+
+	// Set texture interpolation methods for minification and magnification
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+
+	// Set texture clamping methodw
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapFilter);
+
+	glFramebufferTexture2D(
+		GL_FRAMEBUFFER,
+		GL_COLOR_ATTACHMENT0 + id,
+		GL_TEXTURE_2D,
+		textureID,
+		0
+	);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	info("Mipmap generated for " + textureID);
+
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR)
+		error("Texturing error: " + to_string(err));
+}
+
+void ShaderToy::ShaderToyFrameBuffer::loadShaders(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName) {
+	vertexShader = renderer->initShaders(GL_VERTEX_SHADER, vertexShaderName);
+	fragmentShader = renderer->initShaders(GL_FRAGMENT_SHADER, fragShaderName, uniformShaderName, mainFileName);
+	shaderProgram = renderer->initProgram(vertexShader, fragmentShader);
+	uniforms->linkShader(shaderProgram);
+}
+
+GLuint ShaderToy::ShaderToyFrameBuffer::getID() const {
+	return id;
+}
+
+void ShaderToy::ShaderToyFrameBuffer::render() const {
+	uniforms->update();
+	geometry->render();
 }

@@ -108,6 +108,7 @@ private:
 	clock_t prevTime;
 	VideoCapture cap;
 	Mat smallerMat;
+	TextureFilter m_filter; 
 };
 
 class SHTexture : public Texture

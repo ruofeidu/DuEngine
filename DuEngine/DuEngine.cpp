@@ -97,7 +97,9 @@ void g_render() {
 	DebugTimer::Start("timeDelta");
 	DebugTimer::StartAverageWindow("Render");
 #endif
+
 	DuEngine::GetInstance()->render();
+
 #if COMPILE_WITH_TIMER
 	auto timeDelta = DebugTimer::End("timeDelta", true);
 	auto averageTimeDelta = DebugTimer::EndAverageWindow("Render");
@@ -385,7 +387,10 @@ GLuint DuEngine::matToTexture2D(cv::Mat &mat, GLuint format, GLenum minFilter, G
 	// Generate a number for our textureID's unique handle
 	GLuint textureID;
 	glGenTextures(1, &textureID);
+
+	// Active the texture object
 	glActiveTexture(GL_TEXTURE0 + textureID);
+
 	// Bind to our texture handle
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -433,11 +438,12 @@ GLuint DuEngine::matToTexture2D(cv::Mat &mat, GLuint format, GLenum minFilter, G
 		minFilter == GL_NEAREST_MIPMAP_LINEAR ||
 		minFilter == GL_NEAREST_MIPMAP_NEAREST)) {
 		glGenerateMipmap(GL_TEXTURE_2D);
-		info("Mipmap generated for " + textureID);
+		info("Mipmap generated for texture" + textureID);
 	}
 
 	GLenum err = glGetError();
-	if (err != GL_NO_ERROR) cout << "Texture" << err << endl;
+	if (err != GL_NO_ERROR) 
+		error("Texturing error: " + to_string(err));
 
 	return textureID;
 }
@@ -488,6 +494,7 @@ void Texture::setFiltering(int a_tfMagnification, int a_tfMinification) {
 VideoTexture::VideoTexture(string filename, bool vflip, TextureFilter filter, TextureWrap warp) {
 	cap.open(filename);
 	_vflip = vflip;
+	m_filter = filter; 
 	if (!cap.isOpened()) {
 		error("Cannot open the video texture."); 
 		return;
@@ -564,6 +571,10 @@ void VideoTexture::update() {
 		GL_UNSIGNED_BYTE,    // GLenum type,
 		mat.ptr()            // const GLvoid * pixels
 		);
+
+	if (m_filter == TextureFilter::MIPMAP) {
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
 	// info("video texture " + to_string(id) + " updated for the frame #" + to_string(frames)); 
 }
 

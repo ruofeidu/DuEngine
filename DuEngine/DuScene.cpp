@@ -34,17 +34,23 @@ void DuEngine::initScene() {
 			}
 		}
 
-		s = "iChannel" + to_string(i) + "_mm";
+		s = "iChannel" + to_string(i) + "_filter";
 		auto filter = config->GetStringWithDefault(s, "mipmap");
+		auto textureFilter = filter == "linear" ? TextureFilter::LINEAR : ((filter == "nearest") ? TextureFilter::NEAREST : TextureFilter::MIPMAP); 
+
+		s = "iChannel" + to_string(i) + "_wrap";
+		auto wrap = config->GetStringWithDefault(s, "repeat");
+		auto textureWrap = !wrap.compare("repeat") ? TextureWrap::REPEAT : TextureWrap::CLAMP;
+
 		s = "iChannel" + to_string(i) + "_vflip";
 		auto vFlip = config->GetBoolWithDefault(s, true); 
 		if (!type.compare("rgb")) {
 			info(fileName);
-			auto t = filter == "linear" ? new Texture(fileName) : new Texture(fileName, vFlip, TextureFilter::MIPMAP, TextureWrap::REPEAT);
+			auto t = filter == "linear" ? new Texture(fileName) : new Texture(fileName, vFlip, textureFilter, textureWrap);
 			shadertoy->uniforms->bindTexture2D(t->id, i);
 		} else
 		if (!type.compare("video")) {
-			auto t = new VideoTexture(fileName);
+			auto t = new VideoTexture(fileName, vFlip, textureFilter, textureWrap);
 			videoTextures.push_back(t);
 			shadertoy->uniforms->bindTexture2D(t->GetTextureID(), i);
 		} else
@@ -56,7 +62,7 @@ void DuEngine::initScene() {
 		} else
 		if (!type.compare("font")) {
 			if (!fontTexture) {
-				fontTexture = new Texture(m_relativePath + "presets/tex21.png", true, TextureFilter::MIPMAP, TextureWrap::REPEAT);
+				fontTexture = new Texture(m_relativePath + "presets/tex21.png", true, textureFilter, textureWrap);
 			}
 			shadertoy->uniforms->bindTexture2D(fontTexture->GetTextureID(), i);
 		}
@@ -79,25 +85,14 @@ int DuEngine::getFrameNumber() {
 }
 
 void DuEngine::render() {
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-1, 1, -1, 1, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	for (const auto& v : videoTextures) v->update(); 
-	shadertoy->uniforms->update(getNumFrameFromVideos());
-
+	for (const auto& v : videoTextures) v->update();
 	shadertoy->render();
 	glutSwapBuffers();
-
 	glutPostRedisplay();
 
 	if (m_recording && m_recordStart + 1 <= getFrameNumber() && getFrameNumber() <= m_recordEnd + 1) {
 		this->takeScreenshot(m_recordPath);
 	}
-	// glutTimerFunc(40, g_timer, 0);
 }
 
 void DuEngine::updateFPS(float timeDelta, float averageTimeDelta) {
