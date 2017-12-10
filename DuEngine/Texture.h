@@ -20,12 +20,16 @@ enum class TextureWrap : std::int8_t { CLAMP = 0, REPEAT = 1 };
 class Texture
 {
 public:
+	GLuint current_id = 0;
 	GLuint id;
 	GLuint sampler;
+	bool frameBuffer = false; 
 	Mat mat;
 
 	Texture() {}
-	GLuint GetTextureID() { return this->id; }
+	GLuint GetTextureID() { 
+		return !frameBuffer ? this->id : this->current_id;
+	}
 	Texture(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWrap warp = TextureWrap::REPEAT);
 
 protected:
@@ -77,7 +81,9 @@ private:
 class FrameBufferTexture : public Texture
 {
 public:
-	FrameBufferTexture(GLuint FBO, int width, int height, TextureFilter filter = TextureFilter::LINEAR, TextureWrap warp = TextureWrap::REPEAT);
 
+	FrameBufferTexture(GLuint FBO, int width, int height, TextureFilter filter = TextureFilter::LINEAR, TextureWrap warp = TextureWrap::REPEAT);
+	GLuint GetTextureID();
+	void setCommonTextureID(GLuint id); 
 private:
 };

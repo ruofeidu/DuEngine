@@ -69,7 +69,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     
 #endif
     
-    if( iFrame<50 ) f = step(0.5, hash1(fragCoord.x*13.0+hash1(fragCoord.y*71.1)));
+    if( iFrame < 4 ) f = step(0.5, hash1(fragCoord.x*13.0+hash1(fragCoord.y*71.1)));
 	
 	fragColor = vec4( f, 0.0, 0.0, 0.0 );
 }

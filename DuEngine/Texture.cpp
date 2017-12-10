@@ -253,4 +253,16 @@ FrameBufferTexture::FrameBufferTexture(GLuint FBO, int width, int height, Textur
 		0 // Specifies the mipmap level of the texture image to be attached, which must be 0.
 		);
 	glGenerateMipmap(GL_TEXTURE_2D);
+	info("Mipmap generated for framgebuffer " + to_string(FBO) + ", with texture ID " + to_string(id));
+
+	current_id = id; 
+	frameBuffer = true; 
+}
+
+GLuint FrameBufferTexture::GetTextureID() {
+	return this->current_id;
+}
+
+void FrameBufferTexture::setCommonTextureID(GLuint id) {
+	current_id = id;
 }

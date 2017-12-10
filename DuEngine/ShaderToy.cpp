@@ -147,6 +147,7 @@ void ShaderToy::ShaderToyUniforms::linkShader(GLuint shaderProgram) {
 	uNumBands = glGetUniformLocation(shaderProgram, "iNumBands");
 	uK = glGetUniformLocation(shaderProgram, "vK");
 #endif
+	debug("Linked Shader" + to_string(shaderProgram)); 
 }
 
 void ShaderToy::ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
@@ -203,6 +204,9 @@ void ShaderToy::ShaderToyUniforms::update() {
 	if (uDate >= 0) glUniform4f(uDate, iDate.x, iDate.y, iDate.z, iDate.w);
 	for (int i = 0; i < iChannels.size(); ++i) if (uChannels[i] >= 0) {
 		glUniform1i(uChannels[i], iChannels[i]->GetTextureID());
+#if DEBUG_MULTIPASS
+		debug("Updated channel " + to_string(i) + " with texture " + to_string(iChannels[i]->GetTextureID())); 
+#endif
 	}
 
 	for (int i = 0; i < vec2_buffers.size(); ++i) if (uVec2Buffers[i] >= 0) {
@@ -271,7 +275,6 @@ ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, Shade
 	for (int i = 0; i < 2; ++i) {
 		glBindFramebuffer(GL_FRAMEBUFFER, FBO[i]);
 		textures[i] = new FrameBufferTexture(FBO[i], geometry->getWidth(), geometry->getHeight()); 
-		info("Mipmap generated for framgebuffer " + to_string(FBO[i]) + ", with texture ID " + to_string(textures[i]->GetTextureID()));
 #if COMPILE_CHECK_GL_ERROR
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR)
@@ -299,15 +302,13 @@ void ShaderToy::ShaderToyFrameBuffer::render() {
 	uniforms->update();
 	geometry->render();
 
-	// passthrough shader ~ glCopyTexSubImage2D > glBlitFramebuffer >> glCopyPixels
-	// another approach is to use two FBOs
-	//glBindFramebuffer(GL_FRAMEBUFFER, id);
-	// update your own texture
-	//glActiveTexture(GL_TEXTURE0 + readTexture);
-	//glBindTexture(GL_TEXTURE_2D, writeTexture);
-	//glCopyTexSubImage2D(readTexture, 0, 0, 0, 0, 0, geometry->getWidth(), geometry->getHeight());
-	//glGenerateMipmap(GL_TEXTURE_2D);
 	id = 1 - id;
 	tex = textures[1 - id];
+	for (int i = 0; i < 2; ++i) {
+		textures[i]->setCommonTextureID(tex->id);
+	}
+
+#if DEBUG_MULTIPASS
 	debug("Writing frame buffer " + to_string(id) + " and read from frame buffer " + to_string(tex->GetTextureID())); 
+#endif
 }

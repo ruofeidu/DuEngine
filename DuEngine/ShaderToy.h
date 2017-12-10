@@ -176,10 +176,10 @@ class ShaderToy
 		// FBO, frame buffer object ID
 		GLuint FBO[2];
 		// texture object
-		Texture* textures[2];
+		FrameBufferTexture* textures[2];
 
 		GLuint id;
-		Texture* tex = textures[1];
+		FrameBufferTexture* tex = textures[1];
 
 	public:
 		ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels);
