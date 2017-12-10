@@ -28,6 +28,7 @@ void ShaderToy::loadShaders(string vertexShaderName, string fragShaderName, stri
 	fragmentShader = renderer->initShaders(GL_FRAGMENT_SHADER, fragShaderName, uniformShaderName, mainFileName);
 	shaderProgram = renderer->initProgram(vertexShader, fragmentShader);
 	uniforms->linkShader(shaderProgram);
+	debug("Main buffer load: " + fragShaderName); 
 }
 
 void ShaderToy::setTexture2D(cv::Mat &mat, GLuint channel) {
@@ -92,7 +93,7 @@ void ShaderToy::ShaderToyGeometry::render() {
 
 ShaderToy::ShaderToyUniforms::ShaderToyUniforms(ShaderToyGeometry* geom, int numChannels) {
 	reset(geom);
-	iChannels = vector<GLuint>(numChannels);
+	iChannels = vector<Texture*>(numChannels);
 	uChannels = vector<GLint>(numChannels);
 	iVec2Buffers = vector<GLuint>(numChannels);
 	uVec2Buffers = vector<GLint>(numChannels);
@@ -148,12 +149,13 @@ void ShaderToy::ShaderToyUniforms::linkShader(GLuint shaderProgram) {
 #endif
 }
 
-void ShaderToy::ShaderToyUniforms::bindTexture2D(GLuint tex, GLuint channel) {
+void ShaderToy::ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
 	if (uChannels[channel] >= 0) {
 		iChannels[channel] = tex; 
-		glActiveTexture(GL_TEXTURE0 + tex);
-		glBindTexture(GL_TEXTURE_2D, tex);
-		glUniform1i(uChannels[channel], tex);
+		auto id = tex->GetTextureID(); 
+		glActiveTexture(GL_TEXTURE0 + id);
+		glBindTexture(GL_TEXTURE_2D, id);
+		glUniform1i(uChannels[channel], id);
 	} else {
 		cout << "! Channel " << channel << " is not used in the shader." << endl;
 	}
@@ -199,8 +201,8 @@ void ShaderToy::ShaderToyUniforms::update() {
 	if (uFrame >= 0) glUniform1i(uFrame, iFrame);
 	if (uMouse >= 0) glUniform4f(uMouse, iMouse.x, iMouse.y, iMouse.z, iMouse.w);
 	if (uDate >= 0) glUniform4f(uDate, iDate.x, iDate.y, iDate.z, iDate.w);
-	for (int i = 0; i < iChannels.size(); ++i) {
-		glUniform1i(uChannels[i], iChannels[i]);
+	for (int i = 0; i < iChannels.size(); ++i) if (uChannels[i] >= 0) {
+		glUniform1i(uChannels[i], iChannels[i]->GetTextureID());
 	}
 
 	for (int i = 0; i < vec2_buffers.size(); ++i) if (uVec2Buffers[i] >= 0) {
@@ -244,14 +246,19 @@ string ShaderToy::ShaderToyUniforms::getMouseString() {
 }
 
 void ShaderToy::render() {
-	for (const auto& frameBuffer : m_frameBuffers) {
+	for (auto& frameBuffer : m_frameBuffers) {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer.getID());
 		frameBuffer.render(); 
+		// in which we:
+		// uniforms->update();
+		// geometry->render();
+		    // use program
+		    // draw the triangles
 	}
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	uniforms->update();
-	geometry->render(); 
+	geometry->render();
 }
 
 ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels) {
@@ -259,38 +266,21 @@ ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, Shade
 	geometry = _geometry;
 	uniforms = new ShaderToyUniforms(_geometry, numChannels);
 
-	glGenFramebuffers(1, &id); 
-	glBindFramebuffer(GL_FRAMEBUFFER, id);
+	glGenFramebuffers(2, FBO);
 
-	glGenTextures(1, &textureID);
-	glActiveTexture(GL_TEXTURE0 + textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	GLenum minFilter = GL_LINEAR_MIPMAP_LINEAR;
-	GLenum magFilter = GL_LINEAR;
-	GLenum wrapFilter = GL_REPEAT;
-
-	// Set texture interpolation methods for minification and magnification
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
-
-	// Set texture clamping methodw
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapFilter);
-
-	glFramebufferTexture2D(
-		GL_FRAMEBUFFER,
-		GL_COLOR_ATTACHMENT0 + id,
-		GL_TEXTURE_2D,
-		textureID,
-		0
-	);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	info("Mipmap generated for " + textureID);
-
-	GLenum err = glGetError();
-	if (err != GL_NO_ERROR)
-		error("Texturing error: " + to_string(err));
+	for (int i = 0; i < 2; ++i) {
+		glBindFramebuffer(GL_FRAMEBUFFER, FBO[i]);
+		textures[i] = new FrameBufferTexture(FBO[i], geometry->getWidth(), geometry->getHeight()); 
+		info("Mipmap generated for framgebuffer " + to_string(FBO[i]) + ", with texture ID " + to_string(textures[i]->GetTextureID()));
+#if COMPILE_CHECK_GL_ERROR
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR)
+			logerror("Texturing error: " + to_string(err));
+#endif
+	}
+	
+	id = 0;
+	tex = textures[1 - id];  
 }
 
 void ShaderToy::ShaderToyFrameBuffer::loadShaders(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName) {
@@ -298,13 +288,26 @@ void ShaderToy::ShaderToyFrameBuffer::loadShaders(string vertexShaderName, strin
 	fragmentShader = renderer->initShaders(GL_FRAGMENT_SHADER, fragShaderName, uniformShaderName, mainFileName);
 	shaderProgram = renderer->initProgram(vertexShader, fragmentShader);
 	uniforms->linkShader(shaderProgram);
+	debug("Frame buffer load: " + fragShaderName);
 }
 
-GLuint ShaderToy::ShaderToyFrameBuffer::getID() const {
+GLuint ShaderToy::ShaderToyFrameBuffer::getID() {
 	return id;
 }
 
-void ShaderToy::ShaderToyFrameBuffer::render() const {
+void ShaderToy::ShaderToyFrameBuffer::render() {
 	uniforms->update();
 	geometry->render();
+
+	// passthrough shader ~ glCopyTexSubImage2D > glBlitFramebuffer >> glCopyPixels
+	// another approach is to use two FBOs
+	//glBindFramebuffer(GL_FRAMEBUFFER, id);
+	// update your own texture
+	//glActiveTexture(GL_TEXTURE0 + readTexture);
+	//glBindTexture(GL_TEXTURE_2D, writeTexture);
+	//glCopyTexSubImage2D(readTexture, 0, 0, 0, 0, 0, geometry->getWidth(), geometry->getHeight());
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	id = 1 - id;
+	tex = textures[1 - id];
+	debug("Writing frame buffer " + to_string(id) + " and read from frame buffer " + to_string(tex->GetTextureID())); 
 }

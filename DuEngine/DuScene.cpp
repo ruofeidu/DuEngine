@@ -27,7 +27,12 @@ void DuEngine::initScene() {
 		} else {
 			fragmentShaderName += suffix + ".glsl";
 		}
-		shadertoy->loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
+
+		if (buffer == 0) {
+			shadertoy->loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
+		} else {
+			shadertoy->m_frameBuffers[buffer - 1].loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
+		}
 
 		auto channels_count = config->GetIntWithDefault(prefix + "channels_count", 0);
 		for (int i = 0; i < channels_count; ++i) {
@@ -56,28 +61,29 @@ void DuEngine::initScene() {
 			if (!type.compare("rgb")) {
 				info("Reading texture " + fileName);
 				auto t = filter == "linear" ? new Texture(fileName) : new Texture(fileName, vFlip, textureFilter, textureWrap);
-				uniforms->bindTexture2D(t->id, i);
+				uniforms->bindTexture2D(t, i);
 			} else
 			if (!type.compare("video")) {
 				auto t = new VideoTexture(fileName, vFlip, textureFilter, textureWrap);
 				videoTextures.push_back(t);
-				uniforms->bindTexture2D(t->GetTextureID(), i);
+				uniforms->bindTexture2D(t, i);
 			} else
 			if (!type.compare("key")) {
 				if (!keyboardTexture) {
 					keyboardTexture = new KeyboardTexture();
 				}
-				uniforms->bindTexture2D(keyboardTexture->GetTextureID(), i);
+				uniforms->bindTexture2D(keyboardTexture, i);
 			} else
 			if (!type.compare("font")) {
 				if (!fontTexture) {
 					fontTexture = new Texture(m_relativePath + "presets/tex21.png", true, textureFilter, textureWrap);
 				}
-				uniforms->bindTexture2D(fontTexture->GetTextureID(), i);
+				uniforms->bindTexture2D(fontTexture, i);
 			} else
 			if (type.size() == 1) {
 				int bufferID = (int)(type[0] - 'A');
-				uniforms->bindTexture2D(shadertoy->m_frameBuffers[i].textureID, i);
+				uniforms->bindTexture2D(shadertoy->m_frameBuffers[i].tex, i);
+				debug("Buffer " + to_string(buffer) + " bind with " + to_string(bufferID) + ", whose texture ID is " + to_string(shadertoy->m_frameBuffers[i].tex->GetTextureID()));
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 #pragma once;
 #include "stdafx.h"
 #include "DuEngine.h"
+#include "Texture.h"
 
 using namespace glm;
 using namespace std;
@@ -53,6 +54,10 @@ class ShaderToy
 		void reset(double _width, double _height, double _x0, double _y0);
 
 		void render();
+
+	public:
+		int getWidth() const { return (int)geometry[0]; }
+		int getHeight() const { return (int)geometry[1]; }
 	};
 
 	class ShaderToyUniforms
@@ -73,7 +78,7 @@ class ShaderToy
 		// the frame rate as int
 		int iFrameRate = 60;
 		// input channel. XX = 2D/Cube
-		vector<GLuint> iChannels;
+		vector<Texture*> iChannels;
 		// buffers of vector2
 		vector<GLuint> iVec2Buffers;
 
@@ -121,7 +126,7 @@ class ShaderToy
 
 		void linkShader(GLuint shaderProgram);
 
-		void bindTexture2D(GLuint tex, GLuint channel);
+		void bindTexture2D(Texture* texture, GLuint channel);
 
 		void bindVec2Buffer(GLuint channel, string fileName);
 
@@ -169,15 +174,18 @@ class ShaderToy
 		ShaderToyGeometry* geometry;
 		GLuint vertexShader, fragmentShader, shaderProgram;
 		// FBO, frame buffer object ID
-		GLuint id; 
+		GLuint FBO[2];
 		// texture object
-		GLuint textureID;
+		Texture* textures[2];
+
+		GLuint id;
+		Texture* tex = textures[1];
 
 	public:
 		ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels);
 		void loadShaders(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName);
-		GLuint getID() const;
-		void render() const;
+		GLuint getID();
+		void render();
 	};
 
 public:

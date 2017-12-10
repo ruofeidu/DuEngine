@@ -45,6 +45,9 @@
     <ClCompile Include="DuUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DuConfig.h">
@@ -74,6 +77,9 @@
     <ClInclude Include="DuUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shadertoy.main.glsl">
@@ -88,5 +94,8 @@
     <None Include="shadertoy.default.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Backup.txt" />
   </ItemGroup>
 </Project>

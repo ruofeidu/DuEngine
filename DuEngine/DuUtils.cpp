@@ -24,6 +24,6 @@ void debug(string message) {
 	cout << "* " << message << endl;
 }
 
-void error(string message) {
+void logerror(string message) {
 	cout << "!!! " << message << endl;
 }

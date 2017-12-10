@@ -42,8 +42,11 @@
 #include "dirent.h"
 #endif
 
+#define GLUT_KEY_ESC '\x1b'
+
 #define COMPILE_WITH_SH 1
 #define COMPILE_WITH_TIMER 1
+#define COMPILE_CHECK_GL_ERROR 1
 #define DEBUG_KEYBOARD 0
 
 const float PI = 3.14159265359f;
@@ -54,4 +57,3 @@ const float PI = 3.14159265359f;
 #include "DebugTimer.h"
 #endif
 
-#define GLUT_KEY_ESC '\x1b'
