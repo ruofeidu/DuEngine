@@ -3,31 +3,11 @@
 #include "ShaderToy.h"
 #include "DuConfig.h"
 #include "Texture.h"
+#include "DuUtils.h"
 
 using namespace glm;
 using namespace cv;
 using namespace std;
-
-class Singleton
-{
-public:
-	static Singleton *GetInstance();
-
-private:
-	static Singleton *s_Instance;
-
-	class GC
-	{
-	public:
-		~GC() {
-			if (s_Instance != NULL) {
-				delete s_Instance;
-				s_Instance = NULL;
-			}
-		}
-	};
-	static GC gc;
-};
 
 class Camera
 {
@@ -156,8 +136,6 @@ private:
 	GLuint initShaders(GLenum type, string filename, string uniformFileName = "", string mainFileName = "");
 
 	GLuint initProgram(GLuint vertexshader, GLuint fragmentshader);
-
-	GLuint matToTexture2D(cv::Mat & mat, GLuint format, GLenum minFilter, GLenum magFilter, GLenum wrapFilter, GLuint datatype = GL_UNSIGNED_BYTE);
 
 	class GC
 	{

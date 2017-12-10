@@ -2,6 +2,7 @@
 #include "stdafx.h"
 using namespace glm;
 using namespace std;
+using namespace cv;
 
 enum ETextureFiltering
 {
@@ -16,6 +17,7 @@ enum ETextureFiltering
 
 enum class TextureFilter : std::int8_t { NEAREST = 0, LINEAR = 1, MIPMAP = 2 };
 enum class TextureWrap : std::int8_t { CLAMP = 0, REPEAT = 1 };
+enum class TextureType : std::int8_t { RGB = 0, Video = 1, Keyboard = 2, SH = 3, FrameBuffer = 4, Volume = 5, LightField = 6 };
 
 class Texture
 {
@@ -23,24 +25,32 @@ public:
 	GLuint current_id = 0;
 	GLuint id;
 	GLuint sampler;
+	TextureType type = TextureType::RGB;
 	bool frameBuffer = false; 
 	Mat mat;
 
+	GLenum m_minFilter, m_magFilter, m_wrapFilter; 
+
 	Texture() {}
 	GLuint GetTextureID() { 
-		return !frameBuffer ? this->id : this->current_id;
+		if (type == TextureType::FrameBuffer) {
+			return this->current_id;
+		}
+		return this->id;
 	}
 	Texture(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWrap warp = TextureWrap::REPEAT);
 
 protected:
 	bool _vflip;
 	void setFiltering(int a_tfMagnification, int a_tfMinification);
+	GLuint generateFromMat(cv::Mat & mat, GLuint format, GLenum minFilter, GLenum magFilter, GLenum wrapFilter, GLuint datatype = GL_UNSIGNED_BYTE);
 };
 
 class VideoTexture : public Texture
 {
 public:
 	int vFrame;
+	float fps = DEFAULT_VIDEO_FPS;
 	VideoTexture(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWrap warp = TextureWrap::REPEAT);
 	void togglePaused();
 	void update();
@@ -56,6 +66,7 @@ private:
 	TextureFilter m_filter;
 };
 
+#if COMPILE_WITH_SH
 class SHTexture : public Texture
 {
 public:
@@ -64,6 +75,7 @@ public:
 private:
 	int m_numBands;
 };
+#endif
 
 class KeyboardTexture : public Texture
 {
@@ -81,9 +93,8 @@ private:
 class FrameBufferTexture : public Texture
 {
 public:
-
 	FrameBufferTexture(GLuint FBO, int width, int height, TextureFilter filter = TextureFilter::LINEAR, TextureWrap warp = TextureWrap::REPEAT);
-	GLuint GetTextureID();
-	void setCommonTextureID(GLuint id); 
+	void setCommonTextureID(GLuint id);
+	void reshape(int _width, int _height);
 private:
 };

@@ -27,3 +27,11 @@ void debug(string message) {
 void logerror(string message) {
 	cout << "!!! " << message << endl;
 }
+
+
+Singleton* Singleton::GetInstance() {
+	return s_Instance;
+}
+
+Singleton *Singleton::s_Instance = new Singleton();
+Singleton::GC Singleton::gc;

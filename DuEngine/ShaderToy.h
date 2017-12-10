@@ -69,11 +69,13 @@ class ShaderToy
 		float iGlobalTime;
 		// shader playback frame
 		int iFrame;
+		// let the first three frames the same
+		int iSkip = SKIP_FIRST_FRAMES;
 		// mouse pixel coords. xy: current (if MLB down), zw: click
 		vec4 iMouse;
 		// (year, month, day, time in seconds)
 		vec4 iDate;
-		// render time (in seconds)
+		// rendering time (in seconds)
 		float iTimeDelta = 1000.0f / 60.0f;
 		// the frame rate as int
 		int iFrameRate = 60;
@@ -99,7 +101,7 @@ class ShaderToy
 		GLint uMouse;
 		// (year, month, day, time in seconds)
 		GLint uDate;
-		// render time (in seconds)
+		// rendering time (in seconds)
 		GLint uTimeDelta;
 		// the frame rate as int
 		GLint uFrameRate;
@@ -122,7 +124,10 @@ class ShaderToy
 		ShaderToyUniforms(ShaderToyGeometry* geom, int numChannels);
 
 		void reset(ShaderToyGeometry* geom);
+
 		void resetTime();
+
+		void resetFrame(); 
 
 		void linkShader(GLuint shaderProgram);
 
@@ -135,6 +140,8 @@ class ShaderToy
 		void update();
 
 		void updateFPS(float timeDelta, float averageTimeDelta); 
+
+		void updateResolution(int _width, int _height); 
 
 		void onMouseMove(float x, float y);
 
@@ -177,15 +184,18 @@ class ShaderToy
 		GLuint FBO[2];
 		// texture object
 		FrameBufferTexture* textures[2];
-
+		// id of the FBO array
 		GLuint id;
 		FrameBufferTexture* tex = textures[1];
 
 	public:
 		ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels);
 		void loadShaders(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName);
+		// get FBO index
 		GLuint getID();
 		void render();
+		void swapTextures();
+		void reshape(int _width, int _height);
 	};
 
 public:

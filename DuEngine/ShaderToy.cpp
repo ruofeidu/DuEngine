@@ -36,7 +36,12 @@ void ShaderToy::setTexture2D(cv::Mat &mat, GLuint channel) {
 }
 
 void ShaderToy::reshape(int _width, int _height) {
-	uniforms->iResolution = vec3(_width, _height, uniforms->iResolution.z);
+	uniforms->updateResolution(_width, _height); 
+	uniforms->resetFrame();
+
+	for (auto& frameBuffer : m_frameBuffers) {
+		frameBuffer.reshape(_width, _height); 
+	}
 }
 
 ShaderToy::ShaderToyGeometry::ShaderToyGeometry(double _width, double _height, double _x0, double _y0) {
@@ -100,20 +105,20 @@ ShaderToy::ShaderToyUniforms::ShaderToyUniforms(ShaderToyGeometry* geom, int num
 }
 
 void ShaderToy::ShaderToyUniforms::reset(ShaderToyGeometry* geom) {
-	iFrame = 0;
 	iMouse = vec4(0.0f);
 	// z is ratio of pixel shapes: https://shadertoyunofficial.wordpress.com/2016/07/20/special-shadertoy-features/
 	iResolution = vec3(geom->geometry[0], geom->geometry[1], 1.0);
 	resetTime();
+#if COMPILE_WITH_SH
 	lastFrame = -1;
-	// 
 	iNumBands = 4;
+#endif
 }
 
 void ShaderToy::ShaderToyUniforms::resetTime() {
 	using namespace std;
 	using namespace std::chrono;
-	iFrame = 0;
+	resetFrame(); 
 	system_clock::time_point now = system_clock::now();
 	time_t tt = system_clock::to_time_t(now);
 	// tm utc_tm = *gmtime(&tt);
@@ -122,6 +127,11 @@ void ShaderToy::ShaderToyUniforms::resetTime() {
 	iDate = vec4(local_tm.tm_year + 1900, local_tm.tm_mon, local_tm.tm_mday, secondsOnStart);
 
 	startTime = clock();
+}
+
+void ShaderToy::ShaderToyUniforms::resetFrame() {
+	iFrame = 0;
+	iSkip = SKIP_FIRST_FRAMES;
 }
 
 void ShaderToy::ShaderToyUniforms::linkShader(GLuint shaderProgram) {
@@ -192,7 +202,10 @@ void ShaderToy::ShaderToyUniforms::bindVec2Buffer(GLuint channel, string fileNam
 
 void ShaderToy::ShaderToyUniforms::update() {
 	glUseProgram(linkedProgram);
-	iFrame++;
+	if (--iSkip < 0) {
+		iFrame++;
+		iSkip = -1; 
+	}
 	iGlobalTime = float(clock() - startTime) / CLOCKS_PER_SEC;
 	iDate.w = secondsOnStart + iGlobalTime; // being lazy here, suppose that the month and day does not change
 	if (uResolution >= 0) glUniform3f(uResolution, iResolution.x, iResolution.y, iResolution.z);
@@ -219,6 +232,10 @@ void ShaderToy::ShaderToyUniforms::updateFPS(float timeDelta, float averageTimeD
 	iTimeDelta = timeDelta / 1e3f;
 	if (averageTimeDelta > 0)
 		iFrameRate = int(1000.0f / averageTimeDelta);
+}
+
+void ShaderToy::ShaderToyUniforms::updateResolution(int _width, int _height) {
+	this->iResolution = vec3(_width, _height, this->iResolution.z);
 }
 
 void ShaderToy::ShaderToyUniforms::onMouseMove(float x, float y) {
@@ -253,11 +270,6 @@ void ShaderToy::render() {
 	for (auto& frameBuffer : m_frameBuffers) {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer.getID());
 		frameBuffer.render(); 
-		// in which we:
-		// uniforms->update();
-		// geometry->render();
-		    // use program
-		    // draw the triangles
 	}
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -270,16 +282,11 @@ ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, Shade
 	geometry = _geometry;
 	uniforms = new ShaderToyUniforms(_geometry, numChannels);
 
-	glGenFramebuffers(2, FBO);
 
 	for (int i = 0; i < 2; ++i) {
+		glGenFramebuffers(1, &FBO[i]);
 		glBindFramebuffer(GL_FRAMEBUFFER, FBO[i]);
 		textures[i] = new FrameBufferTexture(FBO[i], geometry->getWidth(), geometry->getHeight()); 
-#if COMPILE_CHECK_GL_ERROR
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR)
-			logerror("Texturing error: " + to_string(err));
-#endif
 	}
 	
 	id = 0;
@@ -295,20 +302,35 @@ void ShaderToy::ShaderToyFrameBuffer::loadShaders(string vertexShaderName, strin
 }
 
 GLuint ShaderToy::ShaderToyFrameBuffer::getID() {
-	return id;
+	return FBO[id];
 }
 
 void ShaderToy::ShaderToyFrameBuffer::render() {
 	uniforms->update();
 	geometry->render();
 
+	swapTextures();
+
+#if DEBUG_MULTIPASS
+	debug("Writing frame buffer " + to_string(getID()) + " and read from texture " + to_string(tex->GetTextureID())); 
+#endif
+}
+
+void ShaderToy::ShaderToyFrameBuffer::swapTextures() {
 	id = 1 - id;
 	tex = textures[1 - id];
 	for (int i = 0; i < 2; ++i) {
 		textures[i]->setCommonTextureID(tex->id);
 	}
-
-#if DEBUG_MULTIPASS
-	debug("Writing frame buffer " + to_string(id) + " and read from frame buffer " + to_string(tex->GetTextureID())); 
-#endif
 }
+
+void ShaderToy::ShaderToyFrameBuffer::reshape(int _width, int _height) {
+	for (int i = 0; i < 2; ++i) {
+		glBindFramebuffer(GL_FRAMEBUFFER, FBO[i]);
+		glViewport(0, 0, _width, _height);
+		textures[i]->reshape(_width, _height);
+	}
+	this->uniforms->updateResolution(_width, _height);
+	this->uniforms->resetFrame();
+}
+

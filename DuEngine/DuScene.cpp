@@ -107,10 +107,11 @@ int DuEngine::getFrameNumber() {
 void DuEngine::render() {
 	for (const auto& v : videoTextures) v->update();
 	shadertoy->render();
+
 	glutSwapBuffers();
 	glutPostRedisplay();
 
-	if (m_recording && m_recordStart + 1 <= getFrameNumber() && getFrameNumber() <= m_recordEnd + 1) {
+	if (m_recording && m_recordStart <= getFrameNumber() && getFrameNumber() <= m_recordEnd) {
 		this->takeScreenshot(m_recordPath);
 	}
 }

@@ -11,15 +11,15 @@ Texture::Texture(string filename, bool vflip, TextureFilter filter, TextureWrap 
 
 	switch (filter) {
 	case TextureFilter::NEAREST:
-		id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_NEAREST, GL_NEAREST, warpFilter);
+		id = this->generateFromMat(mat, GL_BGR, GL_NEAREST, GL_NEAREST, warpFilter);
 		//setFiltering(TEXTURE_FILTER_MAG_NEAREST, TEXTURE_FILTER_MIN_NEAREST);
 		break;
 	case TextureFilter::LINEAR:
-		id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_LINEAR, GL_LINEAR, warpFilter);
+		id = this->generateFromMat(mat, GL_BGR, GL_LINEAR, GL_LINEAR, warpFilter);
 		//setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_NEAREST_MIPMAP);
 		break;
 	case TextureFilter::MIPMAP:
-		id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, warpFilter);
+		id = this->generateFromMat(mat, GL_BGR, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, warpFilter);
 		//setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_TRILINEAR);
 		break;
 	}
@@ -46,6 +46,76 @@ void Texture::setFiltering(int a_tfMagnification, int a_tfMinification) {
 		glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 }
 
+// https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glTexParameter.xml
+// minFilters: GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR
+// magFilters: GL_NEAREST, GL_LINEAR
+// GL_TEXTURE_WRAP_S: GL_CLAMP_TO_EDGE, GL_MIRRORED_REPEAT, GL_REPEAT
+GLuint Texture::generateFromMat(cv::Mat & mat, GLuint format, GLenum minFilter, GLenum magFilter, GLenum wrapFilter, GLuint datatype) {
+	// Generate a number for our textureID's unique handle
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+
+	// Active the texture object
+	glActiveTexture(GL_TEXTURE0 + textureID);
+
+	// Bind to our texture handle
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	// Catch silly-mistake texture interpolation method for magnification
+	if (magFilter == GL_LINEAR_MIPMAP_LINEAR ||
+		magFilter == GL_LINEAR_MIPMAP_NEAREST ||
+		magFilter == GL_NEAREST_MIPMAP_LINEAR ||
+		magFilter == GL_NEAREST_MIPMAP_NEAREST) {
+		warning("! You can't use MIPMAPs for magnification - setting filter to GL_LINEAR");
+		magFilter = GL_LINEAR;
+	}
+
+	// Set texture interpolation methods for minification and magnification
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+
+	// Set texture clamping methodw
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapFilter);
+
+	// Set incoming texture format to:
+	// GL_BGR       for CV_CAP_OPENNI_BGR_IMAGE,
+	// GL_LUMINANCE for CV_CAP_OPENNI_DISPARITY_MAP,
+	// Work out other mappings as required ( there's a list in comments in main() )
+	GLenum inputColourFormat = format;
+	if (mat.channels() == 1) {
+		inputColourFormat = GL_LUMINANCE;
+	}
+
+	// Create the texture
+	glTexImage2D(GL_TEXTURE_2D,     // Type of texture
+		0,					// Pyramid level (for mip-mapping) - 0 is the top level
+		GL_RGB,				// Internal colour format to convert to
+		mat.cols,			// Image width  i.e. 640 for Kinect in standard mode
+		mat.rows,			// Image height i.e. 480 for Kinect in standard mode
+		0,					// Border width in pixels (can either be 1 or 0)
+		inputColourFormat,	// Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
+		datatype,	// Image data type
+		mat.ptr());			// The actual image data itself
+
+							// If we're using mipmaps then generate them. Note: This requires OpenGL 3.0 or higher	   
+	if ((
+		minFilter == GL_LINEAR_MIPMAP_LINEAR ||
+		minFilter == GL_LINEAR_MIPMAP_NEAREST ||
+		minFilter == GL_NEAREST_MIPMAP_LINEAR ||
+		minFilter == GL_NEAREST_MIPMAP_NEAREST)) {
+		glGenerateMipmap(GL_TEXTURE_2D);
+		info("Mipmap generated for texture" + textureID);
+	}
+
+#if COMPILE_CHECK_GL_ERROR
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR)
+		logerror("Texturing error: " + to_string(err));
+#endif
+	return textureID;
+}
+
 VideoTexture::VideoTexture(string filename, bool vflip, TextureFilter filter, TextureWrap warp) {
 	cap.open(filename);
 	_vflip = vflip;
@@ -65,32 +135,32 @@ VideoTexture::VideoTexture(string filename, bool vflip, TextureFilter filter, Te
 	GLenum warpFilter = (warp == TextureWrap::REPEAT) ? GL_REPEAT : GL_CLAMP;
 	switch (filter) {
 	case TextureFilter::NEAREST:
-		id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_NEAREST, GL_NEAREST, warpFilter);
+		id = this->generateFromMat(mat, GL_BGR, GL_NEAREST, GL_NEAREST, warpFilter);
 		//setFiltering(TEXTURE_FILTER_MAG_NEAREST, TEXTURE_FILTER_MIN_NEAREST);
 		break;
 	case TextureFilter::LINEAR:
-		id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_LINEAR, GL_LINEAR, warpFilter);
+		id = this->generateFromMat(mat, GL_BGR, GL_LINEAR, GL_LINEAR, warpFilter);
 		//setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_NEAREST_MIPMAP);
 		break;
 	case TextureFilter::MIPMAP:
-		id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, warpFilter);
+		id = this->generateFromMat(mat, GL_BGR, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, warpFilter);
 		break;
 	default:
 		logerror("Cannot set unknown filters, use linear instead");
-		id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_LINEAR, GL_LINEAR, warpFilter);
+		id = this->generateFromMat(mat, GL_BGR, GL_LINEAR, GL_LINEAR, warpFilter);
 		//setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_NEAREST_MIPMAP);
 		break;
 	}
 	prevTime = clock();
 	vFrame = 0;
-	const int RENDER_FPS = 60;
-	distribution = vector<bool>(RENDER_FPS, false);
-	float video_fps = 25.0;
+	distribution = vector<bool>(DEFAULT_RENDER_FPS, false);
 	float p = 0.0;
-	while (p < RENDER_FPS) {
+	while (p < DEFAULT_RENDER_FPS) {
 		distribution[(int)floor(p)] = true;
-		p += (float)RENDER_FPS / video_fps;
+		p += (float)DEFAULT_RENDER_FPS / fps;
 	}
+
+	type = TextureType::Video; 
 }
 
 void VideoTexture::togglePaused() {
@@ -142,7 +212,7 @@ void VideoTexture::resetTime() {
 */
 KeyboardTexture::KeyboardTexture() {
 	mat = cv::Mat::zeros(3, 256, CV_8UC3);
-	id = DuEngine::GetInstance()->matToTexture2D(mat, GL_RGB, GL_NEAREST, GL_NEAREST, GL_CLAMP);
+	id = this->generateFromMat(mat, GL_RGB, GL_NEAREST, GL_NEAREST, GL_CLAMP);
 }
 
 // 0 is current state
@@ -189,13 +259,15 @@ void KeyboardTexture::update() {
 		);
 }
 
+
+#if COMPILE_WITH_SH
 /**
 * Spherical Harmonics Texture
 */
 SHTexture::SHTexture(int numBands, int numCoefs) {
 	m_numBands = numBands;
 	mat = Mat::zeros(m_numBands, m_numBands, CV_32FC3);
-	id = DuEngine::GetInstance()->matToTexture2D(mat, GL_BGR, GL_NEAREST, GL_NEAREST, GL_CLAMP, GL_FLOAT);
+	id = this->generateFromMat(mat, GL_BGR, GL_NEAREST, GL_NEAREST, GL_CLAMP, GL_FLOAT);
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR)
 		logerror("SH Texture Error:" + to_string(err));
@@ -224,26 +296,45 @@ void SHTexture::update(float coef[NUM_COEF]) {
 		mat.ptr()            // const GLvoid * pixels
 		);
 }
+#endif
 
 FrameBufferTexture::FrameBufferTexture(GLuint FBO, int width, int height, TextureFilter filter, TextureWrap warp) {
+	type = TextureType::FrameBuffer;
+	current_id = id;
+
+	m_minFilter = GL_LINEAR_MIPMAP_LINEAR;
+	m_magFilter = GL_LINEAR;
+	m_wrapFilter = GL_REPEAT;
+
 	glGenTextures(1, &id);
-
-	GLenum minFilter = GL_LINEAR_MIPMAP_LINEAR;
-	GLenum magFilter = GL_LINEAR;
-	GLenum wrapFilter = GL_REPEAT;
-
 	glActiveTexture(GL_TEXTURE0 + id);
-	glBindTexture(GL_TEXTURE_2D, id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	reshape(width, height);
 
+#if DEBUG_MULTIPASS
+	info("Mipmap generated for framgebuffer " + to_string(FBO) + ", with texture ID " + to_string(id));
+#endif
+#if COMPILE_CHECK_GL_ERROR
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR)
+		logerror("Texturing error: " + to_string(err));
+#endif
+}
+
+void FrameBufferTexture::setCommonTextureID(GLuint id) {
+	current_id = id;
+}
+
+void FrameBufferTexture::reshape(int _width, int _height) {
+	glBindTexture(GL_TEXTURE_2D, id);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, _width, _height, 0, GL_RGBA, GL_FLOAT, NULL);
 
 	// Set texture interpolation methods for minification and magnification
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_minFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_magFilter);
 
 	// Set texture clamping methodw
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_wrapFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_wrapFilter);
 
 	glFramebufferTexture2D(
 		GL_FRAMEBUFFER,
@@ -253,16 +344,4 @@ FrameBufferTexture::FrameBufferTexture(GLuint FBO, int width, int height, Textur
 		0 // Specifies the mipmap level of the texture image to be attached, which must be 0.
 		);
 	glGenerateMipmap(GL_TEXTURE_2D);
-	info("Mipmap generated for framgebuffer " + to_string(FBO) + ", with texture ID " + to_string(id));
-
-	current_id = id; 
-	frameBuffer = true; 
-}
-
-GLuint FrameBufferTexture::GetTextureID() {
-	return this->current_id;
-}
-
-void FrameBufferTexture::setCommonTextureID(GLuint id) {
-	current_id = id;
 }

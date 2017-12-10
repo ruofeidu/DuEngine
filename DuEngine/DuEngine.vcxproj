@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DebugTimer.cpp" />
     <ClCompile Include="DuConfig.cpp" />
     <ClCompile Include="DuEngine.cpp" />
@@ -137,6 +138,7 @@
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="DebugTimer.h" />
     <ClInclude Include="dirent.h" />
     <ClInclude Include="DuConfig.h" />

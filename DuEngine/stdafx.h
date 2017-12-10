@@ -43,14 +43,17 @@
 #endif
 
 #define GLUT_KEY_ESC '\x1b'
+const float PI = 3.14159265359f;
 
-#define COMPILE_WITH_SH 1
+#define DEFAULT_VIDEO_FPS 25
+#define DEFAULT_RENDER_FPS 60
+#define SKIP_FIRST_FRAMES 3
+#define COMPILE_WITH_SH 0
 #define COMPILE_WITH_TIMER 1
 #define COMPILE_CHECK_GL_ERROR 1
 #define DEBUG_KEYBOARD 0
 #define DEBUG_MULTIPASS 0
 
-const float PI = 3.14159265359f;
 #if COMPILE_WITH_SH
 #include "SHUtils.h"
 #endif
