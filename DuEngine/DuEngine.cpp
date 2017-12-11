@@ -133,9 +133,10 @@ void DuEngine::start(int argc, char* argv[]) {
 	window->init(argc, argv, m_defaultWidth, m_defaultHeight, _windowTitle);
 
 	m_recording = config->GetBoolWithDefault("recording", m_recording);
-	m_recordPath = config->GetStringWithDefault("record_path", m_recordPath);
+	m_recordPath = config->GetStringWithDefault("record_path", m_sceneName);
 	m_recordStart = config->GetIntWithDefault("record_start", m_recordStart);
 	m_recordEnd = config->GetIntWithDefault("record_end", m_recordEnd);
+	m_recordVideo = config->GetBoolWithDefault("record_video", m_recordVideo);
 
 	initScene();
 
@@ -276,7 +277,7 @@ void DuEngine::reshape(int width, int height) {
 int DuEngine::getNumFrameFromVideos() {
 	int ans = 0;
 	for (const auto &v : videoTextures) {
-		ans = std::max(ans, v->vFrame);
+		ans = std::max(ans, v->getNumVideoFrame());
 	}
 	return ans;
 }

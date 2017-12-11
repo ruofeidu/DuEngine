@@ -65,16 +65,18 @@ void DuEngine::initScene() {
 
 			// texture wrappers
 			auto wrap = config->GetStringWithDefault(iPrefix + "_wrap", "repeat");
-			auto textureWrap = !wrap.compare("repeat") ? TextureWrap::REPEAT : TextureWrap::CLAMP;
+			auto TextureWarp = !wrap.compare("repeat") ? TextureWarp::REPEAT : TextureWarp::CLAMP;
 
 			auto vFlip = config->GetBoolWithDefault(iPrefix + "_vflip", true);
 			if (!type.compare("rgb")) {
 				info("Reading texture " + fileName);
-				auto t = filter == "linear" ? new Texture(fileName) : new Texture(fileName, vFlip, textureFilter, textureWrap);
+				auto t = new Texture2D(fileName, vFlip, textureFilter, TextureWarp);
 				uniforms->bindTexture2D(t, i);
+				debug("RGB: " + to_string(t->GetTextureID()));
+
 			} else
 			if (!type.compare("video")) {
-				auto t = new VideoTexture(fileName, vFlip, textureFilter, textureWrap);
+				auto t = new VideoTexture(fileName, vFlip, textureFilter, TextureWarp);
 				videoTextures.push_back(t);
 				uniforms->bindTexture2D(t, i);
 			} else
@@ -86,7 +88,7 @@ void DuEngine::initScene() {
 			} else
 			if (!type.compare("font")) {
 				if (!fontTexture) {
-					fontTexture = new Texture(m_presetPath + FontTextures["font"], true, textureFilter, textureWrap);
+					fontTexture = new Texture2D(m_presetPath + FontTextures["font"], true, textureFilter, TextureWarp);
 				}
 				uniforms->bindTexture2D(fontTexture, i);
 			} else
@@ -94,7 +96,8 @@ void DuEngine::initScene() {
 				int bufferID = (int)(type[0] - 'a');
 				auto bindedFbo = shadertoy->m_frameBuffers[bufferID];
 				uniforms->bindTexture2D(bindedFbo->getTexture(), i);
-				debug("Buffer " + to_string(buffer) + to_string(i) + " bind with " + to_string(bufferID) + ", whose texture ID is " + to_string(bindedFbo->getTextureID()));
+				debug("Buffer " + to_string(buffer) + to_string(i) + " bind with " + to_string(bufferID) +
+					", whose texture ID is " + to_string(bindedFbo->getTextureID()));
 			}
 		}
 		auto vec2_buffers_count = config->GetIntWithDefault("vec2_buffers_count", 0);
@@ -147,6 +150,9 @@ void DuEngine::takeScreenshot(string folderName) {
 	//std::ostringstream oss;
 	//oss << std::put_time(&tm, "%d-%m-%Y_%H-%M-%S");
 	//auto str = oss.str();
+	if (getFrameNumber() == m_recordStart - 1) {
+
+	}
 	cv::imwrite(folderName + "/" + this->configName.substr(0, configName.size() - 4) + "_" + to_string(getFrameNumber()) + ".png", img);
 }
 

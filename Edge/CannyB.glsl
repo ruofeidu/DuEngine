@@ -1,4 +1,3 @@
-
 /** 
  * Canny Edge Detection by Ruofei Du (DuRuofei.com)
  * Step 1B: Apply (Vertical) Gaussian filter to smooth the image in order to remove the noise

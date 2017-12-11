@@ -28,7 +28,7 @@ bool DuConfig::Load(const string &filename) {
 	// Open file.
 	ifstream in(filename.c_str());
 	if (!in.is_open()) {
-		warning("! Failed to open " + filename + ", using default parameters instead.");
+		warning("Failed to open " + filename + ", using default parameters instead.");
 		return false;
 	}
 

@@ -1,4 +1,3 @@
-
 #define A(X,Y) (tap(iChannel0,vec2(X,Y)))
 #define B(X,Y) (tap(iChannel1,vec2(X,Y)))
 #define C(X,Y) (tap(iChannel2,vec2(X,Y)))

@@ -105,6 +105,7 @@ class ShaderToy
 		GLint uTimeDelta;
 		// the frame rate as int
 		GLint uFrameRate;
+	public:
 		// input channel. XX = 2D/Cube
 		vector<GLint> uChannels;
 		// channel resolution (in pixels)
@@ -184,10 +185,11 @@ class ShaderToy
 		GLuint id;
 		// FBO, frame buffer object ID
 		GLuint FBO[2];
-		// texture object
-		FrameBufferTexture* textures[2];
 		// id of the FBO array
 		FrameBufferTexture* tex = textures[1];
+	public:
+		// texture object
+		FrameBufferTexture* textures[2];
 
 		GLuint vertexShader, fragmentShader, shaderProgram;
 
@@ -227,5 +229,6 @@ public:
 
 
 private:
-	int numChannels;
+	int numChannels = 0;
+	int numBuffers = 0;
 };

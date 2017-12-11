@@ -1,4 +1,3 @@
-
 #define A(X,Y) (tap(iChannel0,vec2(X,Y)))
 vec3 tap(sampler2D tex,vec2 xy) { return texture(tex,xy).xyz; }
 

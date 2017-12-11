@@ -4,6 +4,7 @@ using namespace glm;
 using namespace std;
 using namespace cv;
 
+#if DEBUG_TEXTURE_DEPRECATED_FILTERING
 enum ETextureFiltering
 {
 	TEXTURE_FILTER_MAG_NEAREST = 0, // Nearest criterion for magnification
@@ -14,60 +15,115 @@ enum ETextureFiltering
 	TEXTURE_FILTER_MIN_BILINEAR_MIPMAP, // Bilinear criterion for minification, but on closest mipmap
 	TEXTURE_FILTER_MIN_TRILINEAR, // Bilinear criterion for minification on two closest mipmaps, then averaged
 };
+#endif
 
-enum class TextureFilter : std::int8_t { NEAREST = 0, LINEAR = 1, MIPMAP = 2 };
-enum class TextureWrap : std::int8_t { CLAMP = 0, REPEAT = 1 };
-enum class TextureType : std::int8_t { RGB = 0, Video = 1, Keyboard = 2, SH = 3, FrameBuffer = 4, Volume = 5, LightField = 6 };
+enum class TextureFilter : std::int8_t { NEAREST, LINEAR, MIPMAP };
+enum class TextureWarp : std::int8_t { CLAMP, REPEAT };
+enum class TextureType : std::int8_t { Unknown, RGB, Video, Keyboard, SH, FrameBuffer, Volume, LightField };
 
 class Texture
 {
 public:
-	GLuint current_id = 0;
-	GLuint id;
-	GLuint sampler;
-	TextureType type = TextureType::RGB;
-	bool frameBuffer = false; 
-	Mat mat;
-
-	GLenum m_minFilter, m_magFilter, m_wrapFilter; 
-
-	Texture() {}
-	GLuint GetTextureID() { 
-		if (type == TextureType::FrameBuffer) {
-			return this->current_id;
-		}
-		return this->id;
-	}
-	Texture(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWrap warp = TextureWrap::REPEAT);
+	Texture() {};
+	// Acquire the current texture unit id for reading and binding to shader uniforms
+	GLuint GetTextureID();
+	GLuint GetDirectID(); 
 
 protected:
-	bool _vflip;
+	TextureType type = TextureType::Unknown;
+	// The binded texture id
+	GLuint id = 0;
+	// The texture id for reading
+	GLuint read_texture_id = 0;
+
+	TextureFilter m_filter = TextureFilter::LINEAR;
+	TextureWarp m_warp = TextureWarp::REPEAT;
+
+	// Generate, active, bind, and set filtering, all in one!
+	void genTexture2D();
+
+	// Check filtering and generate mipmaps
+	void generateMipmaps();
+
+	// Setup filtering based on the two protected parameters, m_filter and m_warp
+	void setFiltering();
+
+private:
+	GLenum m_minFilter = GL_LINEAR, m_magFilter = GL_LINEAR, m_wrapFilter = GL_CLAMP;
+#if DEBUG_TEXTURE_DEPRECATED_FILTERING
+private:
+	GLuint m_sampler; 
+	// deprecated("Not using it")
 	void setFiltering(int a_tfMagnification, int a_tfMinification);
-	GLuint generateFromMat(cv::Mat & mat, GLuint format, GLenum minFilter, GLenum magFilter, GLenum wrapFilter, GLuint datatype = GL_UNSIGNED_BYTE);
+#endif
 };
 
-class VideoTexture : public Texture
+
+class TextureMat : public Texture
 {
 public:
-	int vFrame;
-	float fps = DEFAULT_VIDEO_FPS;
-	VideoTexture(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWrap warp = TextureWrap::REPEAT);
+	TextureMat() {};
+	TextureMat(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+	void init(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+
+protected:
+	Mat m_mat = Mat();
+	string m_filename = "";
+	bool m_vFlip = true;
+	GLuint m_format = GL_BGR;
+	GLuint m_dataType = GL_UNSIGNED_BYTE;
+
+protected:
+	// Generate, active, bind, and set filtering, 
+	// update date type format of the mat
+	// texImage2D from the mat
+	// generate mipmaps, all in one!
+	void generateFromMat();
+	void updateFromMat(); 
+	void updateDataTypeFormat();
+
+private:
+	void generateFromMat(cv::Mat& mat);
+	void datatypeFromMat(cv::Mat& mat);
+	void formatFromMat(cv::Mat& mat);
+};
+
+class Texture2D : public TextureMat
+{
+public:
+	Texture2D() {};
+	Texture2D(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+};
+
+class VideoTexture : public Texture2D
+{
+public:
+	VideoTexture() {}; 
+	VideoTexture(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+	int getNumFrame() { return m_numFrames; }
+	int getNumVideoFrame() { return m_numVideoFrames; }
+	void resetTime();
 	void togglePaused();
 	void update();
-	void resetTime();
-	int getNumFrame() { return frames; }
+
+protected:
+	int m_numVideoFrames = 0;
+	int m_numFrames = 0;
+	double m_fps = DEFAULT_VIDEO_FPS;
+
 private:
-	bool paused;
-	int frames;
-	vector<bool> distribution;
-	clock_t prevTime = 0;
-	VideoCapture cap;
+	void error();
+	bool m_paused;
+	// distribution of one frame
+	vector<bool> m_distribution;
+	clock_t m_prevTime = 0;
+	VideoCapture m_video;
 	Mat smallerMat;
 	TextureFilter m_filter;
 };
 
 #if COMPILE_WITH_SH
-class SHTexture : public Texture
+class SHTexture : public TextureMat
 {
 public:
 	SHTexture(int numBands, int numCoef);
@@ -77,26 +133,28 @@ private:
 };
 #endif
 
-class KeyboardTexture : public Texture
+class KeyboardTexture : public Texture2D
 {
 public:
 	KeyboardTexture();
 	void onKeyPress(unsigned char key, bool up);
 
 private:
+	// response time for the keyPress event, by ms
 	clock_t RESPONSE_TIME = 40;
+	// the last time when each key is pressed
 	clock_t prevTimes[256];
+private:
 	void onKeyDown(unsigned char key);
 	void onKeyUp(unsigned char key);
-	void update();
 };
 
 
 class FrameBufferTexture : public Texture
 {
 public:
-	FrameBufferTexture(GLuint FBO, int width, int height, TextureFilter filter = TextureFilter::LINEAR, TextureWrap warp = TextureWrap::REPEAT);
-	void setCommonTextureID(GLuint id);
+	FrameBufferTexture(GLuint FBO, int width, int height, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+	void setReadingTextureID(GLuint id);
 	void reshape(int _width, int _height);
 private:
 };

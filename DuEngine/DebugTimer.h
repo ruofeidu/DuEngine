@@ -17,7 +17,7 @@ struct SingleTimePoint
 class DebugTimer
 {
 private:
-	static const int AVERAGE_WINDOW_SIZE = 60 * 2;
+	static const int AVERAGE_WINDOW_SIZE = 60 * 5;
 	static map<string, steady_clock::time_point> Map;
 	static map<string, SingleTimePoint> AverageWindowMap;
 

@@ -7,3 +7,24 @@
 //glBindTexture(GL_TEXTURE_2D, writeTexture);
 //glCopyTexSubImage2D(readTexture, 0, 0, 0, 0, 0, geometry->getWidth(), geometry->getHeight());
 //glGenerateMipmap(GL_TEXTURE_2D);
+
+	//glGenSamplers(1, &sampler);
+	m_wrapFilter = (warp == TextureWarp::REPEAT) ? GL_REPEAT : GL_CLAMP;
+	switch (filter) {
+	case TextureFilter::NEAREST:
+		m_minFilter = GL_NEAREST;
+		m_magFilter = GL_NEAREST;
+		//setFiltering(TEXTURE_FILTER_MAG_NEAREST, TEXTURE_FILTER_MIN_NEAREST);
+		break;
+	case TextureFilter::LINEAR:
+		m_minFilter = GL_LINEAR;
+		m_magFilter = GL_LINEAR;
+		//setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_NEAREST_MIPMAP);
+		break;
+	case TextureFilter::MIPMAP:
+		m_minFilter = GL_LINEAR_MIPMAP_LINEAR;
+		m_magFilter = GL_LINEAR;
+		//setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_TRILINEAR);
+		break;
+	}
+

@@ -89,6 +89,7 @@ private:
 
 	int m_recordStart = 0;
 	int m_recordEnd = 100;
+	bool m_recordVideo = false;
 	//int m_defaultWidth = 1920;
 	//int m_defaultHeight = 1080;
 	int m_defaultWidth = 1280;

@@ -8,16 +8,16 @@ ShaderToy::ShaderToy(DuEngine * _renderer, double _width, double _height, int _x
 	vertexShader = 0;
 	fragmentShader = 0;
 	shaderProgram = 0;
-	numChannels = 4;
+	numChannels = _renderer->config->GetIntWithDefault("channels_count", 0);
 	uniforms = new ShaderToyUniforms(geometry, numChannels);
-	
-//	auto buffers_count = 
-
 	auto buffers_count = _renderer->config->GetIntWithDefault("buffers_count", 0); 
 	for (int i = 0; i < buffers_count; ++i) {
-		m_frameBuffers.push_back(new ShaderToyFrameBuffer(renderer, geometry, numChannels));
+		auto prefix = string(1, char('A' + i));
+		m_frameBuffers.push_back(new ShaderToyFrameBuffer(renderer, geometry, _renderer->config->GetIntWithDefault(prefix + "_channels_count", 0)));
 	}
+#if VERBOSE_OUTPUT
 	info("ShaderToy is inited.");
+#endif
 }
 
 ShaderToy::ShaderToy(DuEngine * _renderer) : ShaderToy(_renderer, _renderer->window->width, _renderer->window->height, 0, 0) {
@@ -164,7 +164,6 @@ void ShaderToy::ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
 	if (uChannels[channel] >= 0) {
 		iChannels[channel] = tex; 
 		auto id = tex->GetTextureID(); 
-		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, id);
 		glUniform1i(uChannels[channel], id);
 	} else {
@@ -202,7 +201,7 @@ void ShaderToy::ShaderToyUniforms::bindVec2Buffer(GLuint channel, string fileNam
 
 void ShaderToy::ShaderToyUniforms::update() {
 	glUseProgram(linkedProgram);
-	if (--iSkip < 0) {
+	if (iSkip-- < 0) {
 		iFrame++;
 		iSkip = -1; 
 	} else {
@@ -219,9 +218,12 @@ void ShaderToy::ShaderToyUniforms::update() {
 	if (uMouse >= 0) glUniform4f(uMouse, iMouse.x, iMouse.y, iMouse.z, iMouse.w);
 	if (uDate >= 0) glUniform4f(uDate, iDate.x, iDate.y, iDate.z, iDate.w);
 	for (int i = 0; i < iChannels.size(); ++i) if (uChannels[i] >= 0) {
+		glBindTexture(GL_TEXTURE_2D, iChannels[i]->GetTextureID());
 		glUniform1i(uChannels[i], iChannels[i]->GetTextureID());
 #if DEBUG_MULTIPASS
-		debug("Updated channel " + to_string(i) + " with texture " + to_string(iChannels[i]->GetTextureID())); 
+		debug("Updated channel " + to_string(i) + " with texture " + to_string(iChannels[i]->GetTextureID())
+			+ " at location " + to_string(uChannels[i])
+			); 
 #endif
 	}
 
@@ -281,6 +283,10 @@ void ShaderToy::render() {
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	uniforms->update();
+
+#if DEBUG_MULTIPASS
+	glUniform1i(uniforms->uChannels[this->renderer->config->GetIntWithDefault("debug_channel", 2)], this->renderer->config->GetIntWithDefault("debug_channel_val", 6));
+#endif
 	geometry->render();
 }
 
@@ -289,13 +295,12 @@ ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, Shade
 	geometry = _geometry;
 	uniforms = new ShaderToyUniforms(_geometry, numChannels);
 
-
 	for (int i = 0; i < 2; ++i) {
 		glGenFramebuffers(1, &FBO[i]);
 		glBindFramebuffer(GL_FRAMEBUFFER, FBO[i]);
 		textures[i] = new FrameBufferTexture(FBO[i], geometry->getWidth(), geometry->getHeight()); 
 	}
-	
+
 	id = 0;
 	tex = textures[1 - id];  
 }
@@ -305,7 +310,9 @@ void ShaderToy::ShaderToyFrameBuffer::loadShaders(string vertexShaderName, strin
 	fragmentShader = renderer->initShaders(GL_FRAGMENT_SHADER, fragShaderName, uniformShaderName, mainFileName);
 	shaderProgram = renderer->initProgram(vertexShader, fragmentShader);
 	uniforms->linkShader(shaderProgram);
-	debug("Frame buffer load: " + fragShaderName);
+#if VERBOSE_OUTPUT
+	debug("Frame buffer loaded: " + fragShaderName);
+#endif
 }
 
 GLuint ShaderToy::ShaderToyFrameBuffer::getID() {
@@ -327,7 +334,6 @@ void ShaderToy::ShaderToyFrameBuffer::render() {
 #if DEBUG_MULTIPASS
 	debug("Writing frame buffer " + to_string(getID()) + " and read from texture " + to_string(getTextureID())); 
 #endif
-
 	//swapTextures();
 }
 
@@ -335,7 +341,7 @@ void ShaderToy::ShaderToyFrameBuffer::swapTextures() {
 	id = 1 - id;
 	tex = textures[1 - id];
 	for (int i = 0; i < 2; ++i) {
-		textures[i]->setCommonTextureID(tex->id);
+		textures[i]->setReadingTextureID(tex->GetDirectID());
 	}
 }
 
