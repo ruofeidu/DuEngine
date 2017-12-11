@@ -60,7 +60,7 @@ private:
 	bool paused;
 	int frames;
 	vector<bool> distribution;
-	clock_t prevTime;
+	clock_t prevTime = 0;
 	VideoCapture cap;
 	Mat smallerMat;
 	TextureFilter m_filter;
@@ -84,6 +84,8 @@ public:
 	void onKeyPress(unsigned char key, bool up);
 
 private:
+	clock_t RESPONSE_TIME = 40;
+	clock_t prevTimes[256];
 	void onKeyDown(unsigned char key);
 	void onKeyUp(unsigned char key);
 	void update();

@@ -211,26 +211,32 @@ void VideoTexture::resetTime() {
 * Keyboard Texture
 */
 KeyboardTexture::KeyboardTexture() {
-	mat = cv::Mat::zeros(3, 256, CV_8UC3);
-	id = this->generateFromMat(mat, GL_RGB, GL_NEAREST, GL_NEAREST, GL_CLAMP);
+	mat = cv::Mat::zeros(3, 256, CV_8UC1);
+	id = this->generateFromMat(mat, GL_LUMINANCE, GL_NEAREST, GL_NEAREST, GL_CLAMP);
+	memset(prevTimes, 0, 256); 
 }
 
-// 0 is current state
-// 1 is toggle
-// 2 is keypress
-// flipped
+// 0 is current state (keydown event)
+// 1 is keypress event
+// 2 is toggle
 void KeyboardTexture::onKeyDown(unsigned char key) {
-	mat.at<Vec3b>(2, key) = Vec3b(255, 255, 255);
-	mat.at<Vec3b>(0, key) = Vec3b(255, 255, 255);
+	mat.at<uchar>(1, key) = 255;
+	if (clock() - prevTimes[key] > RESPONSE_TIME) {
+		mat.at<uchar>(0, key) = 255;
+		prevTimes[key] = clock();
+	} else {
+		mat.at<uchar>(0, key) = 0;
+	}
 #if DEBUG_KEYBOARD
 	cout << "key down " << key << endl;
 #endif
 }
 
 void KeyboardTexture::onKeyUp(unsigned char key) {
-	mat.at<Vec3b>(1, key) = Vec3b(255, 255, 255) - mat.at<Vec3b>(1, key);
-	mat.at<Vec3b>(2, key) = Vec3b(0, 0, 0);
-	mat.at<Vec3b>(0, key) = Vec3b(0, 0, 0);
+	mat.at<uchar>(2, key) = 255 - mat.at<uchar>(2, key);
+	mat.at<uchar>(1, key) = 0;
+	mat.at<uchar>(0, key) = 0;
+	prevTimes[key] = clock();
 #if DEBUG_KEYBOARD
 	cout << "key up " << key << endl;
 #endif
@@ -253,7 +259,7 @@ void KeyboardTexture::update() {
 		0,                   // GLint level,
 		0, 0,                // GLint xoffset, GLint yoffset,
 		mat.cols, mat.rows,  // GLsizei width, GLsizei height,
-		GL_BGR,              // GLenum format,
+		GL_LUMINANCE,        // GLenum format,
 		GL_UNSIGNED_BYTE,    // GLenum type,
 		mat.ptr()            // const GLvoid * pixels
 		);

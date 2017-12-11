@@ -47,14 +47,14 @@ void DuEngine::initScene() {
 			for (const auto& key : ImageTextures) {
 				if (!type.compare(key.first)) {
 					type = "rgb";
-					fileName = m_relativePath + "presets/" + key.second;
+					fileName = m_presetPath + key.second;
 					break;
 				}
 			}
 			for (const auto& key : VideoTextures) {
 				if (!type.compare(key.first)) {
 					type = "video";
-					fileName = m_relativePath + "presets/" + key.second;
+					fileName = m_presetPath + key.second;
 					break;
 				}
 			}
@@ -86,7 +86,7 @@ void DuEngine::initScene() {
 			} else
 			if (!type.compare("font")) {
 				if (!fontTexture) {
-					fontTexture = new Texture(m_relativePath + "presets/tex21.png", true, textureFilter, textureWrap);
+					fontTexture = new Texture(m_presetPath + FontTextures["font"], true, textureFilter, textureWrap);
 				}
 				uniforms->bindTexture2D(fontTexture, i);
 			} else
@@ -97,18 +97,17 @@ void DuEngine::initScene() {
 				debug("Buffer " + to_string(buffer) + to_string(i) + " bind with " + to_string(bufferID) + ", whose texture ID is " + to_string(bindedFbo->getTextureID()));
 			}
 		}
+		auto vec2_buffers_count = config->GetIntWithDefault("vec2_buffers_count", 0);
+		shadertoy->uniforms->intVec2Buffers(vec2_buffers_count);
+
+		for (int i = 0; i < vec2_buffers_count; ++i) {
+			string s = "vec2_buffers" + to_string(i) + "_file";
+			auto fileName = config->GetString(s);
+			shadertoy->uniforms->bindVec2Buffer(i, fileName);
+		}
 	}
 
-	auto vec2_buffers_count = config->GetIntWithDefault("vec2_buffers_count", 0);
-	shadertoy->uniforms->intVec2Buffers(vec2_buffers_count);
-
-	for (int i = 0; i < vec2_buffers_count; ++i) {
-		string s = "vec2_buffers" + to_string(i) + "_file";
-		auto fileName = config->GetString(s);
-		shadertoy->uniforms->bindVec2Buffer(i, fileName);
-	}
-
-	info("Initialization scene costs: " + to_string(float(clock() - begin_time) / CLOCKS_PER_SEC) + " s");
+	info("Initialization of the scene costs: " + to_string(float(clock() - begin_time) / CLOCKS_PER_SEC) + " s");
 }
 
 int DuEngine::getFrameNumber() {
@@ -116,11 +115,13 @@ int DuEngine::getFrameNumber() {
 }
 
 void DuEngine::render() {
-	for (const auto& v : videoTextures) v->update();
-	shadertoy->render();
+	if (!m_paused) {
+		for (const auto& v : videoTextures) v->update();
+		shadertoy->render();
 
-	glutSwapBuffers();
-	glutPostRedisplay();
+		glutSwapBuffers();
+		glutPostRedisplay();
+	}
 
 	if (m_recording && m_recordStart <= getFrameNumber() && getFrameNumber() <= m_recordEnd) {
 		this->takeScreenshot(m_recordPath);

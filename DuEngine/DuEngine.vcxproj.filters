@@ -88,20 +88,18 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shadertoy.main.glsl">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="shadertoy.uniforms.glsl">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="shadertoy.vert.glsl">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="shadertoy.default.glsl">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="Backup.txt" />
+    <Text Include="shadertoy.default.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </Text>
+    <Text Include="shadertoy.main.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </Text>
+    <Text Include="shadertoy.uniforms.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </Text>
+    <Text Include="shadertoy.vert.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </Text>
   </ItemGroup>
 </Project>

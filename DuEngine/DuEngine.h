@@ -82,8 +82,10 @@ private:
 	string m_sceneName;
 	bool m_fullscreen = false;
 	bool m_recording = false;
+	bool m_paused = false; 
 	string m_recordPath = "";
 	string m_relativePath = "";
+	string m_presetPath = "";
 
 	int m_recordStart = 0;
 	int m_recordEnd = 100;
@@ -115,7 +117,6 @@ private:
 		{ "rustymetal", "tex02.jpg" },
 		{ "stars", "tex03.jpg" },
 		{ "wood", "tex05.jpg" },
-		//{ "font", "tex21.png" },
 	};
 
 	unordered_map<string, string> VideoTextures{
@@ -127,6 +128,11 @@ private:
 		{ "britneyspears", "vid01.webm" },
 	};
 
+	unordered_map<string, string> FontTextures{ 
+		{ "font", "tex21.png" },
+	};
+
+private:
 	int getNumFrameFromVideos();
 
 	string readTextFromFile(string filename);
@@ -134,6 +140,10 @@ private:
 	void reportShaderErrors(const GLint shader);
 
 	void reportProgramErrors(const GLint shader);
+
+	void onError(); 
+
+	void printHelp(); 
 
 	GLuint initShaders(GLenum type, string filename, string uniformFileName = "", string mainFileName = "");
 

@@ -157,7 +157,7 @@ void ShaderToy::ShaderToyUniforms::linkShader(GLuint shaderProgram) {
 	uNumBands = glGetUniformLocation(shaderProgram, "iNumBands");
 	uK = glGetUniformLocation(shaderProgram, "vK");
 #endif
-	debug("Linked Shader" + to_string(shaderProgram)); 
+	debug("Linked with shader " + to_string(shaderProgram)); 
 }
 
 void ShaderToy::ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
@@ -168,7 +168,7 @@ void ShaderToy::ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
 		glBindTexture(GL_TEXTURE_2D, id);
 		glUniform1i(uChannels[channel], id);
 	} else {
-		cout << "! Channel " << channel << " is not used in the shader." << endl;
+		warning("Channel " + to_string(channel) + " is not used in the shader.");
 	}
 }
 
@@ -182,7 +182,7 @@ void ShaderToy::ShaderToyUniforms::bindVec2Buffer(GLuint channel, string fileNam
 	if (uVec2Buffers[channel] >= 0) {
 		FILE* file = fopen(fileName.c_str(), "r");
 		if (!file) {
-			cout << "! Cannot open " + fileName << endl;
+			logerror("Cannot open " + fileName);
 			return;
 		}
 		while (!feof(file)) {
@@ -194,9 +194,9 @@ void ShaderToy::ShaderToyUniforms::bindVec2Buffer(GLuint channel, string fileNam
 		}
 		fclose(file);
 		glUniform2f(uVec2Buffers[channel], buffer[0].x, buffer[0].y);
-		std::cout << "* Read vec2 buffer " << buffer.size() << endl;
+		info("! Read vec2 buffer " + to_string(buffer.size()));
 	} else {
-		cout << "! Vec2 Buffer " << channel << " is not used in the shader." << endl;
+		warning("! Vec2 Buffer of channel " + to_string(channel) + " is not used in the shader.");
 	}
 }
 
@@ -205,6 +205,9 @@ void ShaderToy::ShaderToyUniforms::update() {
 	if (--iSkip < 0) {
 		iFrame++;
 		iSkip = -1; 
+	} else {
+		iFrame = 0;
+		startTime = clock();
 	}
 	iGlobalTime = float(clock() - startTime) / CLOCKS_PER_SEC;
 	iDate.w = secondsOnStart + iGlobalTime; // being lazy here, suppose that the month and day does not change
@@ -258,8 +261,8 @@ void ShaderToy::ShaderToyUniforms::onMouseUp(float x, float y) {
 	mouseDown = false; 
 	iMouse.x = x;
 	iMouse.y = iResolution.y - y;
-	//iMouse.z = 0;
-	//iMouse.w = 0;
+	iMouse.z = -abs(iMouse.z);
+	iMouse.w = -abs(iMouse.w);
 }
 
 string ShaderToy::ShaderToyUniforms::getMouseString() {
@@ -272,13 +275,13 @@ void ShaderToy::render() {
 		frameBuffer->render();
 	}
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	uniforms->update();
-	geometry->render();
-
 	for (auto& frameBuffer : m_frameBuffers) {
 		frameBuffer->swapTextures();
 	}
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	uniforms->update();
+	geometry->render();
 }
 
 ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels) {
@@ -321,11 +324,11 @@ void ShaderToy::ShaderToyFrameBuffer::render() {
 	uniforms->update();
 	geometry->render();
 
-	//swapTextures();
-
 #if DEBUG_MULTIPASS
-	debug("Writing frame buffer " + to_string(getID()) + " and read from texture " + to_string(tex->GetTextureID())); 
+	debug("Writing frame buffer " + to_string(getID()) + " and read from texture " + to_string(getTextureID())); 
 #endif
+
+	//swapTextures();
 }
 
 void ShaderToy::ShaderToyFrameBuffer::swapTextures() {

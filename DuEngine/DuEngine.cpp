@@ -122,9 +122,10 @@ void DuEngine::start(int argc, char* argv[]) {
 		m_relativePath = ""; 
 	}
 	m_relativePath = config->GetStringWithDefault("shader_default", m_relativePath);
-	if (m_relativePath.size() > 0) {
-		info("Relative Path: " + m_relativePath);
-	}
+	//if (m_relativePath.size() > 0) {
+	//	info("Relative Path: " + m_relativePath);
+	//}
+	m_presetPath = config->GetStringWithDefault("preset_path", m_relativePath + "presets/");
 
 	m_defaultWidth = config->GetIntWithDefault("window_width", m_defaultWidth);
 	m_defaultHeight = config->GetIntWithDefault("window_height", m_defaultHeight);
@@ -201,6 +202,10 @@ void DuEngine::special(int key, int x, int y, bool up) {
 		case GLUT_KEY_F1:
 			// Reset everything
 			this->shadertoy->uniforms->reset(this->shadertoy->geometry);
+			shadertoy->uniforms->resetTime();
+			for (const auto& t : videoTextures) {
+				t->resetTime();
+			}
 			break;
 
 		case GLUT_KEY_F2:
@@ -239,21 +244,24 @@ void DuEngine::special(int key, int x, int y, bool up) {
 			break;
 		}
 	}
-
 	if (keyboardTexture) {
+		keyboardTexture->onKeyPress(key, up);
+		// hack the four arrows for ShaderToy
+		if (100 <= key && key <= 103) {
+			key -= 63;
+		}
 		keyboardTexture->onKeyPress(key, up);
 	}
 }
 
 void DuEngine::mousePress(int button, int state, int x, int y) {
 	if (button != GLUT_LEFT_BUTTON) return;
-
 	if (state == GLUT_DOWN) {
 		shadertoy->uniforms->onMouseDown((float)x, (float)y);
-	} else
-		if (state == GLUT_UP) {
-			shadertoy->uniforms->onMouseUp((float)x, (float)y);
-		}
+	}
+	if (state == GLUT_UP) {
+		shadertoy->uniforms->onMouseUp((float)x, (float)y);
+	}
 }
 
 void DuEngine::mouseMove(int x, int y) {
@@ -278,49 +286,53 @@ string DuEngine::readTextFromFile(string filename) {
 	using std::endl;
 	using std::string;
 	using std::ifstream;
-	string str, ret = "";
+	string str, res = "";
 	ifstream in;
 	in.open(filename);
 	if (in.is_open()) {
 		getline(in, str);
 		while (in) {
-			ret += str + "\n";
+			res += str + "\n";
 			getline(in, str);
 		}
-		//    cout << "Shader below\n" << ret << "\n"; 
-		return ret;
+		return res;
 	} else {
 		warning("Unable to open file " + filename);
-		system("pause"); 
-		exit(EXIT_FAILURE); 
+		onError();
 	}
 }
 
 
 void DuEngine::reportShaderErrors(const GLint shader) {
 	GLint length;
-	GLchar * log;
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-	log = new GLchar[length + 1];
+	GLchar* log = new GLchar[length + 1];
 	glGetShaderInfoLog(shader, length, &length, log);
-	cout << "Shader syntax error, see log below\n" << log << "\n";
+	string s(log);
+	logerror("Shader compile error, see log below\n" + s + "\n");
 	delete[] log;
-	system("pause");
-	exit(EXIT_FAILURE);
+	onError();
 }
 
 
 void DuEngine::reportProgramErrors(const GLint program) {
 	GLint length;
-	GLchar * log;
 	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-	log = new GLchar[length + 1];
+	GLchar* log = new GLchar[length + 1];
 	glGetProgramInfoLog(program, length, &length, log);
 	string s(log);
-	logerror("Program compile error, see log Below\n" + s + "\n");
+	logerror("Program linking error, see log below\n" + s + "\n");
 	delete[] log;
+	onError();
+}
+
+void DuEngine::onError() {
 	system("pause");
 	exit(EXIT_FAILURE);
+}
+
+void DuEngine::printHelp() {
+	info("Help:\n\tF1:\tReset everything.\n\tF2:\tTake Screenshot.\n\tF5:\tReset Time\n\tF6:\tPause\n\tF11:\tFullscreen.\n");
 }
 
 GLuint DuEngine::initShaders(GLenum type, string filename, string uniformFileName, string mainFileName) {
@@ -331,22 +343,19 @@ GLuint DuEngine::initShaders(GLenum type, string filename, string uniformFileNam
 		string pre = readTextFromFile(uniformFileName);
 		str = pre + str;
 	}
-
 	if (mainFileName.size() > 0) {
 		string post = readTextFromFile(mainFileName);
 		str = str + post;
 	}
-
-	GLchar * cstr = new GLchar[str.size() + 1];
-	const GLchar * cstr2 = cstr; // Weirdness to get a const char
+	GLchar *cstr = new GLchar[str.size() + 1];
+	const GLchar *cstr2 = cstr; // Weirdness to get a const char
 	strcpy(cstr, str.c_str());
 	glShaderSource(shader, 1, &cstr2, NULL);
 	glCompileShader(shader);
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 	if (!compiled) {
 		reportShaderErrors(shader);
-		system("pause");
-		throw 3;
+		onError();
 	}
 	return shader;
 }
@@ -359,11 +368,10 @@ GLuint DuEngine::initProgram(GLuint vertexshader, GLuint fragmentshader) {
 	glAttachShader(program, fragmentshader);
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_LINK_STATUS, &linked);
-	if (linked) glUseProgram(program);
-	else {
-		reportProgramErrors(program);
-		system("pause");
-		throw 4;
+	if (!linked) {
+		reportProgramErrors(program); 
+		onError();
 	}
+	glUseProgram(program);
 	return program;
 }
