@@ -341,7 +341,7 @@ void SHTexture::update(float coef[NUM_COEF]) {
 
 FrameBufferTexture::FrameBufferTexture(GLuint FBO, int width, int height, TextureFilter filter, TextureWarp warp) {
 	type = TextureType::FrameBuffer;
-	m_filter = TextureFilter::LINEAR;
+	m_filter = TextureFilter::MIPMAP;
 	m_warp = TextureWarp::CLAMP;
 	glGenTextures(1, &id);
 	glActiveTexture(GL_TEXTURE0 + id);
