@@ -12,7 +12,9 @@ void DuEngine::initScene() {
 	for (int buffer = 0; buffer < 1 + shadertoy->m_frameBuffers.size(); ++buffer) {
 		auto suffix = buffer == 0 ? "" : string(1, char('A' + buffer - 1));
 		auto prefix = buffer == 0 ? "" : suffix + "_";
-		auto uniforms = buffer == 0 ? shadertoy->uniforms : shadertoy->m_frameBuffers[buffer - 1].uniforms; 
+		auto fbo = buffer == 0 ? nullptr : shadertoy->m_frameBuffers[buffer - 1];
+
+		auto uniforms = buffer == 0 ? shadertoy->uniforms : fbo->uniforms; 
 		auto vertexShaderName = config->GetStringWithDefault("shader_vert", m_relativePath + "shadertoy.vert.glsl");
 		auto fragmentShaderName = config->GetStringWithDefault("shader_frag", m_relativePath + "shadertoy.default.glsl");
 		auto uniformShaderName = config->GetStringWithDefault("shader_uniform", m_relativePath + "shadertoy.uniforms.glsl");
@@ -31,19 +33,27 @@ void DuEngine::initScene() {
 		if (buffer == 0) {
 			shadertoy->loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
 		} else {
-			shadertoy->m_frameBuffers[buffer - 1].loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
+			fbo->loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
 		}
 
 		auto channels_count = config->GetIntWithDefault(prefix + "channels_count", 0);
 		for (int i = 0; i < channels_count; ++i) {
 			string iPrefix = prefix + "iChannel" + to_string(i);
 			auto type = config->GetStringWithDefault(iPrefix + "_type", "rgb");
+			std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 			auto fileName = m_relativePath + config->GetStringWithDefault(iPrefix + "_tex", "");
 
 			// replace the common textures into the true file names
-			for (const auto& key : m_common_tex) {
+			for (const auto& key : ImageTextures) {
 				if (!type.compare(key.first)) {
 					type = "rgb";
+					fileName = m_relativePath + "presets/" + key.second;
+					break;
+				}
+			}
+			for (const auto& key : VideoTextures) {
+				if (!type.compare(key.first)) {
+					type = "video";
 					fileName = m_relativePath + "presets/" + key.second;
 					break;
 				}
@@ -81,9 +91,10 @@ void DuEngine::initScene() {
 				uniforms->bindTexture2D(fontTexture, i);
 			} else
 			if (type.size() == 1) {
-				int bufferID = (int)(type[0] - 'A');
-				uniforms->bindTexture2D(shadertoy->m_frameBuffers[i].tex, i);
-				debug("Buffer " + to_string(buffer) + " bind with " + to_string(bufferID) + ", whose texture ID is " + to_string(shadertoy->m_frameBuffers[i].tex->GetTextureID()));
+				int bufferID = (int)(type[0] - 'a');
+				auto bindedFbo = shadertoy->m_frameBuffers[bufferID];
+				uniforms->bindTexture2D(bindedFbo->getTexture(), i);
+				debug("Buffer " + to_string(buffer) + to_string(i) + " bind with " + to_string(bufferID) + ", whose texture ID is " + to_string(bindedFbo->getTextureID()));
 			}
 		}
 	}

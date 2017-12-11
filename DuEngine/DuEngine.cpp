@@ -18,17 +18,6 @@ Window::GC Window::gc;
 DuEngine *DuEngine::s_Instance = new DuEngine();
 DuEngine::GC DuEngine::gc;
 
-
-Camera::Camera() {
-	reset();
-}
-
-void Camera::reset() {
-	eye = vec3(0.0, 0.0, 1.0);
-	up = vec3(0.0, 1.0, 0.0);
-	center = vec3(0.0);
-}
-
 DuEngine::DuEngine() {
 	camera = new Camera();
 	window = Window::GetInstance();

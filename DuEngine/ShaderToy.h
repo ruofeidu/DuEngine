@@ -179,20 +179,26 @@ class ShaderToy
 		DuEngine* renderer;
 		ShaderToyUniforms* uniforms;
 		ShaderToyGeometry* geometry;
-		GLuint vertexShader, fragmentShader, shaderProgram;
+
+	private:
+		GLuint id;
 		// FBO, frame buffer object ID
 		GLuint FBO[2];
 		// texture object
 		FrameBufferTexture* textures[2];
 		// id of the FBO array
-		GLuint id;
 		FrameBufferTexture* tex = textures[1];
+
+		GLuint vertexShader, fragmentShader, shaderProgram;
 
 	public:
 		ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels);
 		void loadShaders(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName);
 		// get FBO index
 		GLuint getID();
+		GLuint getTextureID();
+		Texture* getTexture(); 
+
 		void render();
 		void swapTextures();
 		void reshape(int _width, int _height);
@@ -203,7 +209,7 @@ public:
 	ShaderToyUniforms* uniforms;
 	ShaderToyGeometry* geometry;
 	GLuint vertexShader, fragmentShader, shaderProgram;
-	vector<ShaderToyFrameBuffer> m_frameBuffers;
+	vector<ShaderToyFrameBuffer*> m_frameBuffers;
 
 	ShaderToy(DuEngine* _renderer, double _width, double _height, int _x0, double _y0);
 

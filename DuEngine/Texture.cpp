@@ -300,7 +300,6 @@ void SHTexture::update(float coef[NUM_COEF]) {
 
 FrameBufferTexture::FrameBufferTexture(GLuint FBO, int width, int height, TextureFilter filter, TextureWrap warp) {
 	type = TextureType::FrameBuffer;
-	current_id = id;
 
 	m_minFilter = GL_LINEAR_MIPMAP_LINEAR;
 	m_magFilter = GL_LINEAR;
@@ -318,6 +317,7 @@ FrameBufferTexture::FrameBufferTexture(GLuint FBO, int width, int height, Textur
 	if (err != GL_NO_ERROR)
 		logerror("Texturing error: " + to_string(err));
 #endif
+	current_id = id;
 }
 
 void FrameBufferTexture::setCommonTextureID(GLuint id) {

@@ -15,7 +15,7 @@ ShaderToy::ShaderToy(DuEngine * _renderer, double _width, double _height, int _x
 
 	auto buffers_count = _renderer->config->GetIntWithDefault("buffers_count", 0); 
 	for (int i = 0; i < buffers_count; ++i) {
-		m_frameBuffers.push_back(ShaderToyFrameBuffer(renderer, geometry, numChannels));
+		m_frameBuffers.push_back(new ShaderToyFrameBuffer(renderer, geometry, numChannels));
 	}
 	info("ShaderToy is inited.");
 }
@@ -40,7 +40,7 @@ void ShaderToy::reshape(int _width, int _height) {
 	uniforms->resetFrame();
 
 	for (auto& frameBuffer : m_frameBuffers) {
-		frameBuffer.reshape(_width, _height); 
+		frameBuffer->reshape(_width, _height); 
 	}
 }
 
@@ -268,13 +268,17 @@ string ShaderToy::ShaderToyUniforms::getMouseString() {
 
 void ShaderToy::render() {
 	for (auto& frameBuffer : m_frameBuffers) {
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer.getID());
-		frameBuffer.render(); 
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer->getID());
+		frameBuffer->render();
 	}
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	uniforms->update();
 	geometry->render();
+
+	for (auto& frameBuffer : m_frameBuffers) {
+		frameBuffer->swapTextures();
+	}
 }
 
 ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels) {
@@ -305,11 +309,19 @@ GLuint ShaderToy::ShaderToyFrameBuffer::getID() {
 	return FBO[id];
 }
 
+GLuint ShaderToy::ShaderToyFrameBuffer::getTextureID() {
+	return this->tex->GetTextureID();
+}
+
+Texture * ShaderToy::ShaderToyFrameBuffer::getTexture() {
+	return this->tex;
+}
+
 void ShaderToy::ShaderToyFrameBuffer::render() {
 	uniforms->update();
 	geometry->render();
 
-	swapTextures();
+	//swapTextures();
 
 #if DEBUG_MULTIPASS
 	debug("Writing frame buffer " + to_string(getID()) + " and read from texture " + to_string(tex->GetTextureID())); 

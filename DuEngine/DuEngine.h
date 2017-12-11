@@ -3,22 +3,13 @@
 #include "ShaderToy.h"
 #include "DuConfig.h"
 #include "Texture.h"
+#include "Camera.h"
 #include "DuUtils.h"
 
 using namespace glm;
 using namespace cv;
 using namespace std;
 
-class Camera
-{
-public:
-	Camera();
-	void reset();
-	vec3 eye, up, center;
-
-private:
-	static Camera *s_Instance;
-};
 
 class Window
 {
@@ -96,11 +87,13 @@ private:
 
 	int m_recordStart = 0;
 	int m_recordEnd = 100;
-	int m_defaultWidth = 1920;
-	int m_defaultHeight = 1080;
+	//int m_defaultWidth = 1920;
+	//int m_defaultHeight = 1080;
+	int m_defaultWidth = 1280;
+	int m_defaultHeight = 720;
 	unordered_set<string> m_is_created; 
 
-	unordered_map<string, string> m_common_tex {
+	unordered_map<string, string> ImageTextures {
 		{ "pano", "panorama.png" },
 		{ "abstract1", "tex07.jpg" },
 		{ "abstract2", "tex08.jpg" },
@@ -123,6 +116,15 @@ private:
 		{ "stars", "tex03.jpg" },
 		{ "wood", "tex05.jpg" },
 		//{ "font", "tex21.png" },
+	};
+
+	unordered_map<string, string> VideoTextures{
+		{ "1961", "vid02.ogv" },
+		{ "google", "vid00.ogv" },
+		{ "claude", "vid03.webm" },
+		{ "claudevan", "vid03.webm" },
+		{ "britney", "vid01.webm" },
+		{ "britneyspears", "vid01.webm" },
 	};
 
 	int getNumFrameFromVideos();
