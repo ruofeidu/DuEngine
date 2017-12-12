@@ -4,6 +4,9 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 *.png
+*.mp4
+*.avi
+SHSaliency/
 
 # User-specific files
 *.suo

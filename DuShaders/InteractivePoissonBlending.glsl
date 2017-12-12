@@ -21,6 +21,6 @@
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
 	vec2 q = fragCoord.xy / iResolution.xy;
-	fragColor = texture(iChannel1, q);
+	fragColor = texture(iChannel0, q);
     fragColor.rgb *= 0.25 + 0.75 * pow( 16.0 * q.x * q.y * (1.0 - q.x) * (1.0 - q.y), 0.15 );
 }
