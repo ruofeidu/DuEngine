@@ -136,6 +136,7 @@
     <ClCompile Include="ShaderToy.cpp" />
     <ClCompile Include="SHUtils.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -149,6 +150,7 @@
     <ClInclude Include="SHUtils.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Backup.txt" />
