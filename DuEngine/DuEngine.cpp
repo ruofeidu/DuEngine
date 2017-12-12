@@ -376,3 +376,34 @@ GLuint DuEngine::initProgram(GLuint vertexshader, GLuint fragmentshader) {
 	glUseProgram(program);
 	return program;
 }
+
+void DuEngine::takeScreenshot(string folderName) {
+	if (m_is_created.find(folderName) == m_is_created.end()) {
+		CreateDirectory(folderName.c_str(), NULL);
+		m_is_created.insert(folderName);
+	}
+
+	if (m_recordVideo) {
+		if (m_video == nullptr) {
+			m_video = new cv::VideoWriter();
+			m_video->open(folderName + "/" + getTimeForFileName() + ".avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'),
+				DEFAULT_RENDER_FPS, cv::Size(window->width, window->height));
+		} 
+	}
+
+	cv::Mat img(window->height, window->width, CV_8UC3);
+	glPixelStorei(GL_PACK_ALIGNMENT, (img.step & 3) ? 1 : 4);
+	glPixelStorei(GL_PACK_ROW_LENGTH, (GLint)img.step / (GLint)img.elemSize());
+	glReadPixels(0, 0, img.cols, img.rows, GL_BGR_EXT, GL_UNSIGNED_BYTE, img.data);
+	flip(img, img, 0);
+
+
+	if (m_recordVideo) {
+		m_video->write(img);
+		if (getFrameNumber() == m_recordEnd) {
+			m_video->release(); 
+		}
+	}
+	cv::imwrite(folderName + "/" + this->configName.substr(0, configName.size() - 4) + "_" + to_string(getFrameNumber()) + ".png", img);
+}
+

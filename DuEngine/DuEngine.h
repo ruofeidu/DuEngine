@@ -90,6 +90,7 @@ private:
 	int m_recordStart = 0;
 	int m_recordEnd = 100;
 	bool m_recordVideo = false;
+	cv::VideoWriter* m_video = nullptr;
 	//int m_defaultWidth = 1920;
 	//int m_defaultHeight = 1080;
 	int m_defaultWidth = 1280;
@@ -103,6 +104,7 @@ private:
 		{ "abstract3", "tex20.jpg" },
 		{ "bayer", "tex15.png" },
 		{ "gnm", "tex12.png" },
+		{ "greynoise", "tex12.png" },
 		{ "gns", "tex10.png" },
 		{ "lichen", "tex06.png" },
 		{ "london", "tex04.jpg" },
@@ -113,11 +115,19 @@ private:
 		{ "organic4", "tex17.jpg" },
 		{ "pebbles", "tex19.png" },
 		{ "rgbanm", "tex16.png" },
+		{ "noise", "tex16.png" },
 		{ "rgbans", "tex11.png" },
 		{ "rocktiles", "tex00.jpg" },
 		{ "rustymetal", "tex02.jpg" },
 		{ "stars", "tex03.jpg" },
 		{ "wood", "tex05.jpg" },
+		{ "sjtu", "sjtu.jpg" },
+		{ "starr", "starr.jpg" },
+		{ "720p", "720p.jpg" },
+		{ "1080p", "1080p.jpg" },
+		{ "4k", "4k.jpg" },
+		{ "6k", "6k.jpg" },
+		{ "8k", "8k.jpg" }
 	};
 
 	unordered_map<string, string> VideoTextures{

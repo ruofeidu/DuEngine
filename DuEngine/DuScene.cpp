@@ -41,8 +41,13 @@ void DuEngine::initScene() {
 			string iPrefix = prefix + "iChannel" + to_string(i);
 			auto type = config->GetStringWithDefault(iPrefix + "_type", "rgb");
 			std::transform(type.begin(), type.end(), type.begin(), ::tolower);
-			auto fileName = m_relativePath + config->GetStringWithDefault(iPrefix + "_tex", "");
-
+			auto fileName = config->GetStringWithDefault(iPrefix + "_tex", "");
+			if (fileName.size() > 2 && fileName[1] == ':') {
+				// use absolute path
+				fileName = fileName; 
+			} else {
+				fileName = m_relativePath + fileName;
+			}
 			// replace the common textures into the true file names
 			for (const auto& key : ImageTextures) {
 				if (!type.compare(key.first)) {
@@ -134,25 +139,3 @@ void DuEngine::render() {
 void DuEngine::updateFPS(float timeDelta, float averageTimeDelta) {
 	shadertoy->uniforms->updateFPS(timeDelta, averageTimeDelta);
 }
-
-void DuEngine::takeScreenshot(string folderName) {
-	if (m_is_created.find(folderName) == m_is_created.end()) {
-		CreateDirectory(folderName.c_str(), NULL);
-		m_is_created.insert(folderName); 
-	}
-	cv::Mat img(window->height, window->width, CV_8UC3);
-	glPixelStorei(GL_PACK_ALIGNMENT, (img.step & 3) ? 1 : 4);
-	glPixelStorei(GL_PACK_ROW_LENGTH, (GLint)img.step / (GLint)img.elemSize());
-	glReadPixels(0, 0, img.cols, img.rows, GL_BGR_EXT, GL_UNSIGNED_BYTE, img.data);
-	flip(img, img, 0);
-	//auto t = std::time(nullptr);
-	//auto tm = *std::localtime(&t);
-	//std::ostringstream oss;
-	//oss << std::put_time(&tm, "%d-%m-%Y_%H-%M-%S");
-	//auto str = oss.str();
-	if (getFrameNumber() == m_recordStart - 1) {
-
-	}
-	cv::imwrite(folderName + "/" + this->configName.substr(0, configName.size() - 4) + "_" + to_string(getFrameNumber()) + ".png", img);
-}
-

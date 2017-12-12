@@ -71,7 +71,9 @@ void Texture::generateMipmaps() {
 	// If we're using mipmaps then generate them. Note: This requires OpenGL 3.0 or higher	   
 	if (m_filter == TextureFilter::MIPMAP) {
 		glGenerateMipmap(GL_TEXTURE_2D);
+#if VERBOSE_OUTPUT
 		info("Mipmap generated for texture" + id);
+#endif
 	}
 
 #if COMPILE_CHECK_GL_ERROR
@@ -341,7 +343,7 @@ void SHTexture::update(float coef[NUM_COEF]) {
 
 FrameBufferTexture::FrameBufferTexture(GLuint FBO, int width, int height, TextureFilter filter, TextureWarp warp) {
 	type = TextureType::FrameBuffer;
-	m_filter = TextureFilter::MIPMAP;
+	m_filter = TextureFilter::LINEAR;
 	m_warp = TextureWarp::CLAMP;
 	glGenTextures(1, &id);
 	glActiveTexture(GL_TEXTURE0 + id);

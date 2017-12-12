@@ -163,7 +163,8 @@ void ShaderToy::ShaderToyUniforms::linkShader(GLuint shaderProgram) {
 void ShaderToy::ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
 	if (uChannels[channel] >= 0) {
 		iChannels[channel] = tex; 
-		auto id = tex->GetTextureID(); 
+		auto id = tex->GetTextureID();
+		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, id);
 		glUniform1i(uChannels[channel], id);
 	} else {
@@ -218,8 +219,10 @@ void ShaderToy::ShaderToyUniforms::update() {
 	if (uMouse >= 0) glUniform4f(uMouse, iMouse.x, iMouse.y, iMouse.z, iMouse.w);
 	if (uDate >= 0) glUniform4f(uDate, iDate.x, iDate.y, iDate.z, iDate.w);
 	for (int i = 0; i < iChannels.size(); ++i) if (uChannels[i] >= 0) {
-		glBindTexture(GL_TEXTURE_2D, iChannels[i]->GetTextureID());
-		glUniform1i(uChannels[i], iChannels[i]->GetTextureID());
+		auto id = iChannels[i]->GetTextureID();
+		glActiveTexture(GL_TEXTURE0 + id); 
+		glBindTexture(GL_TEXTURE_2D, id);
+		glUniform1i(uChannels[i], id);
 #if DEBUG_MULTIPASS
 		debug("Updated channel " + to_string(i) + " with texture " + to_string(iChannels[i]->GetTextureID())
 			+ " at location " + to_string(uChannels[i])
@@ -323,7 +326,7 @@ GLuint ShaderToy::ShaderToyFrameBuffer::getTextureID() {
 	return this->tex->GetTextureID();
 }
 
-Texture * ShaderToy::ShaderToyFrameBuffer::getTexture() {
+Texture* ShaderToy::ShaderToyFrameBuffer::getTexture() {
 	return this->tex;
 }
 

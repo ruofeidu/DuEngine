@@ -28,6 +28,15 @@ void logerror(string message) {
 	cout << "!!! " << message << endl;
 }
 
+string getTimeForFileName() {
+	auto t = std::time(nullptr);
+	auto tm = *std::localtime(&t);
+	std::ostringstream oss;
+	oss << std::put_time(&tm, "%d-%m-%Y_%H-%M-%S");
+	auto str = oss.str();
+	return str; 
+}
+
 
 Singleton* Singleton::GetInstance() {
 	return s_Instance;

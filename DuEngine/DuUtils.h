@@ -7,8 +7,6 @@ void info(string message);
 void debug(string message);
 void logerror(string message);
 
-
-
 class Singleton
 {
 public:
@@ -30,3 +28,4 @@ private:
 	static GC gc;
 };
 
+string getTimeForFileName();
