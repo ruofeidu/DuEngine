@@ -39,6 +39,20 @@ string getTimeForFileName() {
 	return str; 
 }
 
+string repeatstring(string s, int cnt) {
+	string res = "";
+	for (int i = 0; i < cnt; ++i) res += s; 
+	return res; 
+}
+
+string smartFilePath(string fileName, string path) {
+	if (fileName.size() > 2 && fileName[1] == ':') {
+		return fileName;
+	} else {
+		return path + fileName;
+	}
+}
+
 
 Singleton* Singleton::GetInstance() {
 	return s_Instance;

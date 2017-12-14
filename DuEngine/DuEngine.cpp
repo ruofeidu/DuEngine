@@ -95,12 +95,13 @@ void DuEngine::start(int argc, char* argv[]) {
 
 	// setup shaders path and presets path
 	m_shadersPath = std::string(argv[0]);
+
 	// automatically search the default shader path from the upper-level folders
 	for (int i = 3; i >= 0; --i) {
 		if (i == 0) {
 			m_shadersPath = ""; 
 		} else {
-			auto keywords = string("../", i) + "DuEngine/";
+			auto keywords = repeatstring("../", i) + "DuEngine/";
 			if (m_shadersPath.find(keywords) != std::string::npos) {
 				m_shadersPath = keywords; 
 				break; 
@@ -114,6 +115,7 @@ void DuEngine::start(int argc, char* argv[]) {
 	}
 #endif
 	m_presetsPath = config->GetStringWithDefault("presets_path", m_shadersPath + "presets/");
+	m_resourcesPath = config->GetStringWithDefault("resources_path", m_presetsPath);
 
 	// setup the default window width and height
 	m_defaultWidth = config->GetIntWithDefault("window_width", m_defaultWidth);

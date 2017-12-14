@@ -39,7 +39,7 @@ TextureWarp Texture::QueryWarp(string wrap) {
 const unordered_map<string, TextureType> Texture::TextureMaps {
 	{ "rgb", TextureType::RGB },
 	{ "video", TextureType::VideoFile },
-	{ "videseq", TextureType::VideoSequence },
+	{ "videoseq", TextureType::VideoSequence },
 	{ "key", TextureType::Keyboard },
 	{ "sh", TextureType::SH },
 	{ "a", TextureType::FrameBuffer },
@@ -248,12 +248,12 @@ void TextureMat::updateDataTypeFormat() {
 }
 
 void TextureMat::datatypeFromMat(cv::Mat & mat) {
-	string r;
+	string r; // 8UC3 for example
 	auto type = mat.type();
 	uchar depth = type & CV_MAT_DEPTH_MASK;
 	uchar chans = 1 + (type >> CV_CN_SHIFT);
 	switch (depth) {
-		case CV_8U:  r = "8U"; m_dataType = GL_UNSIGNED_BYTE;  break;
+		case CV_8U:  r = "8U";m_dataType = GL_UNSIGNED_BYTE;  break;
 		case CV_8S:  r = "8S"; m_dataType = GL_BYTE; break;
 		case CV_16U: r = "16U"; m_dataType = GL_UNSIGNED_SHORT; break;
 		case CV_16S: r = "16S"; m_dataType = GL_SHORT; break;
@@ -288,30 +288,14 @@ VideoFileTexture::VideoFileTexture(string filename, bool vflip, TextureFilter fi
 	init(filename, vflip, filter, warp);
 
 	m_video.open(filename);
-
-	m_vFlip = vflip;
-	m_filter = filter;
 	if (!m_video.isOpened()) this->error();
 	m_video >> m_mat;
 	if (m_mat.empty()) this->error();
 	this->generateFromMat();
 
 	m_fps = m_video.get(CV_CAP_PROP_FPS);
-	m_prevTime = clock();
 
-	// synchronization between videos and frame rate
-	m_distribution = vector<bool>(DEFAULT_RENDER_FPS, false);
-	double p = 0.0;
-	int cnt = 0;
-	while (p < DEFAULT_RENDER_FPS) {
-		m_distribution[(int)floor(p)] = true;
-		p += (double)DEFAULT_RENDER_FPS / m_fps;
-		++cnt;
-	}
-	if (cnt != (int)round(m_fps)) {
-		m_distribution[m_distribution.size() - 1] = true;
-	}
-
+	this->initDistribution(); 
 	type = TextureType::VideoFile;
 }
 
@@ -337,18 +321,43 @@ void VideoFileTexture::update() {
 #endif
 }
 
-VideoSequenceTexture::VideoSequenceTexture(string filename, int fps, int startFrame, int endFrame, bool vflip, TextureFilter filter, TextureWarp warp) {
-	init(filename, vflip, filter, warp);
-
+VideoSequenceTexture::VideoSequenceTexture(string fileName, int fps, int startFrame, int endFrame, TextureFilter filter, TextureWarp warp) {
+	init(fileName, true, filter, warp);
+	m_vFlip = false; 
+	for (int i = startFrame; i < endFrame; ++i) {
+		string ithName = fileName;
+		if (fileName.find("%d") != string::npos) {
+			ithName.replace(ithName.find("%d"), 2, to_string(i));
+		}
+		cv::Mat mat = cv::imread(ithName);
+		if (mat.empty()) {
+			logerror("VideoSequenceTexture cannot read " + ithName); 
+		}
+		flip(mat, mat, 0);
+		m_videoseq.push_back(mat);
+	}
+	m_mat = m_videoseq[0];
+	m_fps = fps;
+	info("Read video seq: " + to_string(m_videoseq.size()));
+	this->type = TextureType::VideoSequence; 
+	this->generateFromMat(); 
+	this->initDistribution();
 }
 
 void VideoSequenceTexture::resetTime() {
+	m_numVideoFrames = 0; 
 }
 
 void VideoSequenceTexture::update() {
+	int iFrame = DuEngine::GetInstance()->getFrameNumber();
+	if (!m_distribution[iFrame % m_distribution.size()]) return;
+
+	m_prevTime = clock();
+	m_mat = m_videoseq[m_numVideoFrames % m_videoseq.size()];
+	++m_numVideoFrames; 
+
+	this->updateFromMat();
 }
-
-
 
 void VideoTexture::togglePaused() {
 	m_paused = !m_paused;
@@ -356,11 +365,29 @@ void VideoTexture::togglePaused() {
 
 void VideoFileTexture::resetTime() {
 	m_video.set(CV_CAP_PROP_POS_FRAMES, 0);
+	m_numVideoFrames = 0; 
 }
 
 void VideoTexture::error() {
 	logerror("Cannot open the video texture." + m_filename);
 	exit(EXIT_FAILURE); 
+}
+
+void VideoTexture::initDistribution() {
+	m_prevTime = clock();
+	// synchronization between videos and frame rate
+	m_distribution = vector<bool>(DEFAULT_RENDER_FPS, false);
+	double p = 0.0;
+	int cnt = 0;
+	while (p < DEFAULT_RENDER_FPS) {
+		m_distribution[(int)floor(p)] = true;
+		p += (double)DEFAULT_RENDER_FPS / m_fps;
+		++cnt;
+	}
+	if (cnt != (int)round(m_fps)) {
+		m_distribution[m_distribution.size() - 1] = true;
+	}
+	m_numVideoFrames = 0; 
 }
 
 /**

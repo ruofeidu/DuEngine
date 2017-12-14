@@ -41,16 +41,10 @@ void DuEngine::initScene() {
 		// bind channel textures
 		auto channels_count = config->GetIntWithDefault(prefix + "channels_count", 0);
 		for (int i = 0; i < channels_count; ++i) {
-			string iPrefix = prefix + "iChannel" + to_string(i);
-			auto type = config->GetStringWithDefault(iPrefix + "_type", "rgb");
+			string iPrefix = prefix + "iChannel" + to_string(i) + "_";
+			auto type = config->GetStringWithDefault(iPrefix + "type", "rgb");
 			std::transform(type.begin(), type.end(), type.begin(), ::tolower);
-			auto fileName = config->GetStringWithDefault(iPrefix + "_tex", "");
-			if (fileName.size() > 2 && fileName[1] == ':') {
-				// use absolute path
-				fileName = fileName; 
-			} else {
-				fileName = m_shadersPath + fileName;
-			}
+			auto fileName = smartFilePath(config->GetStringWithDefault(iPrefix + "tex", ""), m_resourcesPath);
 
 			// replace the predefined textures into the real file names
 			for (const auto& key : Texture::ImageTextures) {
@@ -69,9 +63,13 @@ void DuEngine::initScene() {
 			}
 
 			auto textureType = Texture::QueryType(type);
-			auto textureFilter = Texture::QueryFilter(config->GetStringWithDefault(iPrefix + "_filter", "mipmap"));
-			auto textureWarp = Texture::QueryWarp(config->GetStringWithDefault(iPrefix + "_wrap", "repeat"));
-			auto vFlip = config->GetBoolWithDefault(iPrefix + "_vflip", true);
+			auto textureFilter = Texture::QueryFilter(config->GetStringWithDefault(iPrefix + "filter", "mipmap"));
+			auto textureWarp = Texture::QueryWarp(config->GetStringWithDefault(iPrefix + "wrap", "repeat"));
+			auto vFlip = config->GetBoolWithDefault(iPrefix + "vflip", true);
+			auto fps = config->GetIntWithDefault(iPrefix + "fps", 25);
+			auto startFrame = config->GetIntWithDefault(iPrefix + "startFrame", 1);
+			auto endFrame = config->GetIntWithDefault(iPrefix + "endFrame", 100);
+
 			Texture* t = nullptr; 
 
 			switch (textureType) {
@@ -83,16 +81,20 @@ void DuEngine::initScene() {
 				videoTextures.push_back((VideoTexture*)t);
 				break;
 			case TextureType::VideoSequence:
-				break; 
+				t = new VideoSequenceTexture(fileName, fps, startFrame, endFrame, textureFilter, textureWarp);
+				videoTextures.push_back((VideoTexture*)t);
+				break;
 			case TextureType::Keyboard:
 				if (!keyboardTexture)
 					keyboardTexture = new KeyboardTexture();
 				t = keyboardTexture;
+				break; 
 			case TextureType::Font:
 				if (!fontTexture) {
 					fontTexture = new FontTexture(textureFilter, textureWarp);
 				}
 				t = fontTexture;
+				break; 
 			case TextureType::FrameBuffer:
 				int bufferID = (int)(type[0] - 'a');
 				auto bindedFbo = shadertoy->m_frameBuffers[bufferID];
@@ -101,8 +103,14 @@ void DuEngine::initScene() {
 				debug("Buffer " + to_string(buffer) + to_string(i) + " bind with " + to_string(bufferID) +
 					", whose texture ID is " + to_string(bindedFbo->getTextureID()));
 #endif
+				break; 
 			}
-			uniforms->bindTexture2D(t, i);
+
+			if (t != nullptr) {
+				uniforms->bindTexture2D(t, i);
+			} else {
+				logerror("Unknown texture type!");
+			}
 		}
 
 		auto vec2_buffers_count = config->GetIntWithDefault("vec2_buffers_count", 0);
@@ -110,7 +118,7 @@ void DuEngine::initScene() {
 
 		for (int i = 0; i < vec2_buffers_count; ++i) {
 			string s = "vec2_buffers" + to_string(i) + "_file";
-			auto fileName = config->GetString(s);
+			auto fileName = smartFilePath(config->GetString(s), m_resourcesPath);
 			shadertoy->uniforms->bindVec2Buffer(i, fileName);
 		}
 	}

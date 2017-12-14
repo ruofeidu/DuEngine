@@ -29,3 +29,5 @@ private:
 };
 
 string getTimeForFileName();
+string repeatstring(string s, int cnt);
+string smartFilePath(string fileName, string path); 

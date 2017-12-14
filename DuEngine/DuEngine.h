@@ -64,6 +64,7 @@ private:
 
 	string m_shadersPath = "";
 	string m_presetsPath = "";
+	string m_resourcesPath = "";
 	unordered_set<string> m_isPathCreated;
 
 	string m_recordPath = "";

@@ -117,9 +117,11 @@ class VideoTexture : public Texture2D
 public:
 	int getNumFrame() { return m_numFrames; }
 	int getNumVideoFrame() { return m_numVideoFrames; }
+	void togglePaused();
+
+public:
 	virtual void resetTime() = 0;
 	virtual void update() = 0;
-	void togglePaused();
 
 protected:
 	int m_numVideoFrames = 0;
@@ -128,6 +130,7 @@ protected:
 
 protected:
 	void error();
+	void initDistribution();
 	bool m_paused;
 	// distribution of one frame
 	vector<bool> m_distribution;
@@ -150,9 +153,12 @@ private:
 class VideoSequenceTexture : public VideoTexture
 {
 public:
-	VideoSequenceTexture(string filename, int fps, int startFrame, int endFrame, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+	VideoSequenceTexture(string fileName, int fps, int startFrame, int endFrame, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
 	void resetTime();
 	void update();
+
+private:
+	vector<Mat> m_videoseq; 
 };
 
 #if COMPILE_WITH_SH
