@@ -6,36 +6,39 @@ using namespace cv;
 
 void DuEngine::initScene() {
 	clock_t begin_time = clock();
-
+	
 	shadertoy = new ShaderToy(DuEngine::GetInstance());
 
-	for (int buffer = 0; buffer < 1 + shadertoy->m_frameBuffers.size(); ++buffer) {
-		auto suffix = buffer == 0 ? "" : string(1, char('A' + buffer - 1));
-		auto prefix = buffer == 0 ? "" : suffix + "_";
-		auto fbo = buffer == 0 ? nullptr : shadertoy->m_frameBuffers[buffer - 1];
+	auto vertexShaderName = config->GetStringWithDefault("shader_vert", m_shadersPath + "shadertoy.vert.glsl");
+	auto uniformShaderName = config->GetStringWithDefault("shader_uniform", m_shadersPath + "shadertoy.uniforms.glsl");
+	auto mainShaderName = config->GetStringWithDefault("shader_main", m_shadersPath + "shadertoy.main.glsl");
 
-		auto uniforms = buffer == 0 ? shadertoy->uniforms : fbo->uniforms; 
-		auto vertexShaderName = config->GetStringWithDefault("shader_vert", m_relativePath + "shadertoy.vert.glsl");
-		auto fragmentShaderName = config->GetStringWithDefault("shader_frag", m_relativePath + "shadertoy.default.glsl");
-		auto uniformShaderName = config->GetStringWithDefault("shader_uniform", m_relativePath + "shadertoy.uniforms.glsl");
-		auto mainShaderName = config->GetStringWithDefault("shader_main", m_relativePath + "shadertoy.main.glsl");
+	for (int buffer = 0; buffer < 1 + shadertoy->m_frameBuffers.size(); ++buffer) {
+		auto suffix = !buffer ? "" : string(1, char('A' + buffer - 1));
+		auto prefix = !buffer ? "" : suffix + "_";
+		auto fbo = !buffer ? nullptr : shadertoy->m_frameBuffers[buffer - 1];
+		auto uniforms = !buffer ? shadertoy->uniforms : fbo->uniforms; 
 
 		// replace the fragment shader name with $Name and buffer prefix / suffix
+		auto fragmentShaderName = config->GetStringWithDefault("shader_frag", m_shadersPath + "shadertoy.default.glsl");
 		if (fragmentShaderName.find("$Name") != string::npos) {
 			fragmentShaderName.replace(fragmentShaderName.find("$Name"), 5, m_sceneName); 
 		}
 		if (fragmentShaderName.find(".glsl") != string::npos) {
+			// add framebuffer suffix for multipass rendering
 			fragmentShaderName.replace(fragmentShaderName.find(".glsl"), 5, suffix + ".glsl");
 		} else {
 			fragmentShaderName += suffix + ".glsl";
 		}
 
-		if (buffer == 0) {
-			shadertoy->loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
+		// load the shader
+		if (!buffer) {
+			shadertoy->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
 		} else {
-			fbo->loadShaders(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
+			fbo->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
 		}
 
+		// bind channel textures
 		auto channels_count = config->GetIntWithDefault(prefix + "channels_count", 0);
 		for (int i = 0; i < channels_count; ++i) {
 			string iPrefix = prefix + "iChannel" + to_string(i);
@@ -46,65 +49,62 @@ void DuEngine::initScene() {
 				// use absolute path
 				fileName = fileName; 
 			} else {
-				fileName = m_relativePath + fileName;
+				fileName = m_shadersPath + fileName;
 			}
-			// replace the common textures into the true file names
-			for (const auto& key : ImageTextures) {
+
+			// replace the predefined textures into the real file names
+			for (const auto& key : Texture::ImageTextures) {
 				if (!type.compare(key.first)) {
 					type = "rgb";
-					fileName = m_presetPath + key.second;
+					fileName = m_presetsPath + key.second;
 					break;
 				}
 			}
-			for (const auto& key : VideoTextures) {
+			for (const auto& key : Texture::VideoTextures) {
 				if (!type.compare(key.first)) {
 					type = "video";
-					fileName = m_presetPath + key.second;
+					fileName = m_presetsPath + key.second;
 					break;
 				}
 			}
 
-			// texture filters
-			auto filter = config->GetStringWithDefault(iPrefix + "_filter", "mipmap");
-			auto textureFilter = filter == "linear" ? TextureFilter::LINEAR : ((filter == "nearest") ? TextureFilter::NEAREST : TextureFilter::MIPMAP);
-
-			// texture wrappers
-			auto wrap = config->GetStringWithDefault(iPrefix + "_wrap", "repeat");
-			auto TextureWarp = !wrap.compare("repeat") ? TextureWarp::REPEAT : TextureWarp::CLAMP;
-
+			auto textureType = Texture::QueryType(type);
+			auto textureFilter = Texture::QueryFilter(config->GetStringWithDefault(iPrefix + "_filter", "mipmap"));
+			auto textureWarp = Texture::QueryWarp(config->GetStringWithDefault(iPrefix + "_wrap", "repeat"));
 			auto vFlip = config->GetBoolWithDefault(iPrefix + "_vflip", true);
-			if (!type.compare("rgb")) {
-				info("Reading texture " + fileName);
-				auto t = new Texture2D(fileName, vFlip, textureFilter, TextureWarp);
-				uniforms->bindTexture2D(t, i);
-				debug("RGB: " + to_string(t->GetTextureID()));
+			Texture* t = nullptr; 
 
-			} else
-			if (!type.compare("video")) {
-				auto t = new VideoTexture(fileName, vFlip, textureFilter, TextureWarp);
-				videoTextures.push_back(t);
-				uniforms->bindTexture2D(t, i);
-			} else
-			if (!type.compare("key")) {
-				if (!keyboardTexture) {
+			switch (textureType) {
+			case TextureType::RGB:
+				t = new Texture2D(fileName, vFlip, textureFilter, textureWarp); 
+				break;
+			case TextureType::VideoFile:
+				t = new VideoFileTexture(fileName, vFlip, textureFilter, textureWarp);
+				videoTextures.push_back((VideoTexture*)t);
+				break;
+			case TextureType::VideoSequence:
+				break; 
+			case TextureType::Keyboard:
+				if (!keyboardTexture)
 					keyboardTexture = new KeyboardTexture();
-				}
-				uniforms->bindTexture2D(keyboardTexture, i);
-			} else
-			if (!type.compare("font")) {
+				t = keyboardTexture;
+			case TextureType::Font:
 				if (!fontTexture) {
-					fontTexture = new Texture2D(m_presetPath + FontTextures["font"], true, textureFilter, TextureWarp);
+					fontTexture = new FontTexture(textureFilter, textureWarp);
 				}
-				uniforms->bindTexture2D(fontTexture, i);
-			} else
-			if (type.size() == 1) {
+				t = fontTexture;
+			case TextureType::FrameBuffer:
 				int bufferID = (int)(type[0] - 'a');
 				auto bindedFbo = shadertoy->m_frameBuffers[bufferID];
-				uniforms->bindTexture2D(bindedFbo->getTexture(), i);
+				t = bindedFbo->getTexture();
+#if DEBUG_MULTIPASS
 				debug("Buffer " + to_string(buffer) + to_string(i) + " bind with " + to_string(bufferID) +
 					", whose texture ID is " + to_string(bindedFbo->getTextureID()));
+#endif
 			}
+			uniforms->bindTexture2D(t, i);
 		}
+
 		auto vec2_buffers_count = config->GetIntWithDefault("vec2_buffers_count", 0);
 		shadertoy->uniforms->intVec2Buffers(vec2_buffers_count);
 

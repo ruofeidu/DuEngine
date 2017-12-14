@@ -3,16 +3,98 @@
 #include "DuEngine.h"
 #include "DuUtils.h"
 
-GLuint Texture::GetTextureID() {
+GLuint Texture::getTextureID() {
 	if (type == TextureType::FrameBuffer) {
 		return this->read_texture_id;
 	}
 	return this->id;
 }
 
-GLuint Texture::GetDirectID() {
+GLuint Texture::getDirectID() {
 	return read_texture_id;
 }
+
+
+TextureType Texture::getType() {
+	return type;
+}
+
+TextureType Texture::QueryType(string str) {
+	auto res = Texture::TextureMaps.find(str);
+	if (res == Texture::TextureMaps.end()) {
+		logerror("Invalid texture type, please check " + str);
+	} else {
+		return res->second;
+	}
+}
+
+TextureFilter Texture::QueryFilter(string filter) {
+	return filter == "linear" ? TextureFilter::LINEAR : ((filter == "nearest") ? TextureFilter::NEAREST : TextureFilter::MIPMAP);
+}
+
+TextureWarp Texture::QueryWarp(string wrap) {
+	return !wrap.compare("repeat") ? TextureWarp::REPEAT : TextureWarp::CLAMP;
+}
+
+const unordered_map<string, TextureType> Texture::TextureMaps {
+	{ "rgb", TextureType::RGB },
+	{ "video", TextureType::VideoFile },
+	{ "videseq", TextureType::VideoSequence },
+	{ "key", TextureType::Keyboard },
+	{ "sh", TextureType::SH },
+	{ "a", TextureType::FrameBuffer },
+	{ "b", TextureType::FrameBuffer },
+	{ "c", TextureType::FrameBuffer },
+	{ "d", TextureType::FrameBuffer },
+	{ "volume", TextureType::Volume },
+	{ "light", TextureType::LightField },
+};
+
+const unordered_map<string, string> Texture::ImageTextures {
+	{ "pano", "panorama.png" },
+	{ "abstract1", "tex07.jpg" },
+	{ "abstract2", "tex08.jpg" },
+	{ "abstract3", "tex20.jpg" },
+	{ "bayer", "tex15.png" },
+	{ "gnm", "tex12.png" },
+	{ "greynoise", "tex12.png" },
+	{ "gns", "tex10.png" },
+	{ "lichen", "tex06.png" },
+	{ "london", "tex04.jpg" },
+	{ "nyancat", "tex14.png" },
+	{ "organic1", "tex01.jpg" },
+	{ "organic2", "tex03.jpg" },
+	{ "organic3", "tex18.jpg" },
+	{ "organic4", "tex17.jpg" },
+	{ "pebbles", "tex19.png" },
+	{ "rgbanm", "tex16.png" },
+	{ "noise", "tex16.png" },
+	{ "rgbans", "tex11.png" },
+	{ "rocktiles", "tex00.jpg" },
+	{ "rustymetal", "tex02.jpg" },
+	{ "stars", "tex03.jpg" },
+	{ "wood", "tex05.jpg" },
+	{ "sjtu", "sjtu.jpg" },
+	{ "starr", "starr.jpg" },
+	{ "720p", "720p.jpg" },
+	{ "1080p", "1080p.jpg" },
+	{ "4k", "4k.jpg" },
+	{ "6k", "6k.jpg" },
+	{ "8k", "8k.jpg" }
+};
+
+const unordered_map<string, string> Texture::VideoTextures {
+	{ "1961", "vid02.ogv" },
+	{ "google", "vid00.ogv" },
+	{ "claude", "vid03.webm" },
+	{ "claudevan", "vid03.webm" },
+	{ "britney", "vid01.webm" },
+	{ "britneyspears", "vid01.webm" },
+};
+
+const unordered_map<string, string> Texture::FontTextures{
+	{ "font", "tex21.png" },
+};
 
 void Texture::setFiltering() {
 	//glGenSamplers(1, &sampler);
@@ -202,7 +284,7 @@ Texture2D::Texture2D(string filename, bool vflip, TextureFilter filter, TextureW
 	this->generateFromMat();
 }
 
-VideoTexture::VideoTexture(string filename, bool vflip, TextureFilter filter, TextureWarp warp) {
+VideoFileTexture::VideoFileTexture(string filename, bool vflip, TextureFilter filter, TextureWarp warp) {
 	init(filename, vflip, filter, warp);
 
 	m_video.open(filename);
@@ -214,30 +296,26 @@ VideoTexture::VideoTexture(string filename, bool vflip, TextureFilter filter, Te
 	if (m_mat.empty()) this->error();
 	this->generateFromMat();
 
-	m_fps = m_video.get(CV_CAP_PROP_FPS); 
+	m_fps = m_video.get(CV_CAP_PROP_FPS);
 	m_prevTime = clock();
 
 	// synchronization between videos and frame rate
 	m_distribution = vector<bool>(DEFAULT_RENDER_FPS, false);
 	double p = 0.0;
-	int cnt = 0; 
+	int cnt = 0;
 	while (p < DEFAULT_RENDER_FPS) {
 		m_distribution[(int)floor(p)] = true;
 		p += (double)DEFAULT_RENDER_FPS / m_fps;
-		++cnt; 
+		++cnt;
 	}
 	if (cnt != (int)round(m_fps)) {
 		m_distribution[m_distribution.size() - 1] = true;
 	}
 
-	type = TextureType::Video; 
+	type = TextureType::VideoFile;
 }
 
-void VideoTexture::togglePaused() {
-	m_paused = !m_paused;
-}
-
-void VideoTexture::update() {
+void VideoFileTexture::update() {
 	int iFrame = DuEngine::GetInstance()->getFrameNumber();
 	if (!m_distribution[iFrame % m_distribution.size()]) return;
 
@@ -247,7 +325,7 @@ void VideoTexture::update() {
 
 	// loop the video
 	if (m_mat.empty()) {
-		resetTime(); 
+		resetTime();
 		m_video >> m_mat;
 	}
 	if (m_vFlip) flip(m_mat, m_mat, 0);
@@ -259,7 +337,24 @@ void VideoTexture::update() {
 #endif
 }
 
-void VideoTexture::resetTime() {
+VideoSequenceTexture::VideoSequenceTexture(string filename, int fps, int startFrame, int endFrame, bool vflip, TextureFilter filter, TextureWarp warp) {
+	init(filename, vflip, filter, warp);
+
+}
+
+void VideoSequenceTexture::resetTime() {
+}
+
+void VideoSequenceTexture::update() {
+}
+
+
+
+void VideoTexture::togglePaused() {
+	m_paused = !m_paused;
+}
+
+void VideoFileTexture::resetTime() {
 	m_video.set(CV_CAP_PROP_POS_FRAMES, 0);
 }
 
@@ -278,6 +373,7 @@ KeyboardTexture::KeyboardTexture() {
 	m_warp = TextureWarp::CLAMP;
 	this->generateFromMat();
 	memset(prevTimes, 0, 256); 
+	this->type = TextureType::Keyboard;
 }
 
 // 0 is current state (keydown event)
@@ -373,4 +469,12 @@ void FrameBufferTexture::reshape(int _width, int _height) {
 		0 // Specifies the mipmap level of the texture image to be attached, which must be 0.
 	);
 	this->generateMipmaps();
+}
+
+FontTexture::FontTexture(TextureFilter filter, TextureWarp warp) {
+	m_filename = DuEngine::GetInstance()->getPresetsPath() + Texture::FontTextures.find("font")->second;
+	init(m_filename, true, filter, warp);
+	m_mat = imread(m_filename);
+	this->generateFromMat();
+	this->type = TextureType::Font;
 }

@@ -83,6 +83,7 @@ void g_reshape(int width, int height) {
 }
 
 void DuEngine::start(int argc, char* argv[]) {
+	// setup configuration files and the scene name
 	if (argc > 1) {
 		configName = std::string(argv[1]);
 		config = new DuConfig(configName);
@@ -92,33 +93,45 @@ void DuEngine::start(int argc, char* argv[]) {
 		m_sceneName = "default";
 	}
 
-	m_relativePath = std::string(argv[0]);
-	if (m_relativePath.find("../../DuEngine/") != std::string::npos) {
-		m_relativePath = "../../DuEngine/";
-	} else if (m_relativePath.find("../DuEngine/") != std::string::npos) {
-		m_relativePath = "../DuEngine/";
-	} else {
-		m_relativePath = ""; 
+	// setup shaders path and presets path
+	m_shadersPath = std::string(argv[0]);
+	// automatically search the default shader path from the upper-level folders
+	for (int i = 3; i >= 0; --i) {
+		if (i == 0) {
+			m_shadersPath = ""; 
+		} else {
+			auto keywords = string("../", i) + "DuEngine/";
+			if (m_shadersPath.find(keywords) != std::string::npos) {
+				m_shadersPath = keywords; 
+				break; 
+			}
+		}
 	}
-	m_relativePath = config->GetStringWithDefault("shader_default", m_relativePath);
-	//if (m_relativePath.size() > 0) {
-	//	info("Relative Path: " + m_relativePath);
-	//}
-	m_presetPath = config->GetStringWithDefault("preset_path", m_relativePath + "presets/");
+	m_shadersPath = config->GetStringWithDefault("shaders_path", m_shadersPath);
+#if VERBOSE_OUTPUT
+	if (m_shadersPath.size() > 0) {
+		info("Relative Path: " + m_shadersPath);
+	}
+#endif
+	m_presetsPath = config->GetStringWithDefault("presets_path", m_shadersPath + "presets/");
 
+	// setup the default window width and height
 	m_defaultWidth = config->GetIntWithDefault("window_width", m_defaultWidth);
 	m_defaultHeight = config->GetIntWithDefault("window_height", m_defaultHeight);
 	string _windowTitle = config->GetStringWithDefault("window_title", "DuRenderer | " + m_sceneName);
 	window->init(argc, argv, m_defaultWidth, m_defaultHeight, _windowTitle);
 
+	// setup recording
 	m_recording = config->GetBoolWithDefault("recording", m_recording);
 	m_recordPath = config->GetStringWithDefault("record_path", m_sceneName);
 	m_recordStart = config->GetIntWithDefault("record_start", m_recordStart);
 	m_recordEnd = config->GetIntWithDefault("record_end", m_recordEnd);
 	m_recordVideo = config->GetBoolWithDefault("record_video", m_recordVideo);
 
+	// initialize the scene, shaders, and presets
 	initScene();
 
+	// bind the glut functions
 	glutReshapeWindow(window->width, window->height);
 	glutDisplayFunc(g_render);
 	glutMouseFunc(g_mousePress);
@@ -135,6 +148,9 @@ void DuEngine::start(int argc, char* argv[]) {
 void DuEngine::keyboard(unsigned char key, int x, int y, bool up) {
 	if (up) {
 		switch (key) {
+		case GLUT_KEY_ESC:
+			exit(EXIT_SUCCESS);
+			break;
 		case '0':
 		case '1':
 		case '2':
@@ -162,10 +178,6 @@ void DuEngine::keyboard(unsigned char key, int x, int y, bool up) {
 				shadertoy->uniforms->iNumBands = NUM_BANDS - 1;
 #endif
 			break;
-		case GLUT_KEY_ESC:
-			exit(EXIT_SUCCESS);
-			break;
-
 		default:
 			break;
 		}
@@ -357,9 +369,9 @@ GLuint DuEngine::initProgram(GLuint vertexshader, GLuint fragmentshader) {
 }
 
 void DuEngine::takeScreenshot(string folderName) {
-	if (m_is_created.find(folderName) == m_is_created.end()) {
+	if (m_isPathCreated.find(folderName) == m_isPathCreated.end()) {
 		CreateDirectory(folderName.c_str(), NULL);
-		m_is_created.insert(folderName);
+		m_isPathCreated.insert(folderName);
 	}
 
 	if (m_recordVideo) {

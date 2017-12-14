@@ -45,10 +45,11 @@ public:
 	void mouseMove(int x, int y);
 	void reshape(int width, int height);
 
+	int getFrameNumber();
+	string getPresetsPath() { return m_presetsPath; }
+
 private:
 	DuEngine();
-
-	int getFrameNumber();
 	static DuEngine *s_Instance;
 	clock_t beginTime;
 	Camera* camera;
@@ -60,65 +61,18 @@ private:
 	bool m_fullscreen = false;
 	bool m_recording = false;
 	bool m_paused = false; 
-	string m_recordPath = "";
-	string m_relativePath = "";
-	string m_presetPath = "";
 
+	string m_shadersPath = "";
+	string m_presetsPath = "";
+	unordered_set<string> m_isPathCreated;
+
+	string m_recordPath = "";
 	int m_recordStart = 0;
 	int m_recordEnd = 100;
 	bool m_recordVideo = false;
 	cv::VideoWriter* m_video = nullptr;
-	//int m_defaultWidth = 1920;
-	//int m_defaultHeight = 1080;
 	int m_defaultWidth = 1280;
 	int m_defaultHeight = 720;
-	unordered_set<string> m_is_created; 
-
-	unordered_map<string, string> ImageTextures {
-		{ "pano", "panorama.png" },
-		{ "abstract1", "tex07.jpg" },
-		{ "abstract2", "tex08.jpg" },
-		{ "abstract3", "tex20.jpg" },
-		{ "bayer", "tex15.png" },
-		{ "gnm", "tex12.png" },
-		{ "greynoise", "tex12.png" },
-		{ "gns", "tex10.png" },
-		{ "lichen", "tex06.png" },
-		{ "london", "tex04.jpg" },
-		{ "nyancat", "tex14.png" },
-		{ "organic1", "tex01.jpg" },
-		{ "organic2", "tex03.jpg" },
-		{ "organic3", "tex18.jpg" },
-		{ "organic4", "tex17.jpg" },
-		{ "pebbles", "tex19.png" },
-		{ "rgbanm", "tex16.png" },
-		{ "noise", "tex16.png" },
-		{ "rgbans", "tex11.png" },
-		{ "rocktiles", "tex00.jpg" },
-		{ "rustymetal", "tex02.jpg" },
-		{ "stars", "tex03.jpg" },
-		{ "wood", "tex05.jpg" },
-		{ "sjtu", "sjtu.jpg" },
-		{ "starr", "starr.jpg" },
-		{ "720p", "720p.jpg" },
-		{ "1080p", "1080p.jpg" },
-		{ "4k", "4k.jpg" },
-		{ "6k", "6k.jpg" },
-		{ "8k", "8k.jpg" }
-	};
-
-	unordered_map<string, string> VideoTextures{
-		{ "1961", "vid02.ogv" },
-		{ "google", "vid00.ogv" },
-		{ "claude", "vid03.webm" },
-		{ "claudevan", "vid03.webm" },
-		{ "britney", "vid01.webm" },
-		{ "britneyspears", "vid01.webm" },
-	};
-
-	unordered_map<string, string> FontTextures{ 
-		{ "font", "tex21.png" },
-	};
 
 private:
 	int getNumFrameFromVideos();

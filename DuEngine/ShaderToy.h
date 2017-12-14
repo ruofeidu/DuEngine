@@ -195,7 +195,7 @@ class ShaderToy
 
 	public:
 		ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels);
-		void loadShaders(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName);
+		void loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName);
 		// get FBO index
 		GLuint getID();
 		GLuint getTextureID();
@@ -217,7 +217,7 @@ public:
 
 	ShaderToy(DuEngine* _renderer);
 
-	void loadShaders(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName);
+	void loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName);
 
 	void setTexture2D(cv::Mat &mat, GLuint channel);
 

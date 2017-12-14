@@ -19,15 +19,27 @@ enum ETextureFiltering
 
 enum class TextureFilter : std::int8_t { NEAREST, LINEAR, MIPMAP };
 enum class TextureWarp : std::int8_t { CLAMP, REPEAT };
-enum class TextureType : std::int8_t { Unknown, RGB, Video, Keyboard, SH, FrameBuffer, Volume, LightField };
+enum class TextureType : std::int8_t { Unknown, RGB, VideoFile, VideoSequence, Keyboard, Font, SH, FrameBuffer, Volume, LightField };
 
 class Texture
 {
 public:
+	static TextureType QueryType(string str);
+	static TextureFilter QueryFilter(string str);
+	static TextureWarp QueryWarp(string str);
+	const static unordered_map<string, TextureType> TextureMaps;
+	const static unordered_map<string, string> ImageTextures;
+	const static unordered_map<string, string> VideoTextures;
+	const static unordered_map<string, string> FontTextures;
+
+public:
 	Texture() {};
 	// Acquire the current texture unit id for reading and binding to shader uniforms
-	GLuint GetTextureID();
-	GLuint GetDirectID(); 
+	GLuint getTextureID();
+	// Acquire the binded texture unit id
+	GLuint getDirectID();
+	// Acquire the texture type
+	TextureType getType();
 
 protected:
 	TextureType type = TextureType::Unknown;
@@ -57,7 +69,6 @@ private:
 	void setFiltering(int a_tfMagnification, int a_tfMinification);
 #endif
 };
-
 
 class TextureMat : public Texture
 {
@@ -95,31 +106,53 @@ public:
 	Texture2D(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
 };
 
+class FontTexture : public Texture2D
+{
+public:
+	FontTexture(TextureFilter filter, TextureWarp warp);
+};
+
 class VideoTexture : public Texture2D
 {
 public:
-	VideoTexture() {}; 
-	VideoTexture(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
 	int getNumFrame() { return m_numFrames; }
 	int getNumVideoFrame() { return m_numVideoFrames; }
-	void resetTime();
+	virtual void resetTime() = 0;
+	virtual void update() = 0;
 	void togglePaused();
-	void update();
 
 protected:
 	int m_numVideoFrames = 0;
 	int m_numFrames = 0;
 	double m_fps = DEFAULT_VIDEO_FPS;
 
-private:
+protected:
 	void error();
 	bool m_paused;
 	// distribution of one frame
 	vector<bool> m_distribution;
 	clock_t m_prevTime = 0;
-	VideoCapture m_video;
 	Mat smallerMat;
 	TextureFilter m_filter;
+};
+
+class VideoFileTexture : public VideoTexture
+{
+public:
+	VideoFileTexture(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+	void resetTime();
+	void update();
+
+private:
+	VideoCapture m_video;
+};
+
+class VideoSequenceTexture : public VideoTexture
+{
+public:
+	VideoSequenceTexture(string filename, int fps, int startFrame, int endFrame, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+	void resetTime();
+	void update();
 };
 
 #if COMPILE_WITH_SH
@@ -158,3 +191,4 @@ public:
 	void reshape(int _width, int _height);
 private:
 };
+

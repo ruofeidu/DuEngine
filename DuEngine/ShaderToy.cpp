@@ -20,10 +20,10 @@ ShaderToy::ShaderToy(DuEngine * _renderer, double _width, double _height, int _x
 #endif
 }
 
-ShaderToy::ShaderToy(DuEngine * _renderer) : ShaderToy(_renderer, _renderer->window->width, _renderer->window->height, 0, 0) {
+ShaderToy::ShaderToy(DuEngine *_renderer) : ShaderToy(_renderer, _renderer->window->width, _renderer->window->height, 0, 0) {
 }
 
-void ShaderToy::loadShaders(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName = "") {
+void ShaderToy::loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName = "") {
 	vertexShader = renderer->initShaders(GL_VERTEX_SHADER, vertexShaderName);
 	fragmentShader = renderer->initShaders(GL_FRAGMENT_SHADER, fragShaderName, uniformShaderName, mainFileName);
 	shaderProgram = renderer->initProgram(vertexShader, fragmentShader);
@@ -163,7 +163,7 @@ void ShaderToy::ShaderToyUniforms::linkShader(GLuint shaderProgram) {
 void ShaderToy::ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
 	if (uChannels[channel] >= 0) {
 		iChannels[channel] = tex; 
-		auto id = tex->GetTextureID();
+		auto id = tex->getTextureID();
 		glActiveTexture(GL_TEXTURE0 + id);
 		glBindTexture(GL_TEXTURE_2D, id);
 		glUniform1i(uChannels[channel], id);
@@ -219,12 +219,12 @@ void ShaderToy::ShaderToyUniforms::update() {
 	if (uMouse >= 0) glUniform4f(uMouse, iMouse.x, iMouse.y, iMouse.z, iMouse.w);
 	if (uDate >= 0) glUniform4f(uDate, iDate.x, iDate.y, iDate.z, iDate.w);
 	for (int i = 0; i < iChannels.size(); ++i) if (uChannels[i] >= 0) {
-		auto id = iChannels[i]->GetTextureID();
+		auto id = iChannels[i]->getTextureID();
 		glActiveTexture(GL_TEXTURE0 + id); 
 		glBindTexture(GL_TEXTURE_2D, id);
 		glUniform1i(uChannels[i], id);
 #if DEBUG_MULTIPASS
-		debug("Updated channel " + to_string(i) + " with texture " + to_string(iChannels[i]->GetTextureID())
+		debug("Updated channel " + to_string(i) + " with texture " + to_string(iChannels[i]->getTextureID())
 			+ " at location " + to_string(uChannels[i])
 			); 
 #endif
@@ -308,7 +308,7 @@ ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, Shade
 	tex = textures[1 - id];  
 }
 
-void ShaderToy::ShaderToyFrameBuffer::loadShaders(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName) {
+void ShaderToy::ShaderToyFrameBuffer::loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName) {
 	vertexShader = renderer->initShaders(GL_VERTEX_SHADER, vertexShaderName);
 	fragmentShader = renderer->initShaders(GL_FRAGMENT_SHADER, fragShaderName, uniformShaderName, mainFileName);
 	shaderProgram = renderer->initProgram(vertexShader, fragmentShader);
@@ -323,7 +323,7 @@ GLuint ShaderToy::ShaderToyFrameBuffer::getID() {
 }
 
 GLuint ShaderToy::ShaderToyFrameBuffer::getTextureID() {
-	return this->tex->GetTextureID();
+	return this->tex->getTextureID();
 }
 
 Texture* ShaderToy::ShaderToyFrameBuffer::getTexture() {
@@ -344,7 +344,7 @@ void ShaderToy::ShaderToyFrameBuffer::swapTextures() {
 	id = 1 - id;
 	tex = textures[1 - id];
 	for (int i = 0; i < 2; ++i) {
-		textures[i]->setReadingTextureID(tex->GetDirectID());
+		textures[i]->setReadingTextureID(tex->getDirectID());
 	}
 }
 

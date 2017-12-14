@@ -16,7 +16,7 @@ float fbm( vec2 p )
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-    float time = mod( iTime, 60.0 );
+    float time = mod( iTime + 5.0, 60.0 );
 	vec2 p = (-iResolution.xy+2.0*fragCoord.xy) / iResolution.y;
     vec2 i = p;
 
