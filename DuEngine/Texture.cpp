@@ -42,16 +42,21 @@ const unordered_map<string, TextureType> Texture::TextureMaps {
 	{ "videoseq", TextureType::VideoSequence },
 	{ "key", TextureType::Keyboard },
 	{ "sh", TextureType::SH },
+	{ "font", TextureType::Font },
 	{ "a", TextureType::FrameBuffer },
 	{ "b", TextureType::FrameBuffer },
 	{ "c", TextureType::FrameBuffer },
 	{ "d", TextureType::FrameBuffer },
+	{ "e", TextureType::FrameBuffer },
+	{ "f", TextureType::FrameBuffer },
+	{ "g", TextureType::FrameBuffer },
 	{ "volume", TextureType::Volume },
 	{ "light", TextureType::LightField },
 };
 
 const unordered_map<string, string> Texture::ImageTextures {
 	{ "pano", "panorama.png" },
+	{ "panohd", "pano.png" },
 	{ "abstract1", "tex07.jpg" },
 	{ "abstract2", "tex08.jpg" },
 	{ "abstract3", "tex20.jpg" },
@@ -485,6 +490,7 @@ void FrameBufferTexture::setReadingTextureID(GLuint id) {
 void FrameBufferTexture::reshape(int _width, int _height) {
 	glBindTexture(GL_TEXTURE_2D, id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, _width, _height, 0, GL_RGBA, GL_FLOAT, NULL);
+	this->generateMipmaps();
 
 	this->setFiltering(); 
 
