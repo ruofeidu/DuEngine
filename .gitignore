@@ -3,10 +3,14 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+*.jpg
 *.png
+*.log
 *.mp4
 *.avi
+
 SHSaliency/
+Friends/
 
 # User-specific files
 *.suo

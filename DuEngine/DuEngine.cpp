@@ -396,7 +396,8 @@ void DuEngine::takeScreenshot(string folderName) {
 		if (getFrameNumber() == m_recordEnd) {
 			m_video->release(); 
 		}
+	} else {
+		cv::imwrite(folderName + "/" + this->configName.substr(0, configName.size() - 4) + "_" + to_string(getFrameNumber()) + ".png", img);
 	}
-	cv::imwrite(folderName + "/" + this->configName.substr(0, configName.size() - 4) + "_" + to_string(getFrameNumber()) + ".png", img);
 }
 
