@@ -52,23 +52,7 @@ void DuEngine::initScene() {
 			auto type = config->GetStringWithDefault(iPrefix + "type", "unknown");
 			std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 			auto fileName = smartFilePath(config->GetStringWithDefault(iPrefix + "tex", ""), m_resourcesPath);
-
-			// replace the predefined textures into the real file names
-			for (const auto& key : Texture::ImageTextures) {
-				if (!type.compare(key.first)) {
-					type = "rgb";
-					fileName = m_presetsPath + key.second;
-					break;
-				}
-			}
-			for (const auto& key : Texture::VideoTextures) {
-				if (!type.compare(key.first)) {
-					type = "video";
-					fileName = m_presetsPath + key.second;
-					break;
-				}
-			}
-
+			Texture::QueryFileNameByType(type, fileName, m_presetsPath);
 			auto textureType = Texture::QueryType(type);
 			auto textureFilter = Texture::QueryFilter(config->GetStringWithDefault(iPrefix + "filter", "mipmap"));
 			auto textureWarp = Texture::QueryWarp(config->GetStringWithDefault(iPrefix + "wrap", "repeat"));

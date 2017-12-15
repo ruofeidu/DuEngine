@@ -43,6 +43,23 @@ TextureWarp Texture::QueryWarp(string wrap) {
 	return !wrap.compare("repeat") ? TextureWarp::REPEAT : TextureWarp::CLAMP;
 }
 
+void Texture::QueryFileNameByType(string & type, string & fileName, string& presetsPath) {
+	for (const auto& key : Texture::ImageTextures) {
+		if (!type.compare(key.first)) {
+			type = "rgb";
+			fileName = presetsPath + key.second;
+			break;
+		}
+	}
+	for (const auto& key : Texture::VideoTextures) {
+		if (!type.compare(key.first)) {
+			type = "video";
+			fileName = presetsPath + key.second;
+			break;
+		}
+	}
+}
+
 const unordered_map<string, TextureType> Texture::TextureMaps {
 	{ "rgb", TextureType::RGB },
 	{ "video", TextureType::VideoFile },

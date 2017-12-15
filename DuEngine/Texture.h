@@ -27,9 +27,15 @@ public:
 	static TextureType QueryType(string str);
 	static TextureFilter QueryFilter(string str);
 	static TextureWarp QueryWarp(string str);
+	// replace the predefined textures into the real file names
+	static void QueryFileNameByType(string& type, string& fileName, string& presetsPath);
+	// mapping type stringss to TextureType
 	const static unordered_map<string, TextureType> TextureMaps;
+	// mapping strings to Image filenames
 	const static unordered_map<string, string> ImageTextures;
+	// mapping strings to Video filenames
 	const static unordered_map<string, string> VideoTextures;
+	// mapping type strings to Font filenames
 	const static unordered_map<string, string> FontTextures;
 
 public:
