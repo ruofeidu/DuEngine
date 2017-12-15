@@ -234,7 +234,7 @@ void TextureMat::generateFromMat(cv::Mat & mat) {
 	// Create the texture
 	glTexImage2D(GL_TEXTURE_2D,  // Type of texture
 		0,					     // Pyramid level (for mip-mapping) - 0 is the top level
-		GL_RGB,				     // Internal colour format to convert to
+		m_openGLFormat,		     // Internal colour format to convert to
 		mat.cols,			     // Image width  i.e. 640 for Kinect in standard mode
 		mat.rows,			     // Image height i.e. 480 for Kinect in standard mode
 		0,					     // Border width in pixels (can either be 1 or 0)
@@ -248,17 +248,18 @@ void TextureMat::generateFromMat(cv::Mat & mat) {
 void TextureMat::updateDataTypeFormat() {
 	// OpenCV has reversed Y coordinates
 	if (m_vFlip) flip(m_mat, m_mat, 0);
-	datatypeFromMat(m_mat); 
-	formatFromMat(m_mat);
+	updateDatatypeFromMat(m_mat); 
+	updateFormatFromMat(m_mat);
+	updateOpenGLInternalFormat(m_mat); 
 }
 
-void TextureMat::datatypeFromMat(cv::Mat & mat) {
+void TextureMat::updateDatatypeFromMat(cv::Mat & mat) {
 	string r; // 8UC3 for example
 	auto type = mat.type();
 	uchar depth = type & CV_MAT_DEPTH_MASK;
 	uchar chans = 1 + (type >> CV_CN_SHIFT);
 	switch (depth) {
-		case CV_8U:  r = "8U";m_dataType = GL_UNSIGNED_BYTE;  break;
+		case CV_8U:  r = "8U"; m_dataType = GL_UNSIGNED_BYTE;  break;
 		case CV_8S:  r = "8S"; m_dataType = GL_BYTE; break;
 		case CV_16U: r = "16U"; m_dataType = GL_UNSIGNED_SHORT; break;
 		case CV_16S: r = "16S"; m_dataType = GL_SHORT; break;
@@ -275,11 +276,41 @@ void TextureMat::datatypeFromMat(cv::Mat & mat) {
 // Set incoming texture format to:
 // GL_BGR       for CV_CAP_OPENNI_BGR_IMAGE,
 // GL_LUMINANCE for CV_CAP_OPENNI_DISPARITY_MAP,
-void TextureMat::formatFromMat(cv::Mat & mat) {
-	if (mat.channels() == 1) {
+void TextureMat::updateFormatFromMat(cv::Mat & mat) {
+	switch (mat.channels()) {
+	case 1:
 		m_format = GL_LUMINANCE;
-	} else {
+		break;
+	case 2:
+		m_format = GL_RG;
+		break;
+	case 3:
 		m_format = GL_BGR;
+		break;
+	case 4:
+		m_format = GL_BGRA;
+		break;
+	default:
+		logerror("Unknown channels of mat");
+	}
+}
+
+void TextureMat::updateOpenGLInternalFormat(cv::Mat & mat) {
+	switch (mat.channels()) {
+	case 1: 
+		m_openGLFormat = GL_R; 
+		break; 
+	case 2:
+		m_openGLFormat = GL_RG;
+		break;
+	case 3:
+		m_openGLFormat = GL_RGB;
+		break;
+	case 4:
+		m_openGLFormat = GL_RGBA;
+		break;
+	default:
+		logerror("Unknown channels of mat");
 	}
 }
 
@@ -493,7 +524,6 @@ void FrameBufferTexture::reshape(int _width, int _height) {
 	this->generateMipmaps();
 
 	this->setFiltering(); 
-
 	glFramebufferTexture2D(
 		GL_FRAMEBUFFER,
 		GL_COLOR_ATTACHMENT0, // Specifies the attachment point to which an image from texture should be attached. Must be one of the following symbolic constants: GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, or GL_STENCIL_ATTACHMENT.
@@ -507,7 +537,7 @@ void FrameBufferTexture::reshape(int _width, int _height) {
 FontTexture::FontTexture(TextureFilter filter, TextureWarp warp) {
 	m_filename = DuEngine::GetInstance()->getPresetsPath() + Texture::FontTextures.find("font")->second;
 	init(m_filename, true, filter, warp);
-	m_mat = imread(m_filename);
+	m_mat = imread(m_filename, cv::IMREAD_UNCHANGED);
 	this->generateFromMat();
 	this->type = TextureType::Font;
 }

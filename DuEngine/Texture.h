@@ -83,6 +83,7 @@ protected:
 	bool m_vFlip = true;
 	GLuint m_format = GL_BGR;
 	GLuint m_dataType = GL_UNSIGNED_BYTE;
+	GLuint m_openGLFormat = GL_RGB; 
 
 protected:
 	// Generate, active, bind, and set filtering, 
@@ -95,8 +96,9 @@ protected:
 
 private:
 	void generateFromMat(cv::Mat& mat);
-	void datatypeFromMat(cv::Mat& mat);
-	void formatFromMat(cv::Mat& mat);
+	void updateDatatypeFromMat(cv::Mat& mat);
+	void updateFormatFromMat(cv::Mat& mat);
+	void updateOpenGLInternalFormat(cv::Mat& mat); 
 };
 
 class Texture2D : public TextureMat

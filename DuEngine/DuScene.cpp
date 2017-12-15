@@ -42,7 +42,7 @@ void DuEngine::initScene() {
 		auto channels_count = config->GetIntWithDefault(prefix + "channels_count", 0);
 		for (int i = 0; i < channels_count; ++i) {
 			string iPrefix = prefix + "iChannel" + to_string(i) + "_";
-			auto type = config->GetStringWithDefault(iPrefix + "type", "rgb");
+			auto type = config->GetStringWithDefault(iPrefix + "type", "unknown");
 			std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 			auto fileName = smartFilePath(config->GetStringWithDefault(iPrefix + "tex", ""), m_resourcesPath);
 

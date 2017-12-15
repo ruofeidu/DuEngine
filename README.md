@@ -2,7 +2,16 @@
 Here is the implementation of using basic I/O to render fragment-shader demos from ShaderToy in C++.
 ## Installation
 Require: OpenGL 4.5+, OpenCV 3.0+, GLM, Visual Studio
-The solution file locates in DuEngine/DuEngine.sln
+
+The solution file locates in DuEngine/DuEngine.sln, or simply click OpenSolution.cmd.
+Compiled in Windows right now, will update with Mac in the future.
+
+Four Environment paths are required. Easy and simple!
+
+* OPENCV_INC: Directory to OpenCV
+* GLEW_INC: Directory to Glew, Freeglut, and GLM headers
+* OPENCV_LIB: Directory to OpenCV libraries
+* GLEW_LIB: Directory to Glew and Freeglut libraries
 
 ## Features
 ### ConfigFiles
