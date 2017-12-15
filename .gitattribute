@@ -17,6 +17,6 @@ RayTracing/* linguist-vendored
 Sampling/* linguist-vendored
 ShaderOfWeek/* linguist-vendored
 UnitTests/* linguist-vendored
+*.glsl linguist-language=C++
 *.ini linguist-documentation
-*.glsl linguist-vendored
 *.cmd linguist-documentation
