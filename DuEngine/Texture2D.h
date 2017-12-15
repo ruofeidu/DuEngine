@@ -1,3 +1,4 @@
+#pragma once
 /**
 * DuRenderer is a basic OpenGL-based renderer which implements most of the ShaderToy functionality
 * Ruofei Du | Augmentarium Lab | UMIACS
@@ -5,16 +6,12 @@
 * me [at] duruofei [dot] com
 * 12/6/2017
 */
-#include "stdafx.h"
-#include "Camera.h"
+#include "TextureMat.h"
 
-Camera::Camera() {
-	reset();
-}
+class Texture2D : public TextureMat
+{
+public:
+	Texture2D() {};
+	Texture2D(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+};
 
-void Camera::reset() {
-	using namespace glm;
-	eye = vec3(0.0, 0.0, 1.0);
-	up = vec3(0.0, 1.0, 0.0);
-	center = vec3(0.0);
-}

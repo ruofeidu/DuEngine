@@ -134,8 +134,24 @@
     <ClCompile Include="DuUtils.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ShaderToy.cpp" />
+    <ClCompile Include="ShaderToyFrameBuffer.cpp" />
+    <ClCompile Include="ShaderToyGeommetry.cpp" />
+    <ClCompile Include="ShaderToyUniforms.cpp" />
     <ClCompile Include="SHUtils.cpp" />
+    <ClCompile Include="Textuer2D.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Texture3D.cpp" />
+    <ClCompile Include="TextureFont.cpp" />
+    <ClCompile Include="TextureFrameBuffer.cpp" />
+    <ClCompile Include="TextureKeyboard.cpp" />
+    <ClCompile Include="TextureLightField.cpp" />
+    <ClCompile Include="TextureMat.cpp" />
+    <ClCompile Include="TextureSH.cpp" />
+    <ClCompile Include="TexturesManager.cpp" />
+    <ClCompile Include="TextureVideo.cpp" />
+    <ClCompile Include="TextureVideoFile.cpp" />
+    <ClCompile Include="TextureVideoLightField.cpp" />
+    <ClCompile Include="TextureVideoSequence.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +166,19 @@
     <ClInclude Include="SHUtils.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Texture2D.h" />
+    <ClInclude Include="Texture3D.h" />
+    <ClInclude Include="TextureFont.h" />
+    <ClInclude Include="TextureFrameBuffer.h" />
+    <ClInclude Include="TextureKeyboard.h" />
+    <ClInclude Include="TextureLightField.h" />
+    <ClInclude Include="TextureMat.h" />
+    <ClInclude Include="TexturesManager.h" />
+    <ClInclude Include="TextureSH.h" />
+    <ClInclude Include="TextureVideo.h" />
+    <ClInclude Include="TextureVideoFile.h" />
+    <ClInclude Include="TextureVideoLightField.h" />
+    <ClInclude Include="TextureVideoSequence.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

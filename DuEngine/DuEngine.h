@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "ShaderToy.h"
 #include "DuConfig.h"
-#include "Texture.h"
+#include "TexturesManager.h"
 #include "Camera.h"
 #include "Window.h"
 #include "DuUtils.h"
@@ -20,9 +20,9 @@ class DuEngine
 {
 	friend class ShaderToy;
 	friend class Texture;
-	friend class VideoTexture;
-	friend class KeyboardTexture;
-	friend class SHTexture;
+	friend class TextureVideo;
+	friend class TextureKeyboard;
+	friend class TextureSH;
 
 public:
 	static DuEngine *GetInstance();
@@ -30,8 +30,8 @@ public:
 	void initScene();
 
 protected:
-	vector<VideoTexture*> videoTextures;
-	KeyboardTexture* keyboardTexture;
+	vector<TextureVideo*> videoTextures;
+	TextureKeyboard* keyboardTexture;
 	Texture* fontTexture;
 	vector<Texture*> textures;
 

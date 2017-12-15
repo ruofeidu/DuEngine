@@ -57,7 +57,7 @@ const float PI = 3.14159265359f;
 #define DEBUG_VIDEO 0
 #define DEBUG_PATH 0
 #define DEBUG_TEXTURE_DEPRECATED_FILTERING 0
-#define VERBOSE_OUTPUT 0
+#define VERBOSE_OUTPUT 1
 
 #if COMPILE_WITH_SH
 #include "SHUtils.h"

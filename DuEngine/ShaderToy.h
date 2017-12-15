@@ -1,7 +1,7 @@
 #pragma once;
 #include "stdafx.h"
 #include "DuEngine.h"
-#include "Texture.h"
+#include "TexturesManager.h"
 
 using namespace glm;
 using namespace std;
@@ -186,10 +186,10 @@ class ShaderToy
 		// FBO, frame buffer object ID
 		GLuint FBO[2];
 		// id of the FBO array
-		FrameBufferTexture* tex = textures[1];
+		TextureFrameBuffer* tex = textures[1];
 	public:
 		// texture object
-		FrameBufferTexture* textures[2];
+		TextureFrameBuffer* textures[2];
 
 		GLuint vertexShader, fragmentShader, shaderProgram;
 

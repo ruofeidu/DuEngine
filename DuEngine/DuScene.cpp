@@ -1,3 +1,10 @@
+/**
+* DuRenderer is a basic OpenGL-based renderer which implements most of the ShaderToy functionality
+* Ruofei Du | Augmentarium Lab | UMIACS
+* Computer Science Department | University of Maryland, College Park
+* me [at] duruofei [dot] com
+* 12/6/2017
+*/
 #include "stdafx.h"
 #include "DuEngine.h"
 #include "DuUtils.h"
@@ -77,21 +84,21 @@ void DuEngine::initScene() {
 				t = new Texture2D(fileName, vFlip, textureFilter, textureWarp); 
 				break;
 			case TextureType::VideoFile:
-				t = new VideoFileTexture(fileName, vFlip, textureFilter, textureWarp);
-				videoTextures.push_back((VideoTexture*)t);
+				t = new TextureVideoFile(fileName, vFlip, textureFilter, textureWarp);
+				videoTextures.push_back((TextureVideo*)t);
 				break;
 			case TextureType::VideoSequence:
-				t = new VideoSequenceTexture(fileName, fps, startFrame, endFrame, textureFilter, textureWarp);
-				videoTextures.push_back((VideoTexture*)t);
+				t = new TextureVideoSequence(fileName, fps, startFrame, endFrame, textureFilter, textureWarp);
+				videoTextures.push_back((TextureVideo*)t);
 				break;
 			case TextureType::Keyboard:
 				if (!keyboardTexture)
-					keyboardTexture = new KeyboardTexture();
+					keyboardTexture = new TextureKeyboard();
 				t = keyboardTexture;
 				break; 
 			case TextureType::Font:
 				if (!fontTexture) {
-					fontTexture = new FontTexture(textureFilter, textureWarp);
+					fontTexture = new TextureFont(textureFilter, textureWarp);
 				}
 				t = fontTexture;
 				break; 
