@@ -13,6 +13,9 @@ Four Environment paths are required. Easy and simple!
 * OPENCV_LIB: Directory to OpenCV libraries
 * GLEW_LIB: Directory to Glew and Freeglut libraries
 
+To create a new ShaderToy demo, just click _create.cmd in any category folder like "Ray Tracing", input the desired shader name, 
+write in the generated Name.glsl file, modify the channels in the Name.ini file, it's all set.
+
 ## Features
 ### ConfigFiles
 This renderer supports reading from a simple config files and built-in textures.
