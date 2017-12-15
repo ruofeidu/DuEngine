@@ -19,7 +19,7 @@ enum ETextureFiltering
 
 enum class TextureFilter : std::int8_t { NEAREST, LINEAR, MIPMAP };
 enum class TextureWarp : std::int8_t { CLAMP, REPEAT };
-enum class TextureType : std::int8_t { Unknown, RGB, VideoFile, VideoSequence, Keyboard, Font, SH, FrameBuffer, Volume, LightField };
+enum class TextureType : std::int8_t { Unknown, RGB, Noise, VideoFile, VideoSequence, Keyboard, Font, SH, FrameBuffer, Volume, LightField };
 
 class Texture
 {
@@ -33,6 +33,8 @@ public:
 	const static unordered_map<string, TextureType> TextureMaps;
 	// mapping strings to Image filenames
 	const static unordered_map<string, string> ImageTextures;
+	// mapping strings to Image filenames
+	const static unordered_map<string, string> NoiseTextures;
 	// mapping strings to Video filenames
 	const static unordered_map<string, string> VideoTextures;
 	// mapping type strings to Font filenames
@@ -44,6 +46,8 @@ public:
 	GLuint getTextureID();
 	// Acquire the binded texture unit id
 	GLuint getDirectID();
+	// Acquire resolution of the binded texture
+	virtual vec3 getResolution() = 0; 
 	// Acquire the texture type
 	TextureType getType();
 

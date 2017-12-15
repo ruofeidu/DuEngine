@@ -14,6 +14,7 @@ public:
 	TextureMat() {};
 	TextureMat(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
 	void init(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+	vec3 getResolution(); 
 
 protected:
 	Mat m_mat = Mat();

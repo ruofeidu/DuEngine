@@ -14,6 +14,9 @@ public:
 	TextureFrameBuffer(GLuint FBO, int width, int height, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
 	void setReadingTextureID(GLuint id);
 	void reshape(int _width, int _height);
+	vec3 getResolution();
 private:
+	float m_width = 0;
+	float m_height = 0; 
 };
 

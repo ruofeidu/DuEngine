@@ -33,4 +33,11 @@ void TextureFrameBuffer::reshape(int _width, int _height) {
 		0 // Specifies the mipmap level of the texture image to be attached, which must be 0.
 		);
 	this->generateMipmaps();
+
+	m_width = _width; 
+	m_height = _height; 
+}
+
+vec3 TextureFrameBuffer::getResolution() {
+	return vec3(m_width, m_height, 1.0f);
 }

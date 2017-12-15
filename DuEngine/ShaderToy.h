@@ -64,21 +64,21 @@ class ShaderToy
 	{
 	public:
 		// viewport resolution (in pixels)
-		vec3 iResolution;
+		static vec3 iResolution;
 		// shader playback time (in seconds)
-		float iGlobalTime;
+		static float iGlobalTime;
 		// shader playback frame
-		int iFrame;
+		static int iFrame;
 		// let the first three frames the same
 		int iSkip = SKIP_FIRST_FRAMES;
 		// mouse pixel coords. xy: current (if MLB down), zw: click
-		vec4 iMouse;
+		static vec4 iMouse;
 		// (year, month, day, time in seconds)
-		vec4 iDate;
+		static vec4 iDate;
 		// rendering time (in seconds)
-		float iTimeDelta = 1000.0f / 60.0f;
+		static float iTimeDelta;
 		// the frame rate as int
-		int iFrameRate = 60;
+		static int iFrameRate;
 		// input channel. XX = 2D/Cube
 		vector<Texture*> iChannels;
 		// buffers of vector2
@@ -109,7 +109,7 @@ class ShaderToy
 		// input channel. XX = 2D/Cube
 		vector<GLint> uChannels;
 		// channel resolution (in pixels)
-		vector<GLint> uChannelResolution;
+		vector<GLint> uChannelResolutions;
 		// channel playback time (in seconds)
 		vector<GLint> uChannelTimes;
 		// buffers of vector2

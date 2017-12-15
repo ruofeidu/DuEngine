@@ -51,6 +51,13 @@ void Texture::QueryFileNameByType(string & type, string & fileName, string& pres
 			break;
 		}
 	}
+	for (const auto& key : Texture::NoiseTextures) {
+		if (!type.compare(key.first)) {
+			type = "noise";
+			fileName = presetsPath + key.second;
+			break;
+		}
+	}
 	for (const auto& key : Texture::VideoTextures) {
 		if (!type.compare(key.first)) {
 			type = "video";
@@ -62,6 +69,7 @@ void Texture::QueryFileNameByType(string & type, string & fileName, string& pres
 
 const unordered_map<string, TextureType> Texture::TextureMaps {
 	{ "rgb", TextureType::RGB },
+	{ "noise", TextureType::Noise },
 	{ "video", TextureType::VideoFile },
 	{ "videoseq", TextureType::VideoSequence },
 	{ "key", TextureType::Keyboard },
@@ -85,9 +93,6 @@ const unordered_map<string, string> Texture::ImageTextures {
 	{ "abstract2", "tex08.jpg" },
 	{ "abstract3", "tex20.jpg" },
 	{ "bayer", "tex15.png" },
-	{ "gnm", "tex12.png" },
-	{ "greynoise", "tex12.png" },
-	{ "gns", "tex10.png" },
 	{ "lichen", "tex06.png" },
 	{ "london", "tex04.jpg" },
 	{ "nyancat", "tex14.png" },
@@ -96,9 +101,6 @@ const unordered_map<string, string> Texture::ImageTextures {
 	{ "organic3", "tex18.jpg" },
 	{ "organic4", "tex17.jpg" },
 	{ "pebbles", "tex19.png" },
-	{ "rgbanm", "tex16.png" },
-	{ "noise", "tex16.png" },
-	{ "rgbans", "tex11.png" },
 	{ "rocktiles", "tex00.jpg" },
 	{ "rustymetal", "tex02.jpg" },
 	{ "stars", "tex03.jpg" },
@@ -109,8 +111,21 @@ const unordered_map<string, string> Texture::ImageTextures {
 	{ "1080p", "1080p.jpg" },
 	{ "4k", "4k.jpg" },
 	{ "6k", "6k.jpg" },
-	{ "8k", "8k.jpg" }
+	{ "8k", "8k.jpg" },
+	{ "black", "black.jpg" }
 };
+
+
+const unordered_map<string, string> Texture::NoiseTextures{
+	{ "gnm", "tex12.png" },
+	{ "greynoise", "tex12.png" },
+	{ "graynoise", "tex12.png" },
+	{ "gns", "tex10.png" },
+	{ "rgbanm", "tex16.png" },
+	{ "noise", "tex16.png" },
+	{ "rgbans", "tex11.png" },
+};
+
 
 const unordered_map<string, string> Texture::VideoTextures {
 	{ "1961", "vid02.ogv" },

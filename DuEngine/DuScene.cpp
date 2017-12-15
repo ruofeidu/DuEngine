@@ -64,6 +64,8 @@ void DuEngine::initScene() {
 			Texture* t = nullptr; 
 
 			switch (textureType) {
+			case TextureType::Noise:
+				vFlip = config->GetBoolWithDefault(iPrefix + "vflip", false);
 			case TextureType::RGB:
 				t = new Texture2D(fileName, vFlip, textureFilter, textureWarp); 
 				break;

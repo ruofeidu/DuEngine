@@ -1,10 +1,21 @@
 #include "stdafx.h"
 #include "ShaderToy.h"
 
+vec3 ShaderToy::ShaderToyUniforms::iResolution;
+float ShaderToy::ShaderToyUniforms::iGlobalTime;
+int ShaderToy::ShaderToyUniforms::iFrame;
+vec4 ShaderToy::ShaderToyUniforms::iMouse;
+vec4 ShaderToy::ShaderToyUniforms::iDate;
+float ShaderToy::ShaderToyUniforms::iTimeDelta = 1000.0f / 60.0f;
+int ShaderToy::ShaderToyUniforms::iFrameRate = 60;
+
+
 ShaderToy::ShaderToyUniforms::ShaderToyUniforms(ShaderToyGeometry* geom, int numChannels) {
 	reset(geom);
 	iChannels = vector<Texture*>(numChannels);
 	uChannels = vector<GLint>(numChannels);
+	uChannelResolutions = vector<GLint>(numChannels);
+	uChannelTimes = vector<GLint>(numChannels);
 	iVec2Buffers = vector<GLuint>(numChannels);
 	uVec2Buffers = vector<GLint>(numChannels);
 }
@@ -49,11 +60,15 @@ void ShaderToy::ShaderToyUniforms::linkShader(GLuint shaderProgram) {
 	uFrameRate = glGetUniformLocation(shaderProgram, "iFrameRate");
 	uTimeDelta = glGetUniformLocation(shaderProgram, "iTimeDelta");
 	for (int i = 0; i < iChannels.size(); ++i) {
-		string uName = "iChannel" + to_string(i);
+		auto uName = "iChannel" + to_string(i);
 		uChannels[i] = glGetUniformLocation(shaderProgram, uName.c_str());
+		uName = "iChannelResolution[" + to_string(i) + "]";
+		uChannelResolutions[i] = glGetUniformLocation(shaderProgram, uName.c_str());
+		uName = "iChannelTime[" + to_string(i) + "]";
+		uChannelTimes[i] = glGetUniformLocation(shaderProgram, uName.c_str());
 	}
 	for (int i = 0; i < iVec2Buffers.size(); ++i) {
-		string uName = "iVec2" + to_string(i);
+		auto uName = "iVec2" + to_string(i);
 		uVec2Buffers[i] = glGetUniformLocation(shaderProgram, uName.c_str());
 	}
 #if COMPILE_WITH_SH
@@ -132,7 +147,14 @@ void ShaderToy::ShaderToyUniforms::update() {
 		debug("Updated channel " + to_string(i) + " with texture " + to_string(iChannels[i]->getTextureID())
 			+ " at location " + to_string(uChannels[i])
 			);
-#endif
+#endif		
+		if (uChannelResolutions[i] >= 0) {
+			auto res = iChannels[i]->getResolution(); 
+			glUniform3f(uChannelResolutions[i], res.x, res.y, res.z);
+		}
+		if (uChannelTimes[i] >= 0) {
+			glUniform1f(uChannelTimes[i], iGlobalTime);
+		}
 	}
 
 	for (int i = 0; i < vec2_buffers.size(); ++i) if (uVec2Buffers[i] >= 0) {

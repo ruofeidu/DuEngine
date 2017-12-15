@@ -44,7 +44,7 @@ else:
             f.write('buffers_count\t=\t%d\n' % numBuffers)
             for i in range(numBuffers):
                 ch = chr(65+i)
-                f.write('%s_channels_count\t=\t1\n%s_iChannel0_type\t=\tlondon\n' % (ch, ch))
+                f.write('%s_channels_count\t=\t1\n%s_iChannel0_type\t=\tblack\n' % (ch, ch))
     
     with open("%s.glsl" % filename, "w") as f:
         f.write('// %s\n' % shaderToyName)
