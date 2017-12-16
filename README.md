@@ -1,37 +1,46 @@
-# DuEngine for ShaderToy
-Here is the implementation of using basic I/O to render fragment-shader demos from ShaderToy in C++.
-## Installation
-Require: OpenGL 4.5+, OpenCV 3.0+, GLM, Visual Studio
+# DuEngine
+DuEngine is an efficient and interactive C++ graphics engine for rendering, managing, recording image and video screenshots of ShaderToy-like demos with custom 2D/3D/Video textures.
 
-The solution file locates in DuEngine/DuEngine.sln, or simply click OpenSolution.cmd.
-Compiled in Windows right now, will update with Mac in the future.
+## Compilation
+Dependencies: OpenGL 4.5+, [Glew](http://glew.sourceforge.net/install.html), [OpenCV 3.0+](https://opencv.org/releases.html), [GLM](https://github.com/g-truc/glm/releases), [Visual Studio 2015](https://www.visualstudio.com/downloads)+
 
-Four Environment paths are required. Easy and simple!
+* To compile the project, simply run *OpenSolution.cmd*, or locate the solution file at *DuEngine/DuEngine.sln*
+* To test the project, run *UnitTest/debug.cmd*, and you will see the renderer with all sorts of input channels.
 
-* OPENCV_INC: Directory to OpenCV
-* GLEW_INC: Directory to Glew, Freeglut, and GLM headers
-* OPENCV_LIB: Directory to OpenCV libraries
-* GLEW_LIB: Directory to Glew and Freeglut libraries
+If the compilation fails, please fix the following five environment variables.
 
-To create a new ShaderToy demo, just click _create.cmd in any category folder like "Ray Tracing", input the desired shader name, 
-write in the generated Name.glsl file, modify the channels in the Name.ini file, it's all set.
+* OPENCV_INC: Directory to OpenCV include folder.
+* GLEW_INC: Directory to Glew, Freeglut, and GLM headers.
+* OPENCV_LIB: Directory to OpenCV libraries.
+* GLEW_LIB: Directory to Glew and Freeglut libraries.
+* PATH: Add the executable DLLs of OpenCV and GLUT into this variables.
+
+## Run the Default Demo
+
+
+## Create New Demos
+Dependency: Python
+
+To create a new ShaderToy demo, just click *_create.cmd* in any category folder like "Ray Tracing". In the console, please input the desired shader name, like "Test". The Python script will generate *Test.glsl*, *Test.ini*, and *Test.cmd* files. The GLSL file is the main Shadertoy-like GLSL code, the ini file is the config file which defines the input channels, and the cmd file is where you run the demo.
 
 ## Features
 ### ConfigFiles
-This renderer supports reading from a simple config files and built-in textures.
+This renderer provides an easy-to-use interface to link any GLSL demos with built-in, and custom textures.
 Run:
 ```c
 DuEngine config.ini
 ```
 The config file reads like:
 ```c
-shader_frag		=	$Name.glsl
-buffers_count	=	4
-channels_count	=	4
-iChannel0_type	=	A
-iChannel1_type	=	B
-iChannel2_type	=	C
-iChannel3_type	=	D
+shader_frag		    =	$Name.glsl
+buffers_count	    =	4
+channels_count	    =	4
+iChannel0_type	    =	noise
+iChannel1_type	    =	rgb
+iChannel1_tex       =   whatever.png
+iChannel2_type	    =	video
+iChannel2_tex       =   whatever.mp4
+iChannel3_type	    =	A
 A_channels_count	=	1
 A_iChannel0_type	=	london
 B_channels_count	=	1
@@ -45,13 +54,20 @@ D_iChannel0_type	=	C
 ### Multipass
 Full-featured multipass rendering
 
-### Screenshots
+### Screenshots and Recording
+Press F2 to take a screen shot. Inside the configuration file, please add the following statements for recording a video / sequences of images:
+```C
+recording		=	true
+record_start	=	1
+record_end		=	50
+record_video	=	true
+```
+The video will be stored in record by default.
 
-
-Here stores some of my GLSL code written in Shadertoy.com
+In the end, here stores some of my GLSL code written in Shadertoy.com
 [My ShaderToy Public Profile](https://www.shadertoy.com/user/starea)
 
-## Demos and blog posts
+## Demos and Blog Posts
 ![Interactive Poisson Blending](http://www.duruofei.com/Public/trailer/poisson.jpg)
 * [Interactive Poisson Blending](https://www.shadertoy.com/view/4l3Xzl)
     * [Blog post](http://blog.ruofeidu.com/interactive-poisson-blending)

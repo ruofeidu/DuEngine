@@ -5,9 +5,9 @@
 #pragma warning(disable:4996)
 
 #ifdef _DEBUG 
-#pragma comment(lib, "opencv_world330d.lib")
+#pragma comment(lib, "opencv_world331d.lib")
 #else 
-#pragma comment(lib, "opencv_world330.lib")
+#pragma comment(lib, "opencv_world331.lib")
 #endif
 #pragma comment(lib, "glew32.lib")
 
