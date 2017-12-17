@@ -14,17 +14,17 @@ using namespace cv;
 void DuEngine::initScene() {
 	clock_t begin_time = clock();
 	
-	shadertoy = new ShaderToy(DuEngine::GetInstance());
+	m_shadertoy = new ShaderToy(DuEngine::GetInstance());
 
 	auto vertexShaderName = config->GetStringWithDefault("shader_vert", m_shadersPath + "shadertoy.vert.glsl");
 	auto uniformShaderName = config->GetStringWithDefault("shader_uniform", m_shadersPath + "shadertoy.uniforms.glsl");
 	auto mainShaderName = config->GetStringWithDefault("shader_main", m_shadersPath + "shadertoy.main.glsl");
 
-	for (int buffer = 0; buffer < 1 + shadertoy->m_frameBuffers.size(); ++buffer) {
+	for (int buffer = 0; buffer < 1 + m_shadertoy->getNumFrameBuffers(); ++buffer) {
 		auto suffix = !buffer ? "" : string(1, char('A' + buffer - 1));
 		auto prefix = !buffer ? "" : suffix + "_";
-		auto fbo = !buffer ? nullptr : shadertoy->m_frameBuffers[buffer - 1];
-		auto uniforms = !buffer ? shadertoy->uniforms : fbo->uniforms; 
+		auto fbo = m_shadertoy->getBuffer(buffer); 
+		ShaderToyUniforms* uniforms = (ShaderToyUniforms*)(fbo->getUniforms());
 
 		// replace the fragment shader name with $Name and buffer prefix / suffix
 		auto fragmentShaderName = config->GetStringWithDefault("shader_frag", m_shadersPath + "shadertoy.default.glsl");
@@ -38,12 +38,7 @@ void DuEngine::initScene() {
 			fragmentShaderName += suffix + ".glsl";
 		}
 
-		// load the shader
-		if (!buffer) {
-			shadertoy->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
-		} else {
-			fbo->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
-		}
+		fbo->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
 
 		// bind channel textures
 		auto channels_count = config->GetIntWithDefault(prefix + "channels_count", 0);
@@ -90,7 +85,7 @@ void DuEngine::initScene() {
 				break; 
 			case TextureType::FrameBuffer:
 				int bufferID = (int)(type[0] - 'a');
-				auto bindedFbo = shadertoy->m_frameBuffers[bufferID];
+				auto bindedFbo = m_shadertoy->getFrameBuffer(bufferID);
 				t = bindedFbo->getTexture();
 #if DEBUG_MULTIPASS
 				debug("Buffer " + to_string(buffer) + to_string(i) + " bind with " + to_string(bufferID) +
@@ -107,12 +102,12 @@ void DuEngine::initScene() {
 		}
 
 		auto vec2_buffers_count = config->GetIntWithDefault("vec2_buffers_count", 0);
-		shadertoy->uniforms->intVec2Buffers(vec2_buffers_count);
+		uniforms->intVec2Buffers(vec2_buffers_count);
 
 		for (int i = 0; i < vec2_buffers_count; ++i) {
 			string s = "vec2_buffers" + to_string(i) + "_file";
 			auto fileName = smartFilePath(config->GetString(s), m_resourcesPath);
-			shadertoy->uniforms->bindVec2Buffer(i, fileName);
+			uniforms->bindVec2Buffer(i, fileName);
 		}
 	}
 
@@ -120,13 +115,13 @@ void DuEngine::initScene() {
 }
 
 int DuEngine::getFrameNumber() {
-	return this->shadertoy->uniforms->iFrame;
+	return ShaderToyUniforms::iFrame;
 }
 
 void DuEngine::render() {
 	if (!m_paused) {
 		for (const auto& v : videoTextures) v->update();
-		shadertoy->render();
+		m_shadertoy->render();
 
 		glutSwapBuffers();
 		glutPostRedisplay();
@@ -138,5 +133,5 @@ void DuEngine::render() {
 }
 
 void DuEngine::updateFPS(float timeDelta, float averageTimeDelta) {
-	shadertoy->uniforms->updateFPS(timeDelta, averageTimeDelta);
+	ShaderToyUniforms::UpdateFPS(timeDelta, averageTimeDelta);
 }

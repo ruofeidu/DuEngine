@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "ShaderToy.h"
+#include "ShaderToyGeometry.h"
 
-ShaderToy::ShaderToyGeometry::ShaderToyGeometry(double _width, double _height, double _x0, double _y0) {
+ShaderToyGeometry::ShaderToyGeometry(double _width, double _height, double _x0, double _y0) {
 	reset(_width, _height, _x0, _y0);
 
 	GLuint vertexLength = sizeof(vertexBuffer);
@@ -36,19 +36,19 @@ ShaderToy::ShaderToyGeometry::ShaderToyGeometry(double _width, double _height, d
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 }
 
-void ShaderToy::ShaderToyGeometry::reset(double _width, double _height) {
+void ShaderToyGeometry::reset(double _width, double _height) {
 	geometry[0] = _width;
 	geometry[1] = _height;
 }
 
-void ShaderToy::ShaderToyGeometry::reset(double _width, double _height, double _x0, double _y0) {
+void ShaderToyGeometry::reset(double _width, double _height, double _x0, double _y0) {
 	geometry[0] = _width;
 	geometry[1] = _height;
 	geometry[2] = _x0;
 	geometry[3] = _y0;
 }
 
-void ShaderToy::ShaderToyGeometry::render() {
+void ShaderToyGeometry::render() {
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

@@ -28,11 +28,10 @@ TextureType Texture::getType() {
 
 TextureType Texture::QueryType(string str) {
 	auto res = Texture::TextureMaps.find(str);
-	if (res == Texture::TextureMaps.end()) {
-		logerror("Invalid texture type, please check " + str);
-	} else {
+	if (res != Texture::TextureMaps.end()) {
 		return res->second;
 	}
+	return TextureType::Unknown;
 }
 
 TextureFilter Texture::QueryFilter(string filter) {

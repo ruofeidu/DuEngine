@@ -1,66 +1,50 @@
 #include "stdafx.h"
 #include "ShaderToy.h"
 
-ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels) {
-	renderer = _renderer;
-	geometry = _geometry;
-	uniforms = new ShaderToyUniforms(_geometry, numChannels);
+ShaderToyFrameBuffer::ShaderToyFrameBuffer(ShaderToyGeometry* _geometry, int numChannels) {
+	m_geometry = _geometry;
+	m_uniforms = new ShaderToyUniforms(_geometry, numChannels);
 
 	for (int i = 0; i < 2; ++i) {
-		glGenFramebuffers(1, &FBO[i]);
-		glBindFramebuffer(GL_FRAMEBUFFER, FBO[i]);
-		textures[i] = new TextureFrameBuffer(FBO[i], geometry->getWidth(), geometry->getHeight());
+		glGenFramebuffers(1, &m_FBO[i]);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_FBO[i]);
+		m_textures[i] = new TextureFrameBuffer(m_FBO[i], m_geometry->getWidth(), m_geometry->getHeight());
 	}
 
-	id = 0;
-	tex = textures[1 - id];
+	m_pointer = 0;
+	m_pointerToTexture = m_textures[1 - m_pointer];
 }
 
-void ShaderToy::ShaderToyFrameBuffer::loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName) {
-	shaderProgram = new ShaderProgram(vertexShaderName, fragShaderName, uniformShaderName, mainFileName);
-	uniforms->linkShaderProgram(shaderProgram);
-#if VERBOSE_OUTPUT
-	debug("Frame buffer loaded: " + fragShaderName);
-#endif
+GLuint ShaderToyFrameBuffer::getID() {
+	return m_FBO[m_pointer];
 }
 
-GLuint ShaderToy::ShaderToyFrameBuffer::getID() {
-	return FBO[id];
+GLuint ShaderToyFrameBuffer::getTextureID() {
+	return m_pointerToTexture->getTextureID();
 }
 
-GLuint ShaderToy::ShaderToyFrameBuffer::getTextureID() {
-	return this->tex->getTextureID();
+Texture* ShaderToyFrameBuffer::getTexture() {
+	return m_pointerToTexture;
 }
 
-Texture* ShaderToy::ShaderToyFrameBuffer::getTexture() {
-	return this->tex;
-}
-
-void ShaderToy::ShaderToyFrameBuffer::render() {
-	uniforms->update();
-	geometry->render();
-
-#if DEBUG_MULTIPASS
-	debug("Writing frame buffer " + to_string(getID()) + " and read from texture " + to_string(getTextureID()));
-#endif
-	//swapTextures();
-}
-
-void ShaderToy::ShaderToyFrameBuffer::swapTextures() {
-	id = 1 - id;
-	tex = textures[1 - id];
+void ShaderToyFrameBuffer::swapTextures() {
+	m_pointer = 1 - m_pointer;
+	m_pointerToTexture = m_textures[1 - m_pointer];
 	for (int i = 0; i < 2; ++i) {
-		textures[i]->setReadingTextureID(tex->getDirectID());
+		m_textures[i]->setReadingTextureID(m_pointerToTexture->getDirectID());
 	}
 }
 
-void ShaderToy::ShaderToyFrameBuffer::reshape(int _width, int _height) {
+void ShaderToyFrameBuffer::reshape(int _width, int _height) {
 	for (int i = 0; i < 2; ++i) {
-		glBindFramebuffer(GL_FRAMEBUFFER, FBO[i]);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_FBO[i]);
 		glViewport(0, 0, _width, _height);
-		textures[i]->reshape(_width, _height);
+		m_textures[i]->reshape(_width, _height);
 	}
-	this->uniforms->updateResolution(_width, _height);
-	this->uniforms->resetFrame();
+	m_uniforms->reset(_width, _height); 
+}
+
+void ShaderToyFrameBuffer::reset() {
+	
 }
 

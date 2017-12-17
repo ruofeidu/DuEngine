@@ -1,16 +1,17 @@
 #include "stdafx.h"
 #include "ShaderToy.h"
 
-vec3 ShaderToy::ShaderToyUniforms::iResolution;
-float ShaderToy::ShaderToyUniforms::iGlobalTime;
-int ShaderToy::ShaderToyUniforms::iFrame;
-vec4 ShaderToy::ShaderToyUniforms::iMouse;
-vec4 ShaderToy::ShaderToyUniforms::iDate;
-float ShaderToy::ShaderToyUniforms::iTimeDelta = 1000.0f / 60.0f;
-int ShaderToy::ShaderToyUniforms::iFrameRate = 60;
+vec3 ShaderToyUniforms::iResolution;
+float ShaderToyUniforms::iGlobalTime;
+int ShaderToyUniforms::iFrame;
+vec4 ShaderToyUniforms::iMouse;
+vec4 ShaderToyUniforms::iDate;
+float ShaderToyUniforms::iTimeDelta = 1000.0f / 60.0f;
+int ShaderToyUniforms::iFrameRate = 60;
+bool ShaderToyUniforms::MouseDown = false;
 
 
-ShaderToy::ShaderToyUniforms::ShaderToyUniforms(ShaderToyGeometry* geom, int numChannels) {
+ShaderToyUniforms::ShaderToyUniforms(ShaderToyGeometry* geom, int numChannels) {
 	reset(geom);
 	iChannels = vector<Texture*>(numChannels);
 	uChannels = vector<GLint>(numChannels);
@@ -20,21 +21,24 @@ ShaderToy::ShaderToyUniforms::ShaderToyUniforms(ShaderToyGeometry* geom, int num
 	uVec2Buffers = vector<GLint>(numChannels);
 }
 
-void ShaderToy::ShaderToyUniforms::reset(ShaderToyGeometry* geom) {
+void ShaderToyUniforms::reset(int _width, int _height) {
 	iMouse = vec4(0.0f);
-	// z is ratio of pixel shapes: https://shadertoyunofficial.wordpress.com/2016/07/20/special-shadertoy-features/
-	iResolution = vec3(geom->geometry[0], geom->geometry[1], 1.0);
 	resetTime();
 #if COMPILE_WITH_SH
 	lastFrame = -1;
 	iNumBands = 4;
 #endif
+	// z is ratio of pixel shapes: https://shadertoyunofficial.wordpress.com/2016/07/20/special-shadertoy-features/
+	iResolution = vec3(_width, _height, 1.0);
 }
 
-void ShaderToy::ShaderToyUniforms::resetTime() {
+void ShaderToyUniforms::reset(ShaderToyGeometry* geom) {
+	reset((int)geom->geometry[0], (int)geom->geometry[1]);
+}
+
+void ShaderToyUniforms::resetTime() {
 	using namespace std;
 	using namespace std::chrono;
-	resetFrame();
 	system_clock::time_point now = system_clock::now();
 	time_t tt = system_clock::to_time_t(now);
 	// tm utc_tm = *gmtime(&tt);
@@ -43,14 +47,15 @@ void ShaderToy::ShaderToyUniforms::resetTime() {
 	iDate = vec4(local_tm.tm_year + 1900, local_tm.tm_mon, local_tm.tm_mday, secondsOnStart);
 
 	startTime = clock();
+	resetFrame();
 }
 
-void ShaderToy::ShaderToyUniforms::resetFrame() {
+void ShaderToyUniforms::resetFrame() {
 	iFrame = 0;
 	iSkip = SKIP_FIRST_FRAMES;
 }
 
-void ShaderToy::ShaderToyUniforms::linkShaderProgram(ShaderProgram* shaderProgram) {
+void ShaderToyUniforms::linkShaderProgram(ShaderProgram* shaderProgram) {
 	m_program = shaderProgram;
 	uGlobalTime = m_program->getUniformLocation("iTime");
 	uFrame = m_program->getUniformLocation("iFrame");
@@ -76,7 +81,7 @@ void ShaderToy::ShaderToyUniforms::linkShaderProgram(ShaderProgram* shaderProgra
 	debug("Linked with shader " + to_string(m_program->getID()));
 }
 
-void ShaderToy::ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
+void ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
 	if (uChannels[channel] >= 0) {
 		iChannels[channel] = tex;
 		auto id = tex->getTextureID();
@@ -88,11 +93,11 @@ void ShaderToy::ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
 	}
 }
 
-void ShaderToy::ShaderToyUniforms::intVec2Buffers(int numBuffers) {
+void ShaderToyUniforms::intVec2Buffers(int numBuffers) {
 	vec2_buffers = vector<vector<vec2>>(numBuffers);
 }
 
-void ShaderToy::ShaderToyUniforms::bindVec2Buffer(GLuint channel, string fileName) {
+void ShaderToyUniforms::bindVec2Buffer(GLuint channel, string fileName) {
 	auto &buffer = vec2_buffers[channel];
 
 	if (uVec2Buffers[channel] >= 0) {
@@ -116,7 +121,7 @@ void ShaderToy::ShaderToyUniforms::bindVec2Buffer(GLuint channel, string fileNam
 	}
 }
 
-void ShaderToy::ShaderToyUniforms::update() {
+void ShaderToyUniforms::update() {
 	m_program->use();
 	if (iSkip-- < 0) {
 		iFrame++;
@@ -153,25 +158,25 @@ void ShaderToy::ShaderToyUniforms::update() {
 	}
 }
 
-void ShaderToy::ShaderToyUniforms::updateFPS(float timeDelta, float averageTimeDelta) {
+void ShaderToyUniforms::UpdateFPS(float timeDelta, float averageTimeDelta) {
 	iTimeDelta = timeDelta / 1e3f;
 	if (averageTimeDelta > 0)
 		iFrameRate = int(1000.0f / averageTimeDelta);
 }
 
-void ShaderToy::ShaderToyUniforms::updateResolution(int _width, int _height) {
+void ShaderToyUniforms::updateResolution(int _width, int _height) {
 	this->iResolution = vec3(_width, _height, this->iResolution.z);
 }
 
-void ShaderToy::ShaderToyUniforms::onMouseMove(float x, float y) {
-	if (mouseDown) {
+void ShaderToyUniforms::OnMouseMove(float x, float y) {
+	if (MouseDown) {
 		iMouse.x = x;
 		iMouse.y = iResolution.y - y;
 	}
 }
 
-void ShaderToy::ShaderToyUniforms::onMouseDown(float x, float y) {
-	mouseDown = true;
+void ShaderToyUniforms::OnMouseDown(float x, float y) {
+	MouseDown = true;
 	iMouse.x = x;
 	iMouse.y = iResolution.y - y;
 	iMouse.z = x;
@@ -179,51 +184,51 @@ void ShaderToy::ShaderToyUniforms::onMouseDown(float x, float y) {
 }
 
 
-void ShaderToy::ShaderToyUniforms::onMouseUp(float x, float y) {
-	mouseDown = false;
+void ShaderToyUniforms::OnMouseUp(float x, float y) {
+	MouseDown = false;
 	iMouse.x = x;
 	iMouse.y = iResolution.y - y;
 	iMouse.z = -abs(iMouse.z);
 	iMouse.w = -abs(iMouse.w);
 }
 
-string ShaderToy::ShaderToyUniforms::getMouseString() {
+string ShaderToyUniforms::GetMouseString() {
 	return to_string((float)iMouse.x / iResolution.x) + "\t" + to_string((float)iMouse.y / iResolution.y);
 }
 
-void ShaderToy::ShaderToyUniforms::Set(GLint location, Texture * texture) {
+void ShaderToyUniforms::Set(GLint location, Texture * texture) {
 	auto id = texture->getTextureID();
 	glActiveTexture(GL_TEXTURE0 + id);
 	glBindTexture(GL_TEXTURE_2D, id);
 	glUniform1i(location, id);
 }
 
-void ShaderToy::ShaderToyUniforms::Set(GLint location, vec4 & v) {
+void ShaderToyUniforms::Set(GLint location, vec4 & v) {
 	if (location >= 0) {
 		glUniform4f(location, v.x, v.y, v.z, v.w);
 	}
 }
 
-void ShaderToy::ShaderToyUniforms::Set(GLint location, vec3 & v) {
+void ShaderToyUniforms::Set(GLint location, vec3 & v) {
 	if (location >= 0) {
 		glUniform3f(location, v.x, v.y, v.z);
 	}
 }
 
-void ShaderToy::ShaderToyUniforms::Set(GLint location, vec2 & v) {
+void ShaderToyUniforms::Set(GLint location, vec2 & v) {
 	if (location >= 0) {
 		glUniform2f(location, v.x, v.y);
 	}
 }
 
-void ShaderToy::ShaderToyUniforms::Set(GLint location, float value) {
+void ShaderToyUniforms::Set(GLint location, float value) {
 	if (location >= 0) {
 		glUniform1f(location, value);
 	}
 }
 
 
-void ShaderToy::ShaderToyUniforms::Set(GLint location, int value) {
+void ShaderToyUniforms::Set(GLint location, int value) {
 	if (location >= 0) {
 		glUniform1i(location, value);
 	}

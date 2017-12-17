@@ -18,6 +18,7 @@ class TexturesManager
 {
 public:
 	static TexturesManager *GetInstance();
+	void reset();
 
 private:
 	static TexturesManager *s_Instance;

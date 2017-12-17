@@ -22,7 +22,7 @@ DuEngine::GC DuEngine::gc;
 
 DuEngine::DuEngine() {
 	camera = new Camera();
-	window = Window::GetInstance();
+	m_window = Window::GetInstance();
 }
 
 DuEngine* DuEngine::GetInstance() {
@@ -55,7 +55,7 @@ void g_timer(int id) {
 	glutPostRedisplay();
 }
 
-// https://stackoverflow.com/questions/12619107/opengl-glut-window-very-slow-why
+// https://stackoverflow.com/questions/12619107/opengl-glut-m_window-very-slow-why
 void g_render() {
 	Sleep(1);
 #if COMPILE_WITH_TIMER
@@ -87,9 +87,9 @@ void g_reshape(int width, int height) {
 void DuEngine::start(int argc, char* argv[]) {
 	// setup configuration files and the scene name
 	if (argc > 1) {
-		configName = std::string(argv[1]);
-		config = new DuConfig(configName);
-		m_sceneName = configName.substr(0, configName.size() - 4);
+		m_configName = std::string(argv[1]);
+		config = new DuConfig(m_configName);
+		m_sceneName = m_configName.substr(0, m_configName.size() - 4);
 	} else {
 		config = new DuConfig(DuConfig::DefaultName);
 		m_sceneName = "default";
@@ -119,11 +119,11 @@ void DuEngine::start(int argc, char* argv[]) {
 	m_presetsPath = config->GetStringWithDefault("presets_path", m_shadersPath + "presets/");
 	m_resourcesPath = config->GetStringWithDefault("resources_path", m_presetsPath);
 
-	// setup the default window width and height
+	// setup the default m_window width and height
 	m_defaultWidth = config->GetIntWithDefault("window_width", m_defaultWidth);
 	m_defaultHeight = config->GetIntWithDefault("window_height", m_defaultHeight);
 	string _windowTitle = config->GetStringWithDefault("window_title", "DuRenderer | " + m_sceneName);
-	window->init(argc, argv, m_defaultWidth, m_defaultHeight, _windowTitle);
+	m_window->init(argc, argv, m_defaultWidth, m_defaultHeight, _windowTitle);
 
 	// setup recording
 	m_recording = config->GetBoolWithDefault("recording", m_recording);
@@ -136,7 +136,7 @@ void DuEngine::start(int argc, char* argv[]) {
 	initScene();
 
 	// bind the glut functions
-	glutReshapeWindow(window->width, window->height);
+	glutReshapeWindow(m_window->width, m_window->height);
 	glutDisplayFunc(g_render);
 	glutMouseFunc(g_mousePress);
 	glutMotionFunc(g_mouseMove);
@@ -155,35 +155,6 @@ void DuEngine::keyboard(unsigned char key, int x, int y, bool up) {
 		case GLUT_KEY_ESC:
 			exit(EXIT_SUCCESS);
 			break;
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-			break;
-		case '-':
-		case '_':
-#if COMPILE_WITH_SH
-			shadertoy->uniforms->iNumBands--;
-			if (shadertoy->uniforms->iNumBands < 0)
-				shadertoy->uniforms->iNumBands = 0;
-#endif
-			break;
-		case '=':
-		case '+':
-#if COMPILE_WITH_SH
-			shadertoy->uniforms->iNumBands++;
-			if (shadertoy->uniforms->iNumBands >= NUM_BANDS)
-				shadertoy->uniforms->iNumBands = NUM_BANDS - 1;
-#endif
-			break;
-		default:
-			break;
 		}
 	}
 
@@ -197,11 +168,8 @@ void DuEngine::special(int key, int x, int y, bool up) {
 		switch (key) {
 		case GLUT_KEY_F1:
 			// Reset the time
-			this->shadertoy->uniforms->reset(this->shadertoy->geometry);
-			shadertoy->uniforms->resetTime();
-			for (const auto& t : videoTextures) {
-				t->resetTime();
-			}
+			m_shadertoy->reset();
+			m_textureManager->reset(); 
 			break;
 
 		case GLUT_KEY_F2:
@@ -210,11 +178,7 @@ void DuEngine::special(int key, int x, int y, bool up) {
 			break;
 
 		case GLUT_KEY_F5:
-			// Reset and recompile
-			shadertoy->uniforms->resetTime();
-			for (const auto& t : videoTextures) {
-				t->resetTime();
-			}
+			m_shadertoy->recompile();
 			break; 
 		case GLUT_KEY_F6:
 			// Video Pause
@@ -223,20 +187,11 @@ void DuEngine::special(int key, int x, int y, bool up) {
 			}
 		case GLUT_KEY_F10:
 			// Debug Mouse
-			debug(this->shadertoy->uniforms->getMouseString());
+			debug(ShaderToyUniforms::GetMouseString());
 			break;
 
 		case GLUT_KEY_F11:
-			// Full screen
-			m_fullscreen = !m_fullscreen;
-			if (m_fullscreen) {
-				m_defaultWidth = window->width;
-				m_defaultHeight = window->height;
-				glutFullScreen();
-			} else {
-				glutReshapeWindow(m_defaultWidth, m_defaultHeight);
-				glutPositionWindow(0, 0);
-			}
+			this->toggleFullScreen(); 
 			break;
 		}
 	}
@@ -253,20 +208,32 @@ void DuEngine::special(int key, int x, int y, bool up) {
 void DuEngine::mousePress(int button, int state, int x, int y) {
 	if (button != GLUT_LEFT_BUTTON) return;
 	if (state == GLUT_DOWN) {
-		shadertoy->uniforms->onMouseDown((float)x, (float)y);
+		ShaderToyUniforms::OnMouseDown((float)x, (float)y);
 	}
 	if (state == GLUT_UP) {
-		shadertoy->uniforms->onMouseUp((float)x, (float)y);
+		ShaderToyUniforms::OnMouseUp((float)x, (float)y);
 	}
 }
 
 void DuEngine::mouseMove(int x, int y) {
-	shadertoy->uniforms->onMouseMove((float)x, (float)y);
+	ShaderToyUniforms::OnMouseMove((float)x, (float)y);
 }
 
 void DuEngine::reshape(int width, int height) {
-	window->reshape(width, height);
-	shadertoy->reshape(width, height);
+	m_window->reshape(width, height);
+	m_shadertoy->reshape(width, height);
+}
+
+void DuEngine::toggleFullScreen() {
+	m_fullscreen = !m_fullscreen;
+	if (m_fullscreen) {
+		m_defaultWidth = m_window->width;
+		m_defaultHeight = m_window->height;
+		glutFullScreen();
+	} else {
+		glutReshapeWindow(m_defaultWidth, m_defaultHeight);
+		glutPositionWindow(0, 0);
+	}
 }
 
 int DuEngine::getNumFrameFromVideos() {
@@ -291,11 +258,11 @@ void DuEngine::takeScreenshot(string folderName) {
 		if (m_video == nullptr) {
 			m_video = new cv::VideoWriter();
 			m_video->open(folderName + "/" + getTimeForFileName() + ".avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'),
-				DEFAULT_RENDER_FPS, cv::Size(window->width, window->height));
+				DEFAULT_RENDER_FPS, cv::Size(m_window->width, m_window->height));
 		} 
 	}
 
-	cv::Mat img(window->height, window->width, CV_8UC3);
+	cv::Mat img(m_window->height, m_window->width, CV_8UC3);
 	glPixelStorei(GL_PACK_ALIGNMENT, (img.step & 3) ? 1 : 4);
 	glPixelStorei(GL_PACK_ROW_LENGTH, (GLint)img.step / (GLint)img.elemSize());
 	glReadPixels(0, 0, img.cols, img.rows, GL_BGR_EXT, GL_UNSIGNED_BYTE, img.data);
@@ -308,7 +275,7 @@ void DuEngine::takeScreenshot(string folderName) {
 			m_video->release(); 
 		}
 	} else {
-		cv::imwrite(folderName + "/" + this->configName.substr(0, configName.size() - 4) + "_" + to_string(getFrameNumber()) + ".png", img);
+		cv::imwrite(folderName + "/" + this->m_configName.substr(0, m_configName.size() - 4) + "_" + to_string(getFrameNumber()) + ".png", img);
 	}
 }
 

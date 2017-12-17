@@ -10,56 +10,63 @@
 #include "DuUtils.h"
 
 ShaderToy::ShaderToy(DuEngine * _renderer, double _width, double _height, int _x0, double _y0) {
-	renderer = _renderer;
-	geometry = new ShaderToyGeometry(_width, _height, _x0, _y0);
-	shaderProgram = nullptr;
-	numChannels = _renderer->config->GetIntWithDefault("channels_count", 0);
-	uniforms = new ShaderToyUniforms(geometry, numChannels);
+	auto geometry = new ShaderToyGeometry(_width, _height, _x0, _y0);
+	auto numChannels = _renderer->config->GetIntWithDefault("channels_count", 0);
+	m_screenBuffer = new ShaderToyScreenBuffer(geometry, numChannels);
+
 	auto buffers_count = _renderer->config->GetIntWithDefault("buffers_count", 0); 
 	for (int i = 0; i < buffers_count; ++i) {
 		auto prefix = string(1, char('A' + i));
-		m_frameBuffers.push_back(new ShaderToyFrameBuffer(renderer, geometry, _renderer->config->GetIntWithDefault(prefix + "_channels_count", 0)));
+		auto numChannels = _renderer->config->GetIntWithDefault(prefix + "_channels_count", 0);
+		m_frameBuffers.push_back(new ShaderToyFrameBuffer(geometry, numChannels));
 	}
 #if VERBOSE_OUTPUT
 	info("ShaderToy is inited.");
 #endif
 }
 
-ShaderToy::ShaderToy(DuEngine *_renderer) : ShaderToy(_renderer, _renderer->window->width, _renderer->window->height, 0, 0) {
-}
-
-void ShaderToy::loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName = "") {
-	shaderProgram = new ShaderProgram(vertexShaderName, fragShaderName, uniformShaderName, mainFileName);
-	uniforms->linkShaderProgram(shaderProgram);
-#if VERBOSE_OUTPUT
-	info("Main fragment shader loaded: " + fragShaderName);
-#endif
+ShaderToy::ShaderToy(DuEngine *_renderer) : ShaderToy(_renderer, _renderer->m_window->width, _renderer->m_window->height, 0, 0) {
 }
 
 void ShaderToy::reshape(int _width, int _height) {
-	uniforms->updateResolution(_width, _height); 
-	uniforms->resetFrame();
-
+	m_screenBuffer->reshape(_width, _height); 
 	for (auto& frameBuffer : m_frameBuffers) {
 		frameBuffer->reshape(_width, _height); 
 	}
 }
 
+void ShaderToy::reset() {
+	m_screenBuffer->reset(); 
+	for (auto& frameBuffer : m_frameBuffers) {
+		frameBuffer->reset();
+	}
+}
+
+void ShaderToy::recompile() {
+
+}
+
 void ShaderToy::render() {
 	for (auto& frameBuffer : m_frameBuffers) {
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer->getID());
 		frameBuffer->render();
 	}
-
 	for (auto& frameBuffer : m_frameBuffers) {
 		frameBuffer->swapTextures();
 	}
-
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	uniforms->update();
-
 #if DEBUG_MULTIPASS
 	glUniform1i(uniforms->uChannels[this->renderer->config->GetIntWithDefault("debug_channel", 2)], this->renderer->config->GetIntWithDefault("debug_channel_val", 6));
 #endif
-	geometry->render();
+	m_screenBuffer->render();
+}
+
+int ShaderToy::getNumFrameBuffers() {
+	return (int)m_frameBuffers.size();
+}
+
+FrameBuffer* ShaderToy::getBuffer(int id) {
+	return id == 0 ? (FrameBuffer*)m_screenBuffer : (FrameBuffer*)getFrameBuffer(id - 1);
+}
+
+ShaderToyFrameBuffer * ShaderToy::getFrameBuffer(int id) {
+	return id >= 0 && id < m_frameBuffers.size() ? m_frameBuffers[id] : nullptr; 
 }

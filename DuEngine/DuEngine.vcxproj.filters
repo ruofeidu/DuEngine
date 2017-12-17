@@ -46,6 +46,24 @@
     <Filter Include="Source Files\Engine">
       <UniqueIdentifier>{f68966bc-5adb-41e5-b82e-7d2163c664df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\FrameBuffer">
+      <UniqueIdentifier>{e67326d2-b92f-4f7f-8c55-595248ec1f6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Geometry">
+      <UniqueIdentifier>{8ad2ba01-9671-48e6-a1b8-efbf94354473}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Geometry">
+      <UniqueIdentifier>{7f801b85-f8d5-4aff-9a9e-343eef603810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Uniforms">
+      <UniqueIdentifier>{aab86be6-05ea-4c79-82ab-465d1a732ff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Uniforms">
+      <UniqueIdentifier>{44630626-0861-4096-b358-58a7dd1ccf89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FrameBuffer">
+      <UniqueIdentifier>{c65a8049-f13a-4d9d-90b9-209d6fd95355}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SHUtils.cpp">
@@ -120,23 +138,35 @@
     <ClCompile Include="TexturesManager.cpp">
       <Filter>Source Files\Textures</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderToyGeometry.h">
+      <Filter>Header Files\Geometry</Filter>
+    </ClCompile>
     <ClCompile Include="ShaderToyGeommetry.cpp">
-      <Filter>Source Files\Engine</Filter>
+      <Filter>Source Files\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Source Files\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Uniforms.cpp">
+      <Filter>Source Files\Uniforms</Filter>
     </ClCompile>
     <ClCompile Include="ShaderToyUniforms.cpp">
-      <Filter>Source Files\Engine</Filter>
+      <Filter>Source Files\Uniforms</Filter>
     </ClCompile>
     <ClCompile Include="ShaderToyFrameBuffer.cpp">
-      <Filter>Source Files\Engine</Filter>
+      <Filter>Source Files\FrameBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Source Files\FrameBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderToyScreenBuffer.cpp">
+      <Filter>Source Files\FrameBuffer</Filter>
     </ClCompile>
     <ClCompile Include="ShaderProgram.cpp">
-      <Filter>Header Files\Engine</Filter>
+      <Filter>Source Files\Uniforms</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HashVec2b.h">
-      <Filter>Source Files\SH</Filter>
-    </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Header Files\Textures</Filter>
     </ClInclude>
@@ -209,8 +239,29 @@
     <ClInclude Include="TexturesManager.h">
       <Filter>Header Files\Textures</Filter>
     </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
+      <Filter>Header Files\FrameBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Header Files\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderToyScreenBuffer.h">
+      <Filter>Header Files\FrameBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Uniforms.h">
+      <Filter>Header Files\Uniforms</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderToyUniforms.h">
+      <Filter>Header Files\Uniforms</Filter>
+    </ClInclude>
     <ClInclude Include="ShaderProgram.h">
-      <Filter>Source Files\Engine</Filter>
+      <Filter>Header Files\Uniforms</Filter>
+    </ClInclude>
+    <ClInclude Include="HashVec2b.h">
+      <Filter>Header Files\SH</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderToyFrameBuffer.h">
+      <Filter>Header Files\FrameBuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -30,6 +30,8 @@ public:
 	void initScene();
 
 protected:
+	TexturesManager* m_textureManager; 
+
 	vector<TextureVideo*> videoTextures;
 	TextureKeyboard* keyboardTexture;
 	Texture* fontTexture;
@@ -53,10 +55,10 @@ private:
 	static DuEngine *s_Instance;
 	clock_t beginTime;
 	Camera* camera;
-	Window* window;
-	ShaderToy* shadertoy;
+	Window* m_window;
+	ShaderToy* m_shadertoy;
 	DuConfig* config;
-	string configName;
+	string m_configName;
 	string m_sceneName;
 	bool m_fullscreen = false;
 	bool m_recording = false;
@@ -76,6 +78,8 @@ private:
 	int m_defaultHeight = 720;
 
 private:
+	void toggleFullScreen();
+
 	int getNumFrameFromVideos();
 
 	void printHelp(); 

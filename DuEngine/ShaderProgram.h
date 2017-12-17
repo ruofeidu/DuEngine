@@ -81,11 +81,11 @@ private:
 				res += str + "\n";
 				getline(in, str);
 			}
-			return res;
 		} else {
 			warning("Unable to open file " + filename);
 			onError();
 		}
+		return res;
 	}
 
 

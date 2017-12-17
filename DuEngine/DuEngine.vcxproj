@@ -132,11 +132,15 @@
     <ClCompile Include="DuEngine.cpp" />
     <ClCompile Include="DuScene.cpp" />
     <ClCompile Include="DuUtils.cpp" />
+    <ClCompile Include="FrameBuffer.cpp" />
+    <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="ShaderToy.cpp" />
     <ClCompile Include="ShaderToyFrameBuffer.cpp" />
+    <ClCompile Include="ShaderToyGeometry.h" />
     <ClCompile Include="ShaderToyGeommetry.cpp" />
+    <ClCompile Include="ShaderToyScreenBuffer.cpp" />
     <ClCompile Include="ShaderToyUniforms.cpp" />
     <ClCompile Include="SHUtils.cpp" />
     <ClCompile Include="Textuer2D.cpp" />
@@ -153,6 +157,7 @@
     <ClCompile Include="TextureVideoFile.cpp" />
     <ClCompile Include="TextureVideoLightField.cpp" />
     <ClCompile Include="TextureVideoSequence.cpp" />
+    <ClCompile Include="Uniforms.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -162,9 +167,14 @@
     <ClInclude Include="DuConfig.h" />
     <ClInclude Include="DuEngine.h" />
     <ClInclude Include="DuUtils.h" />
+    <ClInclude Include="FrameBuffer.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="HashVec2b.h" />
+    <ClInclude Include="ShaderToyFrameBuffer.h" />
+    <ClInclude Include="ShaderToyScreenBuffer.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="ShaderToy.h" />
+    <ClInclude Include="ShaderToyUniforms.h" />
     <ClInclude Include="SHUtils.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Texture.h" />
@@ -181,6 +191,7 @@
     <ClInclude Include="TextureVideoFile.h" />
     <ClInclude Include="TextureVideoLightField.h" />
     <ClInclude Include="TextureVideoSequence.h" />
+    <ClInclude Include="Uniforms.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
