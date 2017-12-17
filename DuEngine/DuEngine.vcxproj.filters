@@ -165,6 +165,9 @@
     <ClCompile Include="ShaderProgram.cpp">
       <Filter>Source Files\Uniforms</Filter>
     </ClCompile>
+    <ClCompile Include="PathManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texture.h">
@@ -262,6 +265,9 @@
     </ClInclude>
     <ClInclude Include="ShaderToyFrameBuffer.h">
       <Filter>Header Files\FrameBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="PathManager.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

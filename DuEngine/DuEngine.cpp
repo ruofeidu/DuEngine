@@ -23,6 +23,7 @@ DuEngine::GC DuEngine::gc;
 DuEngine::DuEngine() {
 	camera = new Camera();
 	m_window = Window::GetInstance();
+	m_textureManager = new TexturesManager();
 }
 
 DuEngine* DuEngine::GetInstance() {
@@ -86,51 +87,22 @@ void g_reshape(int width, int height) {
 
 void DuEngine::start(int argc, char* argv[]) {
 	// setup configuration files and the scene name
-	if (argc > 1) {
-		m_configName = std::string(argv[1]);
-		config = new DuConfig(m_configName);
-		m_sceneName = m_configName.substr(0, m_configName.size() - 4);
-	} else {
-		config = new DuConfig(DuConfig::DefaultName);
-		m_sceneName = "default";
-	}
-
-	// setup shaders path and presets path
-	m_shadersPath = std::string(argv[0]);
-
-	// automatically search the default shader path from the upper-level folders
-	for (int i = 3; i >= 0; --i) {
-		if (i == 0) {
-			m_shadersPath = ""; 
-		} else {
-			auto keywords = repeatstring("../", i) + "DuEngine/";
-			if (m_shadersPath.find(keywords) != std::string::npos) {
-				m_shadersPath = keywords; 
-				break; 
-			}
-		}
-	}
-	m_shadersPath = config->GetStringWithDefault("shaders_path", m_shadersPath);
-#if VERBOSE_OUTPUT
-	if (m_shadersPath.size() > 0) {
-		info("Relative Path: " + m_shadersPath);
-	}
-#endif
-	m_presetsPath = config->GetStringWithDefault("presets_path", m_shadersPath + "presets/");
-	m_resourcesPath = config->GetStringWithDefault("resources_path", m_presetsPath);
-
+	m_config = argc > 1 ? new DuConfig(std::string(argv[1])) : new DuConfig();
+	m_path = new PathManager(std::string(argv[0]), m_config);
+	
 	// setup the default m_window width and height
-	m_defaultWidth = config->GetIntWithDefault("window_width", m_defaultWidth);
-	m_defaultHeight = config->GetIntWithDefault("window_height", m_defaultHeight);
-	string _windowTitle = config->GetStringWithDefault("window_title", "DuRenderer | " + m_sceneName);
+	m_defaultWidth = m_config->GetIntWithDefault("window_width", m_defaultWidth);
+	m_defaultHeight = m_config->GetIntWithDefault("window_height", m_defaultHeight);
+	string _windowTitle = m_config->GetStringWithDefault("window_title", "DuRenderer | " + m_config->GetName());
 	m_window->init(argc, argv, m_defaultWidth, m_defaultHeight, _windowTitle);
 
 	// setup recording
-	m_recording = config->GetBoolWithDefault("recording", m_recording);
-	m_recordPath = config->GetStringWithDefault("record_path", m_sceneName);
-	m_recordStart = config->GetIntWithDefault("record_start", m_recordStart);
-	m_recordEnd = config->GetIntWithDefault("record_end", m_recordEnd);
-	m_recordVideo = config->GetBoolWithDefault("record_video", m_recordVideo);
+	m_recording = m_config->GetBoolWithDefault("recording", m_recording);
+	m_recordPath = m_config->GetStringWithDefault("record_path", m_config->GetName());
+	m_recordStart = m_config->GetIntWithDefault("record_start", m_recordStart);
+	m_recordEnd = m_config->GetIntWithDefault("record_end", m_recordEnd);
+	m_recordVideo = m_config->GetBoolWithDefault("record_video", m_recordVideo);
+
 
 	// initialize the scene, shaders, and presets
 	initScene();
@@ -157,10 +129,7 @@ void DuEngine::keyboard(unsigned char key, int x, int y, bool up) {
 			break;
 		}
 	}
-
-	if (keyboardTexture) {
-		keyboardTexture->onKeyPress(key, up);
-	}
+	m_textureManager->updateKeyboard(key, up);
 }
 
 void DuEngine::special(int key, int x, int y, bool up) {
@@ -174,17 +143,19 @@ void DuEngine::special(int key, int x, int y, bool up) {
 
 		case GLUT_KEY_F2:
 			// Take screenshot
-			this->takeScreenshot();
+			m_takeSingleScreenShot = true; 
 			break;
 
 		case GLUT_KEY_F5:
 			m_shadertoy->recompile();
 			break; 
 		case GLUT_KEY_F6:
-			// Video Pause
-			for (const auto& t : videoTextures) {
-				t->togglePaused(); 
-			}
+			m_textureManager->togglePause(); 
+		case GLUT_KEY_F9:
+			// Debug iFrame
+			debug(to_string(getFrameNumber()));
+			break;
+
 		case GLUT_KEY_F10:
 			// Debug Mouse
 			debug(ShaderToyUniforms::GetMouseString());
@@ -195,14 +166,7 @@ void DuEngine::special(int key, int x, int y, bool up) {
 			break;
 		}
 	}
-	if (keyboardTexture) {
-		keyboardTexture->onKeyPress(key, up);
-		// hack the four arrows for ShaderToy
-		if (100 <= key && key <= 103) {
-			key -= 63;
-		}
-		keyboardTexture->onKeyPress(key, up);
-	}
+	m_textureManager->updateKeyboard(key, up);
 }
 
 void DuEngine::mousePress(int button, int state, int x, int y) {
@@ -236,23 +200,12 @@ void DuEngine::toggleFullScreen() {
 	}
 }
 
-int DuEngine::getNumFrameFromVideos() {
-	int ans = 0;
-	for (const auto &v : videoTextures) {
-		ans = std::max(ans, v->getNumVideoFrame());
-	}
-	return ans;
-}
-
 void DuEngine::printHelp() {
 	info("Help:\n\tF1:\tReset everything.\n\tF2:\tTake Screenshot.\n\tF5:\tReset Time\n\tF6:\tPause\n\tF11:\tFullscreen.\n");
 }
 
 void DuEngine::takeScreenshot(string folderName) {
-	if (m_isPathCreated.find(folderName) == m_isPathCreated.end()) {
-		CreateDirectory(folderName.c_str(), NULL);
-		m_isPathCreated.insert(folderName);
-	}
+	m_path->createPathIfNotExisted(folderName); 
 
 	if (m_recordVideo) {
 		if (m_video == nullptr) {
@@ -275,7 +228,7 @@ void DuEngine::takeScreenshot(string folderName) {
 			m_video->release(); 
 		}
 	} else {
-		cv::imwrite(folderName + "/" + this->m_configName.substr(0, m_configName.size() - 4) + "_" + to_string(getFrameNumber()) + ".png", img);
+		cv::imwrite(folderName + "/" + m_config->GetName() + "_" + to_string(getFrameNumber()) + ".png", img);
 	}
 }
 

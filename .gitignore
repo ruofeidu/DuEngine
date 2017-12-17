@@ -8,7 +8,9 @@
 *.log
 *.mp4
 *.avi
-
+DuEngine/*.ini
+DuEngine/*.glsl
+DuEngine/*.cmd
 SHSaliency/
 Friends/
 

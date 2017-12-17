@@ -17,10 +17,26 @@
 class TexturesManager
 {
 public:
+	TexturesManager() {};
 	static TexturesManager *GetInstance();
+	void update(); 
 	void reset();
+	void togglePause(); 
+	void updateKeyboard(unsigned char key, bool up); 
+
+	Texture* addKeyboard();
+	Texture* addFont(TextureFilter filter, TextureWarp warp);
+	Texture* addVideoFile(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp);
+	Texture* addVideoSequence(string fileName, int fps, int startFrame, int endFrame, TextureFilter filter, TextureWarp warp);
+	Texture* addTexture2D(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp);
 
 private:
+	void addVideoTexture(TextureVideo* tex);
+	vector<TextureVideo*> m_videos;
+	TextureKeyboard* m_keyboard;
+	Texture* m_font;
+	vector<Texture*> m_textures;
+
 	static TexturesManager *s_Instance;
 
 	class GC

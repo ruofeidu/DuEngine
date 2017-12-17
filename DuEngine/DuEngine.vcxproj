@@ -135,6 +135,7 @@
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="PathManager.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="ShaderToy.cpp" />
     <ClCompile Include="ShaderToyFrameBuffer.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="HashVec2b.h" />
+    <ClInclude Include="PathManager.h" />
     <ClInclude Include="ShaderToyFrameBuffer.h" />
     <ClInclude Include="ShaderToyScreenBuffer.h" />
     <ClInclude Include="ShaderProgram.h" />

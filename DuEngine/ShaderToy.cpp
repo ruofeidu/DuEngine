@@ -11,13 +11,13 @@
 
 ShaderToy::ShaderToy(DuEngine * _renderer, double _width, double _height, int _x0, double _y0) {
 	auto geometry = new ShaderToyGeometry(_width, _height, _x0, _y0);
-	auto numChannels = _renderer->config->GetIntWithDefault("channels_count", 0);
+	auto numChannels = _renderer->m_config->GetIntWithDefault("channels_count", 0);
 	m_screenBuffer = new ShaderToyScreenBuffer(geometry, numChannels);
 
-	auto buffers_count = _renderer->config->GetIntWithDefault("buffers_count", 0); 
+	auto buffers_count = _renderer->m_config->GetIntWithDefault("buffers_count", 0);
 	for (int i = 0; i < buffers_count; ++i) {
 		auto prefix = string(1, char('A' + i));
-		auto numChannels = _renderer->config->GetIntWithDefault(prefix + "_channels_count", 0);
+		auto numChannels = _renderer->m_config->GetIntWithDefault(prefix + "_channels_count", 0);
 		m_frameBuffers.push_back(new ShaderToyFrameBuffer(geometry, numChannels));
 	}
 #if VERBOSE_OUTPUT

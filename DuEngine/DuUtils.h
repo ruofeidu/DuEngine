@@ -12,7 +12,6 @@ void onError();
 // file systems
 bool dirExists(const std::string& dirName_in);
 string getTimeForFileName();
-string smartFilePath(string fileName, string path); 
 
 // string utilities
 string repeatstring(string s, int cnt);

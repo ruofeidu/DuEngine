@@ -9,11 +9,12 @@ class DuConfig
 {
 public:
 	static std::string DefaultName;
+	std::string m_name; 
 
 public:
 	DuConfig();
-	DuConfig(const std::string &filename);
-	bool Load(const std::string &filename);
+	DuConfig(std::string filename);
+	bool Load(std::string filename);
 
 	void SetErrorIfNameNotFound(bool error) { m_bErrorIfNameNotFound = error; }
 
@@ -23,6 +24,7 @@ public:
 	int				GetInt(const std::string &name) const;
 	float			GetFloat(const std::string &name) const;
 	double			GetDouble(const std::string &name) const;
+	std::string     GetName() const; 
 
 public:
 	std::vector<std::string> GetKeyList() const;

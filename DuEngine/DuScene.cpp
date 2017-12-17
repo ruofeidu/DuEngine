@@ -16,72 +16,53 @@ void DuEngine::initScene() {
 	
 	m_shadertoy = new ShaderToy(DuEngine::GetInstance());
 
-	auto vertexShaderName = config->GetStringWithDefault("shader_vert", m_shadersPath + "shadertoy.vert.glsl");
-	auto uniformShaderName = config->GetStringWithDefault("shader_uniform", m_shadersPath + "shadertoy.uniforms.glsl");
-	auto mainShaderName = config->GetStringWithDefault("shader_main", m_shadersPath + "shadertoy.main.glsl");
+	auto vertexShaderName = m_path->getVertexShader();
+	auto uniformShaderName = m_path->getUniformShader();
+	auto mainShaderName = m_path->getMainShader();
 
 	for (int buffer = 0; buffer < 1 + m_shadertoy->getNumFrameBuffers(); ++buffer) {
 		auto suffix = !buffer ? "" : string(1, char('A' + buffer - 1));
 		auto prefix = !buffer ? "" : suffix + "_";
 		auto fbo = m_shadertoy->getBuffer(buffer); 
 		ShaderToyUniforms* uniforms = (ShaderToyUniforms*)(fbo->getUniforms());
-
-		// replace the fragment shader name with $Name and buffer prefix / suffix
-		auto fragmentShaderName = config->GetStringWithDefault("shader_frag", m_shadersPath + "shadertoy.default.glsl");
-		if (fragmentShaderName.find("$Name") != string::npos) {
-			fragmentShaderName.replace(fragmentShaderName.find("$Name"), 5, m_sceneName); 
-		}
-		if (fragmentShaderName.find(".glsl") != string::npos) {
-			// add framebuffer suffix for multipass rendering
-			fragmentShaderName.replace(fragmentShaderName.find(".glsl"), 5, suffix + ".glsl");
-		} else {
-			fragmentShaderName += suffix + ".glsl";
-		}
-
+		auto fragmentShaderName = m_path->getFragmentShader(suffix);
 		fbo->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
 
 		// bind channel textures
-		auto channels_count = config->GetIntWithDefault(prefix + "channels_count", 0);
+		auto channels_count = m_config->GetIntWithDefault(prefix + "channels_count", 0);
 		for (int i = 0; i < channels_count; ++i) {
 			string iPrefix = prefix + "iChannel" + to_string(i) + "_";
-			auto type = config->GetStringWithDefault(iPrefix + "type", "unknown");
+			auto type = m_config->GetStringWithDefault(iPrefix + "type", "unknown");
 			std::transform(type.begin(), type.end(), type.begin(), ::tolower);
-			auto fileName = smartFilePath(config->GetStringWithDefault(iPrefix + "tex", ""), m_resourcesPath);
-			Texture::QueryFileNameByType(type, fileName, m_presetsPath);
+			auto fileName = m_path->getResource(iPrefix + "tex");
+			Texture::QueryFileNameByType(type, fileName, m_path->getPresetPath());
 			auto textureType = Texture::QueryType(type);
-			auto textureFilter = Texture::QueryFilter(config->GetStringWithDefault(iPrefix + "filter", "mipmap"));
-			auto textureWarp = Texture::QueryWarp(config->GetStringWithDefault(iPrefix + "wrap", "repeat"));
-			auto vFlip = config->GetBoolWithDefault(iPrefix + "vflip", true);
-			auto fps = config->GetIntWithDefault(iPrefix + "fps", 25);
-			auto startFrame = config->GetIntWithDefault(iPrefix + "startFrame", 1);
-			auto endFrame = config->GetIntWithDefault(iPrefix + "endFrame", 100);
+			auto textureFilter = Texture::QueryFilter(m_config->GetStringWithDefault(iPrefix + "filter", "mipmap"));
+			auto textureWarp = Texture::QueryWarp(m_config->GetStringWithDefault(iPrefix + "wrap", "repeat"));
+			auto vFlip = m_config->GetBoolWithDefault(iPrefix + "vflip", true);
+			auto fps = m_config->GetIntWithDefault(iPrefix + "fps", 25);
+			auto startFrame = m_config->GetIntWithDefault(iPrefix + "startFrame", 1);
+			auto endFrame = m_config->GetIntWithDefault(iPrefix + "endFrame", 100);
 
 			Texture* t = nullptr; 
 
 			switch (textureType) {
 			case TextureType::Noise:
-				vFlip = config->GetBoolWithDefault(iPrefix + "vflip", false);
+				vFlip = m_config->GetBoolWithDefault(iPrefix + "vflip", false);
 			case TextureType::RGB:
-				t = new Texture2D(fileName, vFlip, textureFilter, textureWarp); 
+				t = m_textureManager->addTexture2D(fileName, vFlip, textureFilter, textureWarp); 
 				break;
 			case TextureType::VideoFile:
-				t = new TextureVideoFile(fileName, vFlip, textureFilter, textureWarp);
-				videoTextures.push_back((TextureVideo*)t);
+				t = m_textureManager->addVideoFile(fileName, vFlip, textureFilter, textureWarp); 
 				break;
 			case TextureType::VideoSequence:
-				t = new TextureVideoSequence(fileName, fps, startFrame, endFrame, textureFilter, textureWarp);
-				videoTextures.push_back((TextureVideo*)t);
+				t = m_textureManager->addVideoSequence(fileName, fps, startFrame, endFrame, textureFilter, textureWarp);
 				break;
 			case TextureType::Keyboard:
-				if (!keyboardTexture)
-					keyboardTexture = new TextureKeyboard();
-				t = keyboardTexture;
+				t = m_textureManager->addKeyboard();
 				break; 
 			case TextureType::Font:
-				if (!fontTexture) {
-					fontTexture = new TextureFont(textureFilter, textureWarp);
-				}
-				t = fontTexture;
+				t = m_textureManager->addFont(textureFilter, textureWarp); 
 				break; 
 			case TextureType::FrameBuffer:
 				int bufferID = (int)(type[0] - 'a');
@@ -101,12 +82,11 @@ void DuEngine::initScene() {
 			}
 		}
 
-		auto vec2_buffers_count = config->GetIntWithDefault("vec2_buffers_count", 0);
+		auto vec2_buffers_count = m_config->GetIntWithDefault("vec2_buffers_count", 0);
 		uniforms->intVec2Buffers(vec2_buffers_count);
 
 		for (int i = 0; i < vec2_buffers_count; ++i) {
-			string s = "vec2_buffers" + to_string(i) + "_file";
-			auto fileName = smartFilePath(config->GetString(s), m_resourcesPath);
+			auto fileName = m_path->getResource("vec2_buffers" + to_string(i) + "_file");
 			uniforms->bindVec2Buffer(i, fileName);
 		}
 	}
@@ -120,7 +100,7 @@ int DuEngine::getFrameNumber() {
 
 void DuEngine::render() {
 	if (!m_paused) {
-		for (const auto& v : videoTextures) v->update();
+		m_textureManager->update(); 
 		m_shadertoy->render();
 
 		glutSwapBuffers();
@@ -129,6 +109,10 @@ void DuEngine::render() {
 
 	if (m_recording && m_recordStart <= getFrameNumber() && getFrameNumber() <= m_recordEnd) {
 		this->takeScreenshot(m_recordPath);
+	}
+	if (m_takeSingleScreenShot) {
+		m_takeSingleScreenShot = false; 
+		this->takeScreenshot();
 	}
 }
 

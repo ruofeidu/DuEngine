@@ -5,14 +5,16 @@ using namespace std;
 
 std::string DuConfig::DefaultName = "config.ini";
 
-DuConfig::DuConfig() {
-	m_bErrorIfNameNotFound = true;
-	Load(DefaultName);
+DuConfig::DuConfig() : DuConfig(DefaultName) {
 }
 
-DuConfig::DuConfig(const string &filename) {
+DuConfig::DuConfig(string filename) {
 	m_bErrorIfNameNotFound = true;
 	Load(filename);
+	m_name = filename.substr(0, filename.size() - 4);
+	if (!m_name.compare("config")) {
+		m_name = "default";
+	}
 }
 
 static string Trim(string str) {
@@ -23,7 +25,7 @@ static string Trim(string str) {
 	return str.substr(first, last - first + 1);
 }
 
-bool DuConfig::Load(const string &filename) {
+bool DuConfig::Load(string filename) {
 	m_mEntries.clear();
 	// Open file.
 	ifstream in(filename.c_str());
@@ -98,6 +100,10 @@ float DuConfig::GetFloat(const string &name) const {
 
 double DuConfig::GetDouble(const string &name) const {
 	return atof(GetString(name).c_str());
+}
+
+std::string DuConfig::GetName() const {
+	return m_name; 
 }
 
 bool DuConfig::HasKey(const string& name) const {

@@ -3,6 +3,7 @@
 #include "ShaderToy.h"
 #include "DuConfig.h"
 #include "TexturesManager.h"
+#include "PathManager.h"
 #include "Camera.h"
 #include "Window.h"
 #include "DuUtils.h"
@@ -19,10 +20,6 @@ void g_reshape(int width, int height);
 class DuEngine
 {
 	friend class ShaderToy;
-	friend class Texture;
-	friend class TextureVideo;
-	friend class TextureKeyboard;
-	friend class TextureSH;
 
 public:
 	static DuEngine *GetInstance();
@@ -31,11 +28,7 @@ public:
 
 protected:
 	TexturesManager* m_textureManager; 
-
-	vector<TextureVideo*> videoTextures;
-	TextureKeyboard* keyboardTexture;
-	Texture* fontTexture;
-	vector<Texture*> textures;
+	PathManager* m_path;
 
 public:
 	void render();
@@ -48,7 +41,7 @@ public:
 	void reshape(int width, int height);
 
 	int getFrameNumber();
-	string getPresetsPath() { return m_presetsPath; }
+	string getPresetsPath() { return m_path->getPresetPath(); }
 
 private:
 	DuEngine();
@@ -57,17 +50,10 @@ private:
 	Camera* camera;
 	Window* m_window;
 	ShaderToy* m_shadertoy;
-	DuConfig* config;
-	string m_configName;
-	string m_sceneName;
+	DuConfig* m_config;
 	bool m_fullscreen = false;
 	bool m_recording = false;
 	bool m_paused = false; 
-
-	string m_shadersPath = "";
-	string m_presetsPath = "";
-	string m_resourcesPath = "";
-	unordered_set<string> m_isPathCreated;
 
 	string m_recordPath = "";
 	int m_recordStart = 0;
@@ -76,11 +62,10 @@ private:
 	cv::VideoWriter* m_video = nullptr;
 	int m_defaultWidth = 1280;
 	int m_defaultHeight = 720;
+	bool m_takeSingleScreenShot = false; 
 
 private:
 	void toggleFullScreen();
-
-	int getNumFrameFromVideos();
 
 	void printHelp(); 
 
