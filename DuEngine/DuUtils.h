@@ -10,11 +10,17 @@ void dump(char* pszFormat, ...);
 void onError();
 
 // file systems
-bool dirExists(const std::string& dirName_in);
+bool dirExists(const string& dirName_in);
 string getTimeForFileName();
 
 // string utilities
 string repeatstring(string s, int cnt);
+
+string toLower(const string &value);
+bool toBool(const string &str);
+int toInt(const string &str);
+unsigned int toUInt(const string &str);
+float toFloat(const string &str);
 
 // design pattern utilities
 class Singleton

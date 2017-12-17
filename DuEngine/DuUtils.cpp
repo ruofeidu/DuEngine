@@ -8,7 +8,7 @@
 #include "stdafx.h"
 #include "DuUtils.h"
 
-bool dirExists(const std::string& dirName_in) {
+bool dirExists(const string& dirName_in) {
 	DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
 	if (ftyp == INVALID_FILE_ATTRIBUTES)
 		return false;  //something is wrong with your path!
@@ -59,6 +59,47 @@ string repeatstring(string s, int cnt) {
 	string res = "";
 	for (int i = 0; i < cnt; ++i) res += s; 
 	return res; 
+}
+
+string toLower(const string & value) {
+	string result;
+	result.resize(value.size());
+	std::transform(value.begin(), value.end(), result.begin(), ::tolower);
+	return result;
+}
+
+bool toBool(const string & str) {
+	string value = toLower(str);
+	if (value == "false")
+		return false;
+	else if (value == "true")
+		return true;
+	warning("Could not parse boolean value " + str);
+	return false; 
+}
+
+int toInt(const string & str) {
+	char *end_ptr = nullptr;
+	int result = (int)strtol(str.c_str(), &end_ptr, 10);
+	if (*end_ptr != '\0')
+		warning("Could not parse integer value \"%s\"" + str);
+	return result;
+}
+
+unsigned int toUInt(const string & str) {
+	char *end_ptr = nullptr;
+	unsigned int result = (int)strtoul(str.c_str(), &end_ptr, 10);
+	if (*end_ptr != '\0')
+		warning("Could not parse integer value \"%s\"" + str);
+	return result;
+}
+
+float toFloat(const string & str) {
+	char *end_ptr = nullptr;
+	float result = (float)strtof(str.c_str(), &end_ptr);
+	if (*end_ptr != '\0')
+		warning("Could not parse floating point value \"%s\"" + str);;
+	return result;
 }
 
 void onError() {

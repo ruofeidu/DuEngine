@@ -91,13 +91,13 @@ void DuEngine::start(int argc, char* argv[]) {
 	m_path = new PathManager(std::string(argv[0]), m_config);
 	
 	// setup the default m_window width and height
-	m_defaultWidth = m_config->GetIntWithDefault("window_width", m_defaultWidth);
-	m_defaultHeight = m_config->GetIntWithDefault("window_height", m_defaultHeight);
-	string _windowTitle = m_config->GetStringWithDefault("window_title", "DuRenderer | " + m_config->GetName());
+	m_defaultWidth = m_config->GetIntWithDefault("window_width", m_config->GetIntWithDefault("width", m_defaultWidth));
+	m_defaultHeight = m_config->GetIntWithDefault("window_height", m_config->GetIntWithDefault("height", m_defaultHeight));
+	string _windowTitle = m_config->GetStringWithDefault("window_title", m_config->GetStringWithDefault("title", "DuRenderer | " + m_config->GetName()));
 	m_window->init(argc, argv, m_defaultWidth, m_defaultHeight, _windowTitle);
 
 	// setup recording
-	m_recording = m_config->GetBoolWithDefault("recording", m_recording);
+	m_recording = m_config->GetBoolWithDefault("record", m_config->GetBoolWithDefault("recording", m_recording));
 	m_recordPath = m_config->GetStringWithDefault("record_path", m_config->GetName());
 	m_recordStart = m_config->GetIntWithDefault("record_start", m_recordStart);
 	m_recordEnd = m_config->GetIntWithDefault("record_end", m_recordEnd);
