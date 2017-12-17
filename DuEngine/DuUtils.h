@@ -1,12 +1,23 @@
 #pragma once
 #include "stdafx.h"
 
-bool dirExists(const std::string& dirName_in);
+// debug utilities
 void warning(string message);
 void info(string message);
 void debug(string message);
 void logerror(string message);
+void dump(char* pszFormat, ...);
+void onError();
 
+// file systems
+bool dirExists(const std::string& dirName_in);
+string getTimeForFileName();
+string smartFilePath(string fileName, string path); 
+
+// string utilities
+string repeatstring(string s, int cnt);
+
+// design pattern utilities
 class Singleton
 {
 public:
@@ -27,7 +38,3 @@ private:
 	};
 	static GC gc;
 };
-
-string getTimeForFileName();
-string repeatstring(string s, int cnt);
-string smartFilePath(string fileName, string path); 

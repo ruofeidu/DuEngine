@@ -129,6 +129,9 @@
     <ClCompile Include="ShaderToyFrameBuffer.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderProgram.cpp">
+      <Filter>Header Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HashVec2b.h">
@@ -205,6 +208,9 @@
     </ClInclude>
     <ClInclude Include="TexturesManager.h">
       <Filter>Header Files\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProgram.h">
+      <Filter>Source Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

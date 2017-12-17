@@ -196,7 +196,7 @@ void DuEngine::special(int key, int x, int y, bool up) {
 	if (up) {
 		switch (key) {
 		case GLUT_KEY_F1:
-			// Reset everything
+			// Reset the time
 			this->shadertoy->uniforms->reset(this->shadertoy->geometry);
 			shadertoy->uniforms->resetTime();
 			for (const auto& t : videoTextures) {
@@ -210,7 +210,7 @@ void DuEngine::special(int key, int x, int y, bool up) {
 			break;
 
 		case GLUT_KEY_F5:
-			// All Reset
+			// Reset and recompile
 			shadertoy->uniforms->resetTime();
 			for (const auto& t : videoTextures) {
 				t->resetTime();
@@ -277,99 +277,8 @@ int DuEngine::getNumFrameFromVideos() {
 	return ans;
 }
 
-string DuEngine::readTextFromFile(string filename) {
-	using std::cout;
-	using std::endl;
-	using std::string;
-	using std::ifstream;
-	string str, res = "";
-	ifstream in;
-	in.open(filename);
-	if (in.is_open()) {
-		getline(in, str);
-		while (in) {
-			res += str + "\n";
-			getline(in, str);
-		}
-		return res;
-	} else {
-		warning("Unable to open file " + filename);
-		onError();
-	}
-}
-
-
-void DuEngine::reportShaderErrors(const GLint shader) {
-	GLint length;
-	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-	GLchar* log = new GLchar[length + 1];
-	glGetShaderInfoLog(shader, length, &length, log);
-	string s(log);
-	logerror("Shader compile error, see log below\n" + s + "\n");
-	delete[] log;
-	onError();
-}
-
-
-void DuEngine::reportProgramErrors(const GLint program) {
-	GLint length;
-	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-	GLchar* log = new GLchar[length + 1];
-	glGetProgramInfoLog(program, length, &length, log);
-	string s(log);
-	logerror("Program linking error, see log below\n" + s + "\n");
-	delete[] log;
-	onError();
-}
-
-void DuEngine::onError() {
-	system("pause");
-	exit(EXIT_FAILURE);
-}
-
 void DuEngine::printHelp() {
 	info("Help:\n\tF1:\tReset everything.\n\tF2:\tTake Screenshot.\n\tF5:\tReset Time\n\tF6:\tPause\n\tF11:\tFullscreen.\n");
-}
-
-GLuint DuEngine::initShaders(GLenum type, string filename, string uniformFileName, string mainFileName) {
-	GLuint shader = glCreateShader(type);
-	GLint compiled;
-	string str = readTextFromFile(filename);
-	if (uniformFileName.size() > 0) {
-		string pre = readTextFromFile(uniformFileName);
-		str = pre + str;
-	}
-	if (mainFileName.size() > 0) {
-		string post = readTextFromFile(mainFileName);
-		str = str + post;
-	}
-	GLchar *cstr = new GLchar[str.size() + 1];
-	const GLchar *cstr2 = cstr; // Weirdness to get a const char
-	strcpy(cstr, str.c_str());
-	glShaderSource(shader, 1, &cstr2, NULL);
-	glCompileShader(shader);
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-	if (!compiled) {
-		reportShaderErrors(shader);
-		onError();
-	}
-	return shader;
-}
-
-
-GLuint DuEngine::initProgram(GLuint vertexshader, GLuint fragmentshader) {
-	GLuint program = glCreateProgram();
-	GLint linked;
-	glAttachShader(program, vertexshader);
-	glAttachShader(program, fragmentshader);
-	glLinkProgram(program);
-	glGetProgramiv(program, GL_LINK_STATUS, &linked);
-	if (!linked) {
-		reportProgramErrors(program); 
-		onError();
-	}
-	glUseProgram(program);
-	return program;
 }
 
 void DuEngine::takeScreenshot(string folderName) {

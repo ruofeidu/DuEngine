@@ -17,10 +17,8 @@ ShaderToy::ShaderToyFrameBuffer::ShaderToyFrameBuffer(DuEngine* _renderer, Shade
 }
 
 void ShaderToy::ShaderToyFrameBuffer::loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName) {
-	vertexShader = renderer->initShaders(GL_VERTEX_SHADER, vertexShaderName);
-	fragmentShader = renderer->initShaders(GL_FRAGMENT_SHADER, fragShaderName, uniformShaderName, mainFileName);
-	shaderProgram = renderer->initProgram(vertexShader, fragmentShader);
-	uniforms->linkShader(shaderProgram);
+	shaderProgram = new ShaderProgram(vertexShaderName, fragShaderName, uniformShaderName, mainFileName);
+	uniforms->linkShaderProgram(shaderProgram);
 #if VERBOSE_OUTPUT
 	debug("Frame buffer loaded: " + fragShaderName);
 #endif

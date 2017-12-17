@@ -2,7 +2,12 @@
 DuEngine is an efficient and interactive C++ graphics engine for rendering, managing, recording image and video screenshots of ShaderToy-like demos with custom 2D/3D/Video textures.
 
 ## Compilation
-Dependencies: OpenGL 4.5+, [Glew](http://glew.sourceforge.net/install.html), [OpenCV 3.0+](https://opencv.org/releases.html), [GLM](https://github.com/g-truc/glm/releases), [Visual Studio 2015](https://www.visualstudio.com/downloads)+
+Dependencies: 
+OpenGL 4.5+, [Glew](http://glew.sourceforge.net/install.html), 
+[OpenCV 3.0+](https://opencv.org/releases.html), 
+[GLM](https://github.com/g-truc/glm/releases), 
+[Freeglut](http://freeglut.sourceforge.net/index.php#download), 
+[Visual Studio 2015+](https://www.visualstudio.com/downloads).
 
 * To compile the project, simply run *OpenSolution.cmd*, or locate the solution file at *DuEngine/DuEngine.sln*
 * To test the project, run *UnitTest/debug.cmd*, and you will see the renderer with all sorts of input channels.
@@ -30,7 +35,7 @@ Run:
 ```c
 DuEngine config.ini
 ```
-The config file reads like:
+The config file reads like as follows:
 ```c
 shader_frag		    =	$Name.glsl
 buffers_count	    =	4
@@ -63,6 +68,16 @@ record_end		=	50
 record_video	=	true
 ```
 The video will be stored in record by default.
+
+### Functional Keys
+```C
+F1	=	Reset time;
+F2	=	Screenshot;
+F5	=	Reset and recompile;
+F6	=	Pause / Play all videos;
+F10	=	Debug the mouse output;
+F11	=	Toggle fullscreen mode;
+```
 
 In the end, here stores some of my GLSL code written in Shadertoy.com
 [My ShaderToy Public Profile](https://www.shadertoy.com/user/starea)

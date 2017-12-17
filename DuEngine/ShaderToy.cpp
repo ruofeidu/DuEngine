@@ -12,9 +12,7 @@
 ShaderToy::ShaderToy(DuEngine * _renderer, double _width, double _height, int _x0, double _y0) {
 	renderer = _renderer;
 	geometry = new ShaderToyGeometry(_width, _height, _x0, _y0);
-	vertexShader = 0;
-	fragmentShader = 0;
-	shaderProgram = 0;
+	shaderProgram = nullptr;
 	numChannels = _renderer->config->GetIntWithDefault("channels_count", 0);
 	uniforms = new ShaderToyUniforms(geometry, numChannels);
 	auto buffers_count = _renderer->config->GetIntWithDefault("buffers_count", 0); 
@@ -31,15 +29,11 @@ ShaderToy::ShaderToy(DuEngine *_renderer) : ShaderToy(_renderer, _renderer->wind
 }
 
 void ShaderToy::loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName = "") {
-	vertexShader = renderer->initShaders(GL_VERTEX_SHADER, vertexShaderName);
-	fragmentShader = renderer->initShaders(GL_FRAGMENT_SHADER, fragShaderName, uniformShaderName, mainFileName);
-	shaderProgram = renderer->initProgram(vertexShader, fragmentShader);
-	uniforms->linkShader(shaderProgram);
-	debug("Main buffer load: " + fragShaderName); 
-}
-
-void ShaderToy::setTexture2D(cv::Mat &mat, GLuint channel) {
-
+	shaderProgram = new ShaderProgram(vertexShaderName, fragShaderName, uniformShaderName, mainFileName);
+	uniforms->linkShaderProgram(shaderProgram);
+#if VERBOSE_OUTPUT
+	info("Main fragment shader loaded: " + fragShaderName);
+#endif
 }
 
 void ShaderToy::reshape(int _width, int _height) {
@@ -50,7 +44,6 @@ void ShaderToy::reshape(int _width, int _height) {
 		frameBuffer->reshape(_width, _height); 
 	}
 }
-
 
 void ShaderToy::render() {
 	for (auto& frameBuffer : m_frameBuffers) {

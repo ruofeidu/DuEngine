@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "DuEngine.h"
 #include "TexturesManager.h"
-
+#include "ShaderProgram.h"
 using namespace glm;
 using namespace std;
 
@@ -17,7 +17,7 @@ class ShaderToy
 	{
 		vec3 position;
 		Vertex() {}
-		Vertex(glm::vec3 pos) {
+		Vertex(vec3 pos) {
 			position = pos;
 		}
 	};
@@ -27,7 +27,7 @@ class ShaderToy
 		vec3 position;
 		vec2 texCoord;
 		TexVertex() {}
-		TexVertex(glm::vec3 pos, glm::vec2 tex) {
+		TexVertex(vec3 pos, vec2 tex) {
 			position = pos;
 			texCoord = tex;
 		}
@@ -86,7 +86,7 @@ class ShaderToy
 
 	private:
 		clock_t startTime;
-		GLint linkedProgram;
+		ShaderProgram* m_program;
 		float secondsOnStart;
 		
 		// location of uniforms
@@ -105,6 +105,7 @@ class ShaderToy
 		GLint uTimeDelta;
 		// the frame rate as int
 		GLint uFrameRate;
+
 	public:
 		// input channel. XX = 2D/Cube
 		vector<GLint> uChannels;
@@ -130,7 +131,7 @@ class ShaderToy
 
 		void resetFrame(); 
 
-		void linkShader(GLuint shaderProgram);
+		void linkShaderProgram(ShaderProgram* shaderProgram);
 
 		void bindTexture2D(Texture* texture, GLuint channel);
 
@@ -152,6 +153,13 @@ class ShaderToy
 
 		string getMouseString();
 
+	private:
+		static void Set(GLint location, vec4 &v);
+		static void Set(GLint location, vec3 &v);
+		static void Set(GLint location, vec2 &v);
+		static void Set(GLint location, float value);
+		static void Set(GLint location, int value);
+		static void Set(GLint location, Texture* texture);
 
 #if COMPILE_WITH_SH
 	private:
@@ -190,8 +198,7 @@ class ShaderToy
 	public:
 		// texture object
 		TextureFrameBuffer* textures[2];
-
-		GLuint vertexShader, fragmentShader, shaderProgram;
+		ShaderProgram* shaderProgram;
 
 	public:
 		ShaderToyFrameBuffer(DuEngine* _renderer, ShaderToyGeometry* _geometry, int numChannels);
@@ -210,7 +217,7 @@ public:
 	DuEngine* renderer;
 	ShaderToyUniforms* uniforms;
 	ShaderToyGeometry* geometry;
-	GLuint vertexShader, fragmentShader, shaderProgram;
+	ShaderProgram* shaderProgram;
 	vector<ShaderToyFrameBuffer*> m_frameBuffers;
 
 	ShaderToy(DuEngine* _renderer, double _width, double _height, int _x0, double _y0);
@@ -218,8 +225,6 @@ public:
 	ShaderToy(DuEngine* _renderer);
 
 	void loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName);
-
-	void setTexture2D(cv::Mat &mat, GLuint channel);
 
 	void reshape(int _width, int _height);
 

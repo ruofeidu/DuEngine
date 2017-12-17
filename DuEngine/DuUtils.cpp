@@ -31,6 +31,15 @@ void debug(string message) {
 	cout << "* " << message << endl;
 }
 
+void dump(char* pszFormat, ...) {
+	static char s_acBuf[2048]; // this here is a caveat!
+	va_list args;
+	va_start(args, pszFormat);
+	vsprintf(s_acBuf, pszFormat, args);
+	OutputDebugString(s_acBuf);
+	va_end(args);
+}
+
 void logerror(string message) {
 	cout << "!!! " << message << endl;
 	system("pause"); 
@@ -58,6 +67,11 @@ string smartFilePath(string fileName, string path) {
 	} else {
 		return path + fileName;
 	}
+}
+
+void onError() {
+	system("pause");
+	exit(EXIT_FAILURE);
 }
 
 

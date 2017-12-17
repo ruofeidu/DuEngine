@@ -50,34 +50,30 @@ void ShaderToy::ShaderToyUniforms::resetFrame() {
 	iSkip = SKIP_FIRST_FRAMES;
 }
 
-void ShaderToy::ShaderToyUniforms::linkShader(GLuint shaderProgram) {
-	linkedProgram = shaderProgram;
-	uGlobalTime = glGetUniformLocation(shaderProgram, "iTime");
-	uFrame = glGetUniformLocation(shaderProgram, "iFrame");
-	uMouse = glGetUniformLocation(shaderProgram, "iMouse");
-	uDate = glGetUniformLocation(shaderProgram, "iDate");
-	uResolution = glGetUniformLocation(shaderProgram, "iResolution");
-	uFrameRate = glGetUniformLocation(shaderProgram, "iFrameRate");
-	uTimeDelta = glGetUniformLocation(shaderProgram, "iTimeDelta");
-	for (int i = 0; i < iChannels.size(); ++i) {
-		auto uName = "iChannel" + to_string(i);
-		uChannels[i] = glGetUniformLocation(shaderProgram, uName.c_str());
-		uName = "iChannelResolution[" + to_string(i) + "]";
-		uChannelResolutions[i] = glGetUniformLocation(shaderProgram, uName.c_str());
-		uName = "iChannelTime[" + to_string(i) + "]";
-		uChannelTimes[i] = glGetUniformLocation(shaderProgram, uName.c_str());
+void ShaderToy::ShaderToyUniforms::linkShaderProgram(ShaderProgram* shaderProgram) {
+	m_program = shaderProgram;
+	uGlobalTime = m_program->getUniformLocation("iTime");
+	uFrame = m_program->getUniformLocation("iFrame");
+	uMouse = m_program->getUniformLocation("iMouse");
+	uDate = m_program->getUniformLocation("iDate");
+	uResolution = m_program->getUniformLocation("iResolution");
+	uFrameRate = m_program->getUniformLocation("iFrameRate");
+	uTimeDelta = m_program->getUniformLocation("iTimeDelta");
+	for (size_t i = 0; i < iChannels.size(); ++i) {
+		uChannels[i] = m_program->getUniformLocation("iChannel" + to_string(i));
+		uChannelResolutions[i] = m_program->getUniformLocation("iChannelResolution[" + to_string(i) + "]");
+		uChannelTimes[i] = m_program->getUniformLocation("iChannelTime[" + to_string(i) + "]");
 	}
 	for (int i = 0; i < iVec2Buffers.size(); ++i) {
-		auto uName = "iVec2" + to_string(i);
-		uVec2Buffers[i] = glGetUniformLocation(shaderProgram, uName.c_str());
+		uVec2Buffers[i] = m_program->getUniformLocation("iVec2" + to_string(i));
 	}
 #if COMPILE_WITH_SH
-	uSHCoefs = glGetUniformLocation(shaderProgram, "vSHCoefs");
-	uSph = glGetUniformLocation(shaderProgram, "vSph");
-	uNumBands = glGetUniformLocation(shaderProgram, "iNumBands");
-	uK = glGetUniformLocation(shaderProgram, "vK");
+	uSHCoefs = m_program->getUniformLocation("vSHCoefs");
+	uSph = m_program->getUniformLocation("vSph");
+	uNumBands = m_program->getUniformLocation("iNumBands");
+	uK = m_program->getUniformLocation("vK");
 #endif
-	debug("Linked with shader " + to_string(shaderProgram));
+	debug("Linked with shader " + to_string(m_program->getID()));
 }
 
 void ShaderToy::ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
@@ -121,7 +117,7 @@ void ShaderToy::ShaderToyUniforms::bindVec2Buffer(GLuint channel, string fileNam
 }
 
 void ShaderToy::ShaderToyUniforms::update() {
-	glUseProgram(linkedProgram);
+	m_program->use();
 	if (iSkip-- < 0) {
 		iFrame++;
 		iSkip = -1;
@@ -131,35 +127,29 @@ void ShaderToy::ShaderToyUniforms::update() {
 	}
 	iGlobalTime = float(clock() - startTime) / CLOCKS_PER_SEC;
 	iDate.w = secondsOnStart + iGlobalTime; // being lazy here, suppose that the month and day does not change
-	if (uResolution >= 0) glUniform3f(uResolution, iResolution.x, iResolution.y, iResolution.z);
-	if (uGlobalTime >= 0) glUniform1f(uGlobalTime, iGlobalTime);
-	if (uTimeDelta >= 0) glUniform1f(uTimeDelta, iTimeDelta);
-	if (uFrameRate >= 0) glUniform1i(uFrameRate, iFrameRate);
-	if (uFrame >= 0) glUniform1i(uFrame, iFrame);
-	if (uMouse >= 0) glUniform4f(uMouse, iMouse.x, iMouse.y, iMouse.z, iMouse.w);
-	if (uDate >= 0) glUniform4f(uDate, iDate.x, iDate.y, iDate.z, iDate.w);
+	
+	Set(uResolution, iResolution);
+	Set(uGlobalTime, iGlobalTime);
+	Set(uTimeDelta, iTimeDelta);
+	Set(uFrameRate, iFrameRate);
+	Set(uFrameRate, iFrameRate);
+	Set(uFrame, iFrame);
+	Set(uMouse, iMouse);
+	Set(uDate, iDate);
+
 	for (int i = 0; i < iChannels.size(); ++i) if (uChannels[i] >= 0) {
-		auto id = iChannels[i]->getTextureID();
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, id);
-		glUniform1i(uChannels[i], id);
+		Set(uChannels[i], iChannels[i]);
 #if DEBUG_MULTIPASS
 		debug("Updated channel " + to_string(i) + " with texture " + to_string(iChannels[i]->getTextureID())
 			+ " at location " + to_string(uChannels[i])
 			);
 #endif		
-		if (uChannelResolutions[i] >= 0) {
-			auto res = iChannels[i]->getResolution(); 
-			glUniform3f(uChannelResolutions[i], res.x, res.y, res.z);
-		}
-		if (uChannelTimes[i] >= 0) {
-			glUniform1f(uChannelTimes[i], iGlobalTime);
-		}
+		Set(uChannelResolutions[i], iChannels[i]->getResolution());
+		Set(uChannelTimes[i], iGlobalTime);
 	}
 
-	for (int i = 0; i < vec2_buffers.size(); ++i) if (uVec2Buffers[i] >= 0) {
-		auto &v2 = vec2_buffers[i][iFrame % vec2_buffers[i].size()];
-		glUniform2f(uVec2Buffers[i], v2.x, v2.y);
+	for (int i = 0; i < vec2_buffers.size(); ++i) {
+		Set(uVec2Buffers[i], vec2_buffers[i][iFrame % vec2_buffers[i].size()]);
 	}
 }
 
@@ -200,3 +190,42 @@ void ShaderToy::ShaderToyUniforms::onMouseUp(float x, float y) {
 string ShaderToy::ShaderToyUniforms::getMouseString() {
 	return to_string((float)iMouse.x / iResolution.x) + "\t" + to_string((float)iMouse.y / iResolution.y);
 }
+
+void ShaderToy::ShaderToyUniforms::Set(GLint location, Texture * texture) {
+	auto id = texture->getTextureID();
+	glActiveTexture(GL_TEXTURE0 + id);
+	glBindTexture(GL_TEXTURE_2D, id);
+	glUniform1i(location, id);
+}
+
+void ShaderToy::ShaderToyUniforms::Set(GLint location, vec4 & v) {
+	if (location >= 0) {
+		glUniform4f(location, v.x, v.y, v.z, v.w);
+	}
+}
+
+void ShaderToy::ShaderToyUniforms::Set(GLint location, vec3 & v) {
+	if (location >= 0) {
+		glUniform3f(location, v.x, v.y, v.z);
+	}
+}
+
+void ShaderToy::ShaderToyUniforms::Set(GLint location, vec2 & v) {
+	if (location >= 0) {
+		glUniform2f(location, v.x, v.y);
+	}
+}
+
+void ShaderToy::ShaderToyUniforms::Set(GLint location, float value) {
+	if (location >= 0) {
+		glUniform1f(location, value);
+	}
+}
+
+
+void ShaderToy::ShaderToyUniforms::Set(GLint location, int value) {
+	if (location >= 0) {
+		glUniform1i(location, value);
+	}
+}
+

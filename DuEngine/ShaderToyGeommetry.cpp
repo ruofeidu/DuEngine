@@ -4,7 +4,7 @@
 ShaderToy::ShaderToyGeometry::ShaderToyGeometry(double _width, double _height, double _x0, double _y0) {
 	reset(_width, _height, _x0, _y0);
 
-	GLuint posLength = sizeof(vertexBuffer);
+	GLuint vertexLength = sizeof(vertexBuffer);
 
 	layoutPosition = 0;
 	layoutTexCoord = 1;
@@ -23,7 +23,7 @@ ShaderToy::ShaderToyGeometry::ShaderToyGeometry(double _width, double _height, d
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, posLength, vertexBuffer, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexLength, vertexBuffer, GL_STATIC_DRAW);
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);

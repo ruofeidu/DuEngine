@@ -78,19 +78,7 @@ private:
 private:
 	int getNumFrameFromVideos();
 
-	string readTextFromFile(string filename);
-
-	void reportShaderErrors(const GLint shader);
-
-	void reportProgramErrors(const GLint shader);
-
-	void onError(); 
-
 	void printHelp(); 
-
-	GLuint initShaders(GLenum type, string filename, string uniformFileName = "", string mainFileName = "");
-
-	GLuint initProgram(GLuint vertexshader, GLuint fragmentshader);
 
 	class GC
 	{
