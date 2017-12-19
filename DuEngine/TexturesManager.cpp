@@ -52,6 +52,12 @@ Texture * TexturesManager::addVideoSequence(string fileName, int fps, int startF
 	return t; 
 }
 
+Texture * TexturesManager::addSphericalHarmonics(string fileName, int fps, int startFrame, int endFrame, int numBands) {
+	auto t = new TextureSH(fileName, fps, startFrame, endFrame, numBands);
+	addVideoTexture((TextureVideo*)t);
+	return t; 
+}
+
 Texture * TexturesManager::addTexture2D(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp) {
 	auto t = new Texture2D(fileName, vFlip, filter, warp);
 	return t; 

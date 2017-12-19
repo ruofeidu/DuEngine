@@ -11,8 +11,7 @@
 #include "DuEngine.h"
 
 TextureVideoSequence::TextureVideoSequence(string fileName, int fps, int startFrame, int endFrame, TextureFilter filter, TextureWarp warp) {
-	init(fileName, true, filter, warp);
-	m_vFlip = false;
+	init(fileName, false, filter, warp);
 	for (int i = startFrame; i < endFrame; ++i) {
 		string ithName = fileName;
 		if (fileName.find("%d") != string::npos) {
@@ -22,6 +21,7 @@ TextureVideoSequence::TextureVideoSequence(string fileName, int fps, int startFr
 		if (mat.empty()) {
 			logerror("TextureVideoSequence cannot read " + ithName);
 		}
+		// prepare the vflip before the run time.
 		flip(mat, mat, 0);
 		m_videoseq.push_back(mat);
 	}

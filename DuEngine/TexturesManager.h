@@ -28,6 +28,7 @@ public:
 	Texture* addFont(TextureFilter filter, TextureWarp warp);
 	Texture* addVideoFile(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp);
 	Texture* addVideoSequence(string fileName, int fps, int startFrame, int endFrame, TextureFilter filter, TextureWarp warp);
+	Texture* addSphericalHarmonics(string fileName, int fps, int startFrame, int endFrame, int numBands);
 	Texture* addTexture2D(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp);
 
 private:

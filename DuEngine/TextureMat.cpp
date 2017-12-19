@@ -40,7 +40,7 @@ void TextureMat::updateFromMat() {
 		m_format,                // GLenum format,
 		m_dataType,              // GLenum type,
 		m_mat.ptr()              // const GLvoid * pixels
-		);
+	);
 	generateMipmaps();
 }
 
@@ -52,6 +52,9 @@ void TextureMat::generateFromMat(cv::Mat & mat) {
 	this->genTexture2D();
 	this->updateDataTypeFormat();
 
+	// OpenCV has reversed Y coordinates
+	if (m_vFlip) flip(m_mat, m_mat, 0);
+
 	// Create the texture
 	glTexImage2D(GL_TEXTURE_2D,  // Type of texture
 		0,					     // Pyramid level (for mip-mapping) - 0 is the top level
@@ -61,14 +64,14 @@ void TextureMat::generateFromMat(cv::Mat & mat) {
 		0,					     // Border width in pixels (can either be 1 or 0)
 		m_format,	             // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
 		m_dataType,	             // Image data type
-		mat.ptr());			     // The actual image data itself
-
+		mat.ptr()			     // The actual image data itself
+	);
+	cout << m_dataType << " vs " << GL_UNSIGNED_BYTE << endl;
+	cout << m_dataType << " vs " << GL_FLOAT << endl;
 	generateMipmaps();
 }
 
 void TextureMat::updateDataTypeFormat() {
-	// OpenCV has reversed Y coordinates
-	if (m_vFlip) flip(m_mat, m_mat, 0);
 	updateDatatypeFromMat(m_mat);
 	updateFormatFromMat(m_mat);
 	updateOpenGLInternalFormat(m_mat);
@@ -132,5 +135,9 @@ void TextureMat::updateOpenGLInternalFormat(cv::Mat & mat) {
 		break;
 	default:
 		logerror("Unknown channels of mat");
+	}
+
+	if (m_dataType == GL_FLOAT && mat.channels() == 3) {
+		m_openGLFormat = GL_RGB32F;
 	}
 }

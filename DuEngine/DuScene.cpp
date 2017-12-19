@@ -42,6 +42,7 @@ void DuEngine::initScene() {
 			auto fps = m_config->GetIntWithDefault(iPrefix + "fps", 25);
 			auto startFrame = m_config->GetIntWithDefault(iPrefix + "startFrame", 1);
 			auto endFrame = m_config->GetIntWithDefault(iPrefix + "endFrame", 100);
+			auto numBands = m_config->GetIntWithDefault(iPrefix + "bands", 25);
 
 			Texture* t = nullptr; 
 
@@ -62,6 +63,9 @@ void DuEngine::initScene() {
 				break; 
 			case TextureType::Font:
 				t = m_textureManager->addFont(textureFilter, textureWarp); 
+				break; 
+			case TextureType::SH:
+				t = m_textureManager->addSphericalHarmonics(fileName, fps, startFrame, endFrame, numBands);
 				break; 
 			case TextureType::FrameBuffer:
 				int bufferID = (int)(type[0] - 'a');

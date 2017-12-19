@@ -10,10 +10,11 @@
 class TextureVideoSequence : public TextureVideo
 {
 public:
+	TextureVideoSequence() {};
 	TextureVideoSequence(string fileName, int fps, int startFrame, int endFrame, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
 	void resetTime();
 	void update();
 
-private:
+protected:
 	vector<Mat> m_videoseq;
 };
