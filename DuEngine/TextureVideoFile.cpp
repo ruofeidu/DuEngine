@@ -25,6 +25,7 @@ TextureVideoFile::TextureVideoFile(string filename, bool vflip, TextureFilter fi
 }
 
 void TextureVideoFile::update() {
+	if (m_paused) return; 
 	int iFrame = DuEngine::GetInstance()->getFrameNumber();
 	if (!m_distribution[iFrame % m_distribution.size()]) return;
 

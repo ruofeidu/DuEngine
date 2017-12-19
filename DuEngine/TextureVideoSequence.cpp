@@ -38,6 +38,7 @@ void TextureVideoSequence::resetTime() {
 }
 
 void TextureVideoSequence::update() {
+	if (m_paused) return;
 	int iFrame = DuEngine::GetInstance()->getFrameNumber();
 	if (!m_distribution[iFrame % m_distribution.size()]) return;
 

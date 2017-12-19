@@ -52,20 +52,22 @@ void DuEngine::initScene() {
 			case TextureType::RGB:
 				t = m_textureManager->addTexture2D(fileName, vFlip, textureFilter, textureWarp); 
 				break;
+
 			case TextureType::VideoFile:
 				t = m_textureManager->addVideoFile(fileName, vFlip, textureFilter, textureWarp); 
 				break;
 			case TextureType::VideoSequence:
 				t = m_textureManager->addVideoSequence(fileName, fps, startFrame, endFrame, textureFilter, textureWarp);
 				break;
+			case TextureType::SH:
+				t = m_textureManager->addSphericalHarmonics(fileName, fps, startFrame, endFrame, numBands);
+				break;
+
 			case TextureType::Keyboard:
 				t = m_textureManager->addKeyboard();
 				break; 
 			case TextureType::Font:
 				t = m_textureManager->addFont(textureFilter, textureWarp); 
-				break; 
-			case TextureType::SH:
-				t = m_textureManager->addSphericalHarmonics(fileName, fps, startFrame, endFrame, numBands);
 				break; 
 			case TextureType::FrameBuffer:
 				int bufferID = (int)(type[0] - 'a');

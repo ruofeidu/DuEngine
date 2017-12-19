@@ -16,7 +16,8 @@
 TextureSH::TextureSH(string fileName, int fps, int startFrame, int endFrame, int numBands) {
 	m_numBands = numBands;
 	m_numCoefficients = m_numBands * m_numBands;
-	double *shCoef = new double[m_numCoefficients * 3];
+	using shtype = float; 
+	shtype *shCoef = new shtype[m_numCoefficients * 3];
 	init(fileName, false, TextureFilter::NEAREST, TextureWarp::CLAMP);
 
 	for (int i = startFrame; i < endFrame; ++i) {
@@ -27,7 +28,7 @@ TextureSH::TextureSH(string fileName, int fps, int startFrame, int endFrame, int
 		cv::Mat mat = Mat::zeros(2, m_numCoefficients, CV_32FC3);
 		try {
 			auto pFile = fopen(ithName.c_str(), "rb");
-			fread(shCoef, sizeof(double), m_numCoefficients * 3, pFile);
+			fread(shCoef, sizeof(shtype), m_numCoefficients * 3, pFile);
 			fclose(pFile);
 			for (int j = 0; j < m_numCoefficients; ++j) {
 				mat.at<Vec3f>(0, j) = Vec3f(shCoef[j * 3 + 0], shCoef[j * 3 + 1], shCoef[j * 3 + 2]);
@@ -46,7 +47,9 @@ TextureSH::TextureSH(string fileName, int fps, int startFrame, int endFrame, int
 	this->generateFromMat();
 	this->initDistribution();
 	info("Read and generated SH Sequences: " + to_string(m_videoseq.size()));
-	info("First: " + to_string(shCoef[0]) + "\t" + to_string(shCoef[1]) + "\t" + to_string(shCoef[2]));
+	for (int i = 0; i < 9; ++i) {
+		cout << shCoef[i] << endl;
+	}
 	delete[] shCoef;
 }
 #endif
