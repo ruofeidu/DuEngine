@@ -13,6 +13,7 @@ DuEngine/*.glsl
 DuEngine/*.cmd
 SHSaliency/
 Friends/
+Copyright/
 
 # User-specific files
 *.suo
