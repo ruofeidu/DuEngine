@@ -84,7 +84,7 @@ public:
 
 	void linkShaderProgram(ShaderProgram* shaderProgram);
 
-	void bindTexture2D(Texture* texture, GLuint channel);
+	void bindTexture(Texture* texture, GLuint channel);
 
 	void bindVec2Buffer(GLuint channel, string fileName);
 

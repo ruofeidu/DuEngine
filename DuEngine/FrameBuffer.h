@@ -13,7 +13,7 @@ protected:
 
 public:
 	void render();
-	void loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName);
+	void loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName, string uniformAppendix = "");
 
 public:
 	Uniforms* getUniforms();

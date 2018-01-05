@@ -165,11 +165,11 @@
     <ClCompile Include="ShaderProgram.cpp">
       <Filter>Source Files\Uniforms</Filter>
     </ClCompile>
-    <ClCompile Include="TextureCube.cpp">
-      <Filter>Source Files\Textures</Filter>
-    </ClCompile>
     <ClCompile Include="PathManager.cpp">
       <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureCubeMap.cpp">
+      <Filter>Source Files\Textures</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -272,7 +272,7 @@
     <ClInclude Include="PathManager.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="TextureCube.h">
+    <ClInclude Include="TextureCubeMap.h">
       <Filter>Header Files\Textures</Filter>
     </ClInclude>
   </ItemGroup>

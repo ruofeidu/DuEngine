@@ -63,6 +63,11 @@ Texture * TexturesManager::addTexture2D(string fileName, bool vFlip, TextureFilt
 	return t; 
 }
 
+Texture * TexturesManager::addTextureCubeMap(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp) {
+	auto t = new TextureCubeMap(fileName, vFlip, filter, warp);
+	return t;
+}
+
 Texture * TexturesManager::addKeyboard() {
 	if (!m_keyboard) m_keyboard = new TextureKeyboard();
 	return m_keyboard;

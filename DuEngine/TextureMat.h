@@ -22,9 +22,9 @@ protected:
 	bool m_vFlip = true;
 	// Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
 	GLuint m_format = GL_BGR;
-	// Image data type
+	// Image data type [GL_UNSIGNED_BYTE]
 	GLuint m_dataType = GL_UNSIGNED_BYTE;
-	// Internal color format to convert to
+	// Internal color format to convert to, [GL_RGB]
 	GLuint m_openGLFormat = GL_RGB;
 
 protected:

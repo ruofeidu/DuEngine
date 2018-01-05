@@ -8,11 +8,11 @@
 */
 #include "TextureMat.h"
 
-class TextureCube : public TextureMat
+class TextureCubeMap : public TextureMat
 {
 public:
-	TextureCube() {};
-	TextureCube(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+	TextureCubeMap() {};
+	TextureCubeMap(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
 
 private:
 	cv::Mat m_cubes[6];

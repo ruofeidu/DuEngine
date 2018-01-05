@@ -12,6 +12,7 @@
 #include "TextureFrameBuffer.h"
 #include "TextureFont.h"
 #include "TextureSH.h"
+#include "TextureCubeMap.h"
 #include "DuUtils.h"
 
 class TexturesManager
@@ -30,6 +31,7 @@ public:
 	Texture* addVideoSequence(string fileName, int fps, int startFrame, int endFrame, TextureFilter filter, TextureWarp warp);
 	Texture* addSphericalHarmonics(string fileName, int fps, int startFrame, int endFrame, int numBands);
 	Texture* addTexture2D(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp);
+	Texture* addTextureCubeMap(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp);
 
 private:
 	void addVideoTexture(TextureVideo* tex);

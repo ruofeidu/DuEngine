@@ -17,6 +17,10 @@ GLuint Texture::getTextureID() {
 	return this->id;
 }
 
+GLenum Texture::getGLType() {
+	return m_glType; 
+}
+
 GLuint Texture::getDirectID() {
 	return read_texture_id;
 }
@@ -24,6 +28,13 @@ GLuint Texture::getDirectID() {
 
 TextureType Texture::getType() {
 	return type;
+}
+
+void Texture::bindUniform(int uniformId) {
+	auto id = this->getTextureID();
+	glActiveTexture(GL_TEXTURE0 + id);
+	glBindTexture(m_glType, id);
+	glUniform1i(uniformId, id);
 }
 
 TextureType Texture::QueryType(string str) {
@@ -64,11 +75,37 @@ void Texture::QueryFileNameByType(string & type, string & fileName, string& pres
 			break;
 		}
 	}
+	for (const auto& key : Texture::CubeMapTextures) {
+		if (!type.compare(key.first)) {
+			type = "cubemap";
+			fileName = presetsPath + key.second;
+			break;
+		}
+	}
+	for (const auto& key : Texture::VolumeTextures) {
+		if (!type.compare(key.first)) {
+			type = "volume";
+			fileName = presetsPath + key.second;
+			break;
+		}
+	}
 }
+
+string Texture::QuerySampler(TextureType type) {
+	string sampler = "sampler2D";
+	switch (type) {
+	case TextureType::CubeMap:
+		sampler = "samplerCube";
+		break;
+	}
+	return sampler; 
+}
+
 
 const unordered_map<string, TextureType> Texture::TextureMaps {
 	{ "rgb", TextureType::RGB },
 	{ "noise", TextureType::Noise },
+	{ "cubemap", TextureType::CubeMap },
 	{ "video", TextureType::VideoFile },
 	{ "videoseq", TextureType::VideoSequence },
 	{ "key", TextureType::Keyboard },
@@ -114,7 +151,22 @@ const unordered_map<string, string> Texture::ImageTextures {
 	{ "black", "black.jpg" }
 };
 
+const unordered_map<string, string> Texture::CubeMapTextures{
+	{ "forest", "cube04_0.png" },
+	{ "forestb", "cube05_0.png" },
+	{ "stpeter", "cube02_0.jpg" },
+	{ "stpeterb", "cube03_0.png" },
+	{ "basilica", "cube02_0.jpg" },
+	{ "basilicab", "cube03_0.png" },
+	{ "uffizi", "cube00_0.jpg" },
+	{ "uffizib", "cube01_0.png" },
+	{ "gallery", "cube00_0.jpg" },
+	{ "galleryb", "cube01_0.png" },
+};
 
+const unordered_map<string, string> Texture::VolumeTextures{
+	{ "noise3d", "noise3d.bin" },
+};
 const unordered_map<string, string> Texture::NoiseTextures{
 	{ "gnm", "tex12.png" },
 	{ "greynoise", "tex12.png" },
@@ -141,7 +193,7 @@ const unordered_map<string, string> Texture::FontTextures{
 
 void Texture::setFiltering() {
 	//glGenSamplers(1, &sampler);
-	m_wrapFilter = (m_warp == TextureWarp::REPEAT) ? GL_REPEAT : GL_CLAMP;
+	m_wrapFilter = (m_warp == TextureWarp::REPEAT) ? GL_REPEAT : ((m_glType == GL_TEXTURE_CUBE_MAP) ? GL_CLAMP_TO_EDGE : GL_CLAMP);
 	switch (m_filter) {
 	case TextureFilter::NEAREST:
 		m_minFilter = GL_NEAREST;
@@ -171,12 +223,14 @@ void Texture::setFiltering() {
 	}
 #endif
 	// Set texture interpolation methods for minification and magnification
-	glTexParameteri(m_texType, GL_TEXTURE_MIN_FILTER, m_minFilter);
-	glTexParameteri(m_texType, GL_TEXTURE_MAG_FILTER, m_magFilter);
+	glTexParameteri(m_glType, GL_TEXTURE_MIN_FILTER, m_minFilter);
+	glTexParameteri(m_glType, GL_TEXTURE_MAG_FILTER, m_magFilter);
 
 	// Set texture clamping methodw
-	glTexParameteri(m_texType, GL_TEXTURE_WRAP_S, m_wrapFilter);
-	glTexParameteri(m_texType, GL_TEXTURE_WRAP_T, m_wrapFilter);
+	glTexParameteri(m_glType, GL_TEXTURE_WRAP_S, m_wrapFilter);
+	glTexParameteri(m_glType, GL_TEXTURE_WRAP_T, m_wrapFilter);
+	if (m_glType == GL_TEXTURE_CUBE_MAP)
+		glTexParameteri(m_glType, GL_TEXTURE_WRAP_R, m_wrapFilter);
 }
 
 void Texture::genTexture2D() {
@@ -187,7 +241,7 @@ void Texture::genTexture2D() {
 	glActiveTexture(GL_TEXTURE0 + id);
 
 	// Bind to our texture handle
-	glBindTexture(m_texType, id);
+	glBindTexture(m_glType, id);
 
 	this->setFiltering();
 }
@@ -195,7 +249,7 @@ void Texture::genTexture2D() {
 void Texture::generateMipmaps() {
 	// If we're using mipmaps then generate them. Note: This requires OpenGL 3.0 or higher	   
 	if (m_filter == TextureFilter::MIPMAP) {
-		glGenerateMipmap(m_texType);
+		glGenerateMipmap(m_glType);
 #if VERBOSE_OUTPUT
 		info("Mipmap generated for texture" + id);
 #endif

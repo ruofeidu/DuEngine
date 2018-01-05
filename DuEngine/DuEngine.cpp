@@ -153,7 +153,7 @@ void DuEngine::special(int key, int x, int y, bool up) {
 			m_textureManager->togglePause(); 
 		case GLUT_KEY_F9:
 			// Debug iFrame
-			debug(to_string(getFrameNumber()));
+			debug(getFrameNumber());
 			break;
 
 		case GLUT_KEY_F10:

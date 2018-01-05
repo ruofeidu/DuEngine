@@ -81,13 +81,10 @@ void ShaderToyUniforms::linkShaderProgram(ShaderProgram* shaderProgram) {
 	debug("Linked with shader " + to_string(m_program->getID()));
 }
 
-void ShaderToyUniforms::bindTexture2D(Texture* tex, GLuint channel) {
+void ShaderToyUniforms::bindTexture(Texture* tex, GLuint channel) {
 	if (uChannels[channel] >= 0) {
 		iChannels[channel] = tex;
-		auto id = tex->getTextureID();
-		glActiveTexture(GL_TEXTURE0 + id);
-		glBindTexture(GL_TEXTURE_2D, id);
-		glUniform1i(uChannels[channel], id);
+		tex->bindUniform(uChannels[channel]); 
 	} else {
 		warning("Channel " + to_string(channel) + " is not used in the shader.");
 	}
@@ -197,10 +194,9 @@ string ShaderToyUniforms::GetMouseString() {
 }
 
 void ShaderToyUniforms::Set(GLint location, Texture * texture) {
-	auto id = texture->getTextureID();
-	glActiveTexture(GL_TEXTURE0 + id);
-	glBindTexture(GL_TEXTURE_2D, id);
-	glUniform1i(location, id);
+	if (location >= 0) {
+		texture->bindUniform(location);
+	}
 }
 
 void ShaderToyUniforms::Set(GLint location, vec4 & v) {

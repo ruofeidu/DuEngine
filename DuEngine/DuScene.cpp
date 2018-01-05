@@ -26,12 +26,23 @@ void DuEngine::initScene() {
 		auto fbo = m_shadertoy->getBuffer(buffer); 
 		ShaderToyUniforms* uniforms = (ShaderToyUniforms*)(fbo->getUniforms());
 		auto fragmentShaderName = m_path->getFragmentShader(suffix);
-		fbo->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName);
+		auto channels_count = m_config->GetIntWithDefault(prefix + "channels_count", 0);
+
+		string uniformAppendix = "";
+		for (int i = 0; i < channels_count; ++i) {
+			auto iPrefix = prefix + "iChannel" + to_string(i) + "_";
+			auto type = toLower(m_config->GetStringWithDefault(iPrefix + "type", "unknown"));
+			auto fileName = m_path->getResource(iPrefix + "tex");
+			Texture::QueryFileNameByType(type, fileName, m_path->getPresetPath());
+			auto textureType = Texture::QueryType(type);
+			uniformAppendix += "uniform " + Texture::QuerySampler(textureType) + " iChannel" + to_string(i) + "; \n";
+		}
+		debug(uniformAppendix); 
+		fbo->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName, uniformAppendix);
 
 		// bind channel textures
-		auto channels_count = m_config->GetIntWithDefault(prefix + "channels_count", 0);
 		for (int i = 0; i < channels_count; ++i) {
-			string iPrefix = prefix + "iChannel" + to_string(i) + "_";
+			auto iPrefix = prefix + "iChannel" + to_string(i) + "_";
 			auto type = toLower(m_config->GetStringWithDefault(iPrefix + "type", "unknown"));
 			auto fileName = m_path->getResource(iPrefix + "tex");
 			Texture::QueryFileNameByType(type, fileName, m_path->getPresetPath());
@@ -68,7 +79,10 @@ void DuEngine::initScene() {
 				break; 
 			case TextureType::Font:
 				t = m_textureManager->addFont(textureFilter, textureWarp); 
-				break; 
+				break;
+			case TextureType::CubeMap:
+				t = m_textureManager->addTextureCubeMap(fileName, vFlip, textureFilter, textureWarp);
+				break;
 			case TextureType::FrameBuffer:
 				int bufferID = (int)(type[0] - 'a');
 				auto bindedFbo = m_shadertoy->getFrameBuffer(bufferID);
@@ -81,7 +95,7 @@ void DuEngine::initScene() {
 			}
 
 			if (t != nullptr) {
-				uniforms->bindTexture2D(t, i);
+				uniforms->bindTexture(t, i);
 			} else {
 				logerror("Unknown texture type!");
 			}

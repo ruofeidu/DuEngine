@@ -19,16 +19,28 @@ bool dirExists(const string& dirName_in) {
 	return false;    // this is not a directory!
 }
 
+void debug(string message) {
+	cout << "* " << message << endl;
+}
+
+void debug(int message) {
+	cout << "* " << message << endl;
+}
+
+void debug(unsigned int message) {
+	cout << "* " << message << endl;
+}
+
+void debug(float message) {
+	cout << "* " << message << endl;
+}
+
 void warning(string message) {
 	cout << "! " << message << endl;
 }
 
 void info(string message) {
 	cout << "~ " << message << endl;
-}
-
-void debug(string message) {
-	cout << "* " << message << endl;
 }
 
 void dump(char* pszFormat, ...) {

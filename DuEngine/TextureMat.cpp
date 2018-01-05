@@ -31,9 +31,9 @@ void TextureMat::generateFromMat() {
 }
 
 void TextureMat::updateFromMat() {
-	glBindTexture(m_texType, id);
+	glBindTexture(m_glType, id);
 	glTexSubImage2D(
-		m_texType,
+		m_glType,
 		0,                       // GLint level,
 		0, 0,                    // GLint xoffset, GLint yoffset,
 		m_mat.cols, m_mat.rows,  // GLsizei width, GLsizei height,
@@ -48,7 +48,7 @@ void TextureMat::texImage(cv::Mat &mat, uchar* pointer) {
 	if (pointer == nullptr)
 		pointer = mat.ptr(); 
 
-	glTexImage2D(m_texType,
+	glTexImage2D(m_glType,
 		0,					     // Pyramid level (for mip-mapping) - 0 is the top level
 		m_openGLFormat,		     
 		mat.cols,			     // Image width 

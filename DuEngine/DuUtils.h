@@ -2,10 +2,15 @@
 #include "stdafx.h"
 
 // debug utilities
+void debug(string message);
+void debug(int message);
+void debug(unsigned int message);
+void debug(float message);
+
 void warning(string message);
 void info(string message);
-void debug(string message);
 void logerror(string message);
+
 void dump(char* pszFormat, ...);
 void onError();
 

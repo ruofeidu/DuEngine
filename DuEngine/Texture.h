@@ -29,27 +29,32 @@ public:
 	static TextureWarp QueryWarp(string str);
 	// replace the predefined textures into the real file names
 	static void QueryFileNameByType(string& type, string& fileName, string& presetsPath);
+	// get sampler2D / samplerCube / sampler3D depending on the types
+	static string QuerySampler(TextureType type); 
 	// mapping type stringss to TextureType
 	const static unordered_map<string, TextureType> TextureMaps;
-	// mapping strings to Image filenames
+	// mapping strings to filenames of various sorts of textures
 	const static unordered_map<string, string> ImageTextures;
-	// mapping strings to Image filenames
+	const static unordered_map<string, string> CubeMapTextures;
+	const static unordered_map<string, string> VolumeTextures;
 	const static unordered_map<string, string> NoiseTextures;
-	// mapping strings to Video filenames
 	const static unordered_map<string, string> VideoTextures;
-	// mapping type strings to Font filenames
 	const static unordered_map<string, string> FontTextures;
 
 public:
 	Texture() {};
 	// Acquire the current texture unit id for reading and binding to shader uniforms
 	GLuint getTextureID();
+	// Acquire the OpenGL texture type
+	GLenum getGLType(); 
 	// Acquire the binded texture unit id
 	GLuint getDirectID();
 	// Acquire resolution of the binded texture
 	virtual vec3 getResolution() = 0; 
 	// Acquire the texture type
 	TextureType getType();
+	// Activate and bind
+	void bindUniform(int uniformId);
 
 protected:
 	TextureType type = TextureType::Unknown;
@@ -58,7 +63,7 @@ protected:
 	// The texture id for reading
 	GLuint read_texture_id = 0;
 	// Type of texture, GL_TEXTURE_2D by default
-	GLenum m_texType = GL_TEXTURE_2D;
+	GLenum m_glType = GL_TEXTURE_2D;
 
 	TextureFilter m_filter = TextureFilter::LINEAR;
 	TextureWarp m_warp = TextureWarp::REPEAT;
