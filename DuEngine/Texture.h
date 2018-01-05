@@ -19,7 +19,7 @@ enum ETextureFiltering
 
 enum class TextureFilter : std::int8_t { NEAREST, LINEAR, MIPMAP };
 enum class TextureWarp : std::int8_t { CLAMP, REPEAT };
-enum class TextureType : std::int8_t { Unknown, RGB, Noise, VideoFile, VideoSequence, Keyboard, Font, SH, FrameBuffer, Volume, LightField };
+enum class TextureType : std::int8_t { Unknown, RGB, Noise, VideoFile, VideoSequence, Keyboard, Font, SH, FrameBuffer, Volume, LightField, CubeMap };
 
 class Texture
 {
@@ -57,6 +57,8 @@ protected:
 	GLuint id = 0;
 	// The texture id for reading
 	GLuint read_texture_id = 0;
+	// Type of texture, GL_TEXTURE_2D by default
+	GLenum m_texType = GL_TEXTURE_2D;
 
 	TextureFilter m_filter = TextureFilter::LINEAR;
 	TextureWarp m_warp = TextureWarp::REPEAT;

@@ -31,9 +31,9 @@ void TextureMat::generateFromMat() {
 }
 
 void TextureMat::updateFromMat() {
-	glBindTexture(GL_TEXTURE_2D, id);
+	glBindTexture(m_texType, id);
 	glTexSubImage2D(
-		GL_TEXTURE_2D,
+		m_texType,
 		0,                       // GLint level,
 		0, 0,                    // GLint xoffset, GLint yoffset,
 		m_mat.cols, m_mat.rows,  // GLsizei width, GLsizei height,
@@ -44,30 +44,31 @@ void TextureMat::updateFromMat() {
 	generateMipmaps();
 }
 
-// https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glTexParameter.xml
-// minFilters: GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR
-// magFilters: GL_NEAREST, GL_LINEAR
-// GL_TEXTURE_WRAP_S: GL_CLAMP_TO_EDGE, GL_MIRRORED_REPEAT, GL_REPEAT
+void TextureMat::texImage(cv::Mat &mat, uchar* pointer) {
+	if (pointer == nullptr)
+		pointer = mat.ptr(); 
+
+	glTexImage2D(m_texType,
+		0,					     // Pyramid level (for mip-mapping) - 0 is the top level
+		m_openGLFormat,		     
+		mat.cols,			     // Image width 
+		mat.rows,			     // Image height
+		0,					     // Border width in pixels (can either be 1 or 0)
+		m_format,
+		m_dataType,
+		pointer			         // The actual image data itself
+	);
+}
+
 void TextureMat::generateFromMat(cv::Mat & mat) {
 	this->genTexture2D();
 	this->updateDataTypeFormat();
 
 	// OpenCV has reversed Y coordinates
-	if (m_vFlip) flip(m_mat, m_mat, 0);
+	if (m_vFlip) flip(mat, mat, 0);
 
-	// Create the texture
-	glTexImage2D(GL_TEXTURE_2D,  // Type of texture
-		0,					     // Pyramid level (for mip-mapping) - 0 is the top level
-		m_openGLFormat,		     // Internal colour format to convert to
-		mat.cols,			     // Image width  i.e. 640 for Kinect in standard mode
-		mat.rows,			     // Image height i.e. 480 for Kinect in standard mode
-		0,					     // Border width in pixels (can either be 1 or 0)
-		m_format,	             // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
-		m_dataType,	             // Image data type
-		mat.ptr()			     // The actual image data itself
-	);
-	cout << m_dataType << " vs " << GL_UNSIGNED_BYTE << endl;
-	cout << m_dataType << " vs " << GL_FLOAT << endl;
+	this->texImage(mat);
+
 	generateMipmaps();
 }
 
@@ -78,7 +79,8 @@ void TextureMat::updateDataTypeFormat() {
 }
 
 void TextureMat::updateDatatypeFromMat(cv::Mat & mat) {
-	string r; // 8UC3 for example
+	// r denotes the string for the datatype, e.g., 8UC3
+	string r;
 	auto type = mat.type();
 	uchar depth = type & CV_MAT_DEPTH_MASK;
 	uchar chans = 1 + (type >> CV_CN_SHIFT);

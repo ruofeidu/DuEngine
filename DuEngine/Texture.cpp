@@ -171,12 +171,12 @@ void Texture::setFiltering() {
 	}
 #endif
 	// Set texture interpolation methods for minification and magnification
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_minFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_magFilter);
+	glTexParameteri(m_texType, GL_TEXTURE_MIN_FILTER, m_minFilter);
+	glTexParameteri(m_texType, GL_TEXTURE_MAG_FILTER, m_magFilter);
 
 	// Set texture clamping methodw
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_wrapFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_wrapFilter);
+	glTexParameteri(m_texType, GL_TEXTURE_WRAP_S, m_wrapFilter);
+	glTexParameteri(m_texType, GL_TEXTURE_WRAP_T, m_wrapFilter);
 }
 
 void Texture::genTexture2D() {
@@ -187,7 +187,7 @@ void Texture::genTexture2D() {
 	glActiveTexture(GL_TEXTURE0 + id);
 
 	// Bind to our texture handle
-	glBindTexture(GL_TEXTURE_2D, id);
+	glBindTexture(m_texType, id);
 
 	this->setFiltering();
 }
@@ -195,7 +195,7 @@ void Texture::genTexture2D() {
 void Texture::generateMipmaps() {
 	// If we're using mipmaps then generate them. Note: This requires OpenGL 3.0 or higher	   
 	if (m_filter == TextureFilter::MIPMAP) {
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glGenerateMipmap(m_texType);
 #if VERBOSE_OUTPUT
 		info("Mipmap generated for texture" + id);
 #endif
