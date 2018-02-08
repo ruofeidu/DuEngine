@@ -54,7 +54,14 @@ vec2 random(vec2 p){
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
 	vec2 q = fragCoord.xy / iResolution.xy;
-    vec3 col = texture(iChannel0, q).rgb;
+    vec3 col = texture(iChannel0, vec2(fract(q.x*2), q.y)).rgb;
+	if (q.x < 0.5) {
+		fragColor = vec4(col, 1.0); 
+		return;
+	}
+	q.x = q.x * 2; 
+	vec2 fc = fragCoord;
+	fc.x = fc.x * 2.0 - iResolution.x; 
    
     vec2 r = random(q);
     r.x *= PI2;
@@ -75,7 +82,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
         for (int i = -kSize; i <= kSize; ++i) {
             for (int j = -kSize; j <= kSize; ++j) {
-                blurred += kernel[kSize+j]*kernel[kSize+i]*texture(iChannel0, (fragCoord.xy+vec2(float(i),float(j))) / iResolution.xy).rgb;
+                blurred += kernel[kSize+j]*kernel[kSize+i]*texture(iChannel0, (fc.xy+vec2(float(i),float(j))) / iResolution.xy).rgb;
             }
     	}
    		blurred = blurred / Z / Z;
@@ -92,6 +99,19 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     //res = clamp(res * 0.7 + 0.3 * res * res * 1.2, 0.0, 1.0);
     
     // edge effect
-    if (iMouse.z > 0.5) res *= 0.25 + 0.75 * pow( 16.0 * q.x * q.y * (1.0 - q.x) * (1.0 - q.y), 0.15 );
+    //if (iMouse.z > 0.5) res *= 0.25 + 0.75 * pow( 16.0 * q.x * q.y * (1.0 - q.x) * (1.0 - q.y), 0.15 );
+	vec4 mask = texture(iChannel1, q).rgba;
+	const float thres = 0.95;
+	res = mix(res, mask.rgb, mask.a);
+	if (mask.r > thres && mask.g > thres && mask.b > thres && mask.a > thres) res = col;
+	mask = texture(iChannel1, (fc.xy+vec2(2.0, 0.0)) / iResolution.xy).rgba;
+	if (mask.r > thres && mask.g > thres && mask.b > thres && mask.a > thres) res = col;
+	mask = texture(iChannel1, (fc.xy+vec2(-2.0, 0.0)) / iResolution.xy).rgba;
+	if (mask.r > thres && mask.g > thres && mask.b > thres && mask.a > thres) res = col;
+	mask = texture(iChannel1, (fc.xy+vec2(0.0, 2.0)) / iResolution.xy).rgba;
+	if (mask.r > thres && mask.g > thres && mask.b > thres && mask.a > thres) res = col;
+	mask = texture(iChannel1, (fc.xy+vec2(0.0, -2.0)) / iResolution.xy).rgba;
+	if (mask.r > thres && mask.g > thres && mask.b > thres && mask.a > thres) res = col;
+	
 	fragColor = vec4(res, 1.0); 
 }
