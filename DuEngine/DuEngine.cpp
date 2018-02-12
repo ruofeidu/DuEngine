@@ -216,6 +216,7 @@ void DuEngine::takeScreenshot(string folderName) {
 	}
 
 	cv::Mat img(m_window->height, m_window->width, CV_8UC3);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glPixelStorei(GL_PACK_ALIGNMENT, (img.step & 3) ? 1 : 4);
 	glPixelStorei(GL_PACK_ROW_LENGTH, (GLint)img.step / (GLint)img.elemSize());
 	glReadPixels(0, 0, img.cols, img.rows, GL_BGR_EXT, GL_UNSIGNED_BYTE, img.data);
