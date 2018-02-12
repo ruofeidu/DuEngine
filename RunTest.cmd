@@ -1,0 +1,2 @@
+cd UnitTests
+"debug.cmd"
