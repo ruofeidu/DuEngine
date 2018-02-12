@@ -89,6 +89,13 @@ void Texture::QueryFileNameByType(string & type, string & fileName, string & pre
 			break;
 		}
 	}
+	for (const auto& key : Texture::CameraTextures) {
+		if (!type.compare(key.first)) {
+			type = "camera";
+			fileName = presetsPath + key.second;
+			break;
+		}
+	}
 }
 
 string Texture::QuerySampler(TextureType type) {
@@ -120,6 +127,7 @@ const unordered_map<string, TextureType> Texture::TextureMaps {
 	{ "g", TextureType::FrameBuffer },
 	{ "volume", TextureType::Volume },
 	{ "light", TextureType::LightField },
+	{ "camera", TextureType::Camera },
 };
 
 const unordered_map<string, string> Texture::ImageTextures {
@@ -189,6 +197,11 @@ const unordered_map<string, string> Texture::VideoTextures {
 
 const unordered_map<string, string> Texture::FontTextures{
 	{ "font", "tex21.png" },
+};
+
+const unordered_map<string, string> Texture::CameraTextures{
+	{ "camera", "camera" },
+	{ "webcam", "camera" },
 };
 
 void Texture::setFiltering() {

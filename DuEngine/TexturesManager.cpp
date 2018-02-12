@@ -40,6 +40,13 @@ void TexturesManager::updateKeyboard(unsigned char key, bool up) {
 	m_keyboard->onKeyPress(key, up);
 }
 
+
+Texture * TexturesManager::addCamera(bool vflip, TextureFilter filter, TextureWarp warp) {
+	auto t = new TextureCamera(vflip, filter, warp);
+	addVideoTexture((TextureVideo*)t);
+	return t;
+}
+
 Texture * TexturesManager::addVideoFile(string filename, bool vflip, TextureFilter filter, TextureWarp warp) {
 	auto t = new TextureVideoFile(filename, vflip, filter, warp);
 	addVideoTexture((TextureVideo*)t);

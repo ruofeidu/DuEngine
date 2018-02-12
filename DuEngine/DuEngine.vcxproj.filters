@@ -171,6 +171,9 @@
     <ClCompile Include="TextureCubeMap.cpp">
       <Filter>Source Files\Textures</Filter>
     </ClCompile>
+    <ClCompile Include="TextureCamera.cpp">
+      <Filter>Source Files\Textures</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texture.h">
@@ -273,6 +276,9 @@
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="TextureCubeMap.h">
+      <Filter>Header Files\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureCamera.h">
       <Filter>Header Files\Textures</Filter>
     </ClInclude>
   </ItemGroup>

@@ -38,7 +38,7 @@ void DuEngine::initScene() {
 			auto textureType = Texture::QueryType(type);
 			uniformSampler += "uniform " + Texture::QuerySampler(textureType) + " iChannel" + to_string(i) + "; \n";
 		}
-		debug(uniformSampler); 
+		//debug(uniformSampler); 
 		fbo->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName, uniformSampler);
 
 		// bind channel textures
@@ -66,6 +66,9 @@ void DuEngine::initScene() {
 				break;
 			case TextureType::VideoFile:
 				t = m_textureManager->addVideoFile(fileName, vFlip, textureFilter, textureWarp); 
+				break;
+			case TextureType::Camera:
+				t = m_textureManager->addCamera(vFlip, textureFilter, textureWarp);
 				break;
 			case TextureType::VideoSequence:
 				t = m_textureManager->addVideoSequence(fileName, fps, startFrame, endFrame, textureFilter, textureWarp);
