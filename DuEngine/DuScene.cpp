@@ -20,6 +20,7 @@ void DuEngine::initScene() {
 	auto uniformShaderName = m_path->getUniformShader();
 	auto mainShaderName = m_path->getMainShader();
 
+	// iterate through buffers; 0: the main framebuffer
 	for (int buffer = 0; buffer < 1 + m_shadertoy->getNumFrameBuffers(); ++buffer) {
 		auto suffix = !buffer ? "" : string(1, char('A' + buffer - 1));
 		auto prefix = !buffer ? "" : suffix + "_";
@@ -28,17 +29,17 @@ void DuEngine::initScene() {
 		auto fragmentShaderName = m_path->getFragmentShader(suffix);
 		auto channels_count = m_config->GetIntWithDefault(prefix + "channels_count", 0);
 
-		string uniformAppendix = "";
+		string uniformSampler = "";
 		for (int i = 0; i < channels_count; ++i) {
 			auto iPrefix = prefix + "iChannel" + to_string(i) + "_";
 			auto type = toLower(m_config->GetStringWithDefault(iPrefix + "type", "unknown"));
 			auto fileName = m_path->getResource(iPrefix + "tex");
 			Texture::QueryFileNameByType(type, fileName, m_path->getPresetPath());
 			auto textureType = Texture::QueryType(type);
-			uniformAppendix += "uniform " + Texture::QuerySampler(textureType) + " iChannel" + to_string(i) + "; \n";
+			uniformSampler += "uniform " + Texture::QuerySampler(textureType) + " iChannel" + to_string(i) + "; \n";
 		}
-		debug(uniformAppendix); 
-		fbo->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName, uniformAppendix);
+		debug(uniformSampler); 
+		fbo->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName, uniformSampler);
 
 		// bind channel textures
 		for (int i = 0; i < channels_count; ++i) {
@@ -63,7 +64,6 @@ void DuEngine::initScene() {
 			case TextureType::RGB:
 				t = m_textureManager->addTexture2D(fileName, vFlip, textureFilter, textureWarp); 
 				break;
-
 			case TextureType::VideoFile:
 				t = m_textureManager->addVideoFile(fileName, vFlip, textureFilter, textureWarp); 
 				break;
@@ -73,7 +73,6 @@ void DuEngine::initScene() {
 			case TextureType::SH:
 				t = m_textureManager->addSphericalHarmonics(fileName, fps, startFrame, endFrame, numBands);
 				break;
-
 			case TextureType::Keyboard:
 				t = m_textureManager->addKeyboard();
 				break; 
@@ -81,6 +80,8 @@ void DuEngine::initScene() {
 				t = m_textureManager->addFont(textureFilter, textureWarp); 
 				break;
 			case TextureType::CubeMap:
+				vFlip = m_config->GetBoolWithDefault(iPrefix + "vflip", false);
+				textureWarp = Texture::QueryWarp(m_config->GetStringWithDefault(iPrefix + "wrap", "clamp"));
 				t = m_textureManager->addTextureCubeMap(fileName, vFlip, textureFilter, textureWarp);
 				break;
 			case TextureType::FrameBuffer:

@@ -53,7 +53,7 @@ TextureWarp Texture::QueryWarp(string wrap) {
 	return !wrap.compare("repeat") ? TextureWarp::REPEAT : TextureWarp::CLAMP;
 }
 
-void Texture::QueryFileNameByType(string & type, string & fileName, string& presetsPath) {
+void Texture::QueryFileNameByType(string & type, string & fileName, string & presetsPath) {
 	for (const auto& key : Texture::ImageTextures) {
 		if (!type.compare(key.first)) {
 			type = "rgb";
@@ -246,8 +246,8 @@ void Texture::genTexture2D() {
 	this->setFiltering();
 }
 
+// If we're using mipmaps then generate them. Note: This requires OpenGL 3.0 or higher	   
 void Texture::generateMipmaps() {
-	// If we're using mipmaps then generate them. Note: This requires OpenGL 3.0 or higher	   
 	if (m_filter == TextureFilter::MIPMAP) {
 		glGenerateMipmap(m_glType);
 #if VERBOSE_OUTPUT

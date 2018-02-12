@@ -10,16 +10,18 @@ TextureCubeMap::TextureCubeMap(string filename, bool vflip, TextureFilter filter
 	m_warp = TextureWarp::CLAMP;
 
 	this->genTexture2D();
+	debug(this->id);
+	//debug(this->getTextureID());
+
 	this->updateDataTypeFormat();
 
 	int n = m_mat.rows, m = m_mat.cols; 
 	for (int i = 0; i < 6; ++i) {
 		m_cubes[i] = m_mat(cv::Rect(0, i*m, m, m)).clone();
 		// OpenCV has reversed Y coordinates
-		if (m_vFlip) flip(m_cubes[i], m_cubes[i], 0);
+		//if (m_vFlip) flip(m_cubes[i], m_cubes[i], 0);
 		m_glType = m_cubeTypes[i]; 
 		this->texImage(m_cubes[i]);
-		//this->generateMipmaps(); 
 #if COMPILE_CHECK_GL_ERROR
 		// Check texturing errors.
 		GLenum err = glGetError();
@@ -27,14 +29,18 @@ TextureCubeMap::TextureCubeMap(string filename, bool vflip, TextureFilter filter
 			warning("Texturing error: " + to_string(err));
 #endif
 	}
-	debug(this->getTextureID()); 
+	debug(this->id);
+	//debug(this->getTextureID()); 
 
 	m_glType = GL_TEXTURE_CUBE_MAP;
 	this->setFiltering();
+	this->generateMipmaps();
 #if COMPILE_CHECK_GL_ERROR
 	// Check texturing errors.
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR)
 		warning("Texturing error: " + to_string(err));
 #endif
+
+	//this->generateMipmaps();
 }

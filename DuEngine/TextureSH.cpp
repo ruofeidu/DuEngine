@@ -11,8 +11,8 @@
 
 #if COMPILE_WITH_SH
 /**
-* Spherical Harmonics Texture
-*/
+ * Spherical Harmonics Texture
+ */
 TextureSH::TextureSH(string fileName, int fps, int startFrame, int endFrame, int numBands) {
 	m_numBands = numBands;
 	m_numCoefficients = m_numBands * m_numBands;

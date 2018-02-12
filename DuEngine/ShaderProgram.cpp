@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "ShaderProgram.h"
 
-ShaderProgram::ShaderProgram(string vertexFileName, string fragmentFileName, string uniformFileName, string mainFileName, string uniformAppendix) {
+ShaderProgram::ShaderProgram(string vertexFileName, string fragmentFileName, string uniformFileName, string mainFileName, string uniformSampler) {
 	m_vertexShader = InitShader(GL_VERTEX_SHADER, vertexFileName);
-	m_fragmentShader = InitShader(GL_FRAGMENT_SHADER, fragmentFileName, uniformFileName, mainFileName, uniformAppendix);
+	m_fragmentShader = InitShader(GL_FRAGMENT_SHADER, fragmentFileName, uniformFileName, mainFileName, uniformSampler);
 	m_shaderProgram = InitProgram(m_vertexShader, m_fragmentShader);
 }
 
@@ -19,20 +19,20 @@ void ShaderProgram::use() {
 	glUseProgram(m_shaderProgram);
 }
 
-GLuint ShaderProgram::InitShader(GLenum type, string filename, string uniformFileName, string mainFileName, string uniformAppendix) {
+GLuint ShaderProgram::InitShader(GLenum type, string filename, string uniformFileName, string mainFileName, string uniformSampler) {
 	GLuint shader = glCreateShader(type);
 	GLint compiled;
 	string str = ReadTextFromFile(filename);
 	if (uniformFileName.size() > 0) {
-		string pre = ReadTextFromFile(uniformFileName);
-		str = pre + uniformAppendix + str;
+		auto uniformCommons = ReadTextFromFile(uniformFileName);
+		str = uniformCommons + uniformSampler + str;
 	}
 
 	if (mainFileName.size() > 0) {
 		string post = ReadTextFromFile(mainFileName);
 		str = str + post;
 	}
-	debug(uniformAppendix); 
+	debug(uniformSampler); 
 
 	GLchar *cstr = new GLchar[str.size() + 1];
 	const GLchar *cstr2 = cstr; // Weirdness to get a const char
