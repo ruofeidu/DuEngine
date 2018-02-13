@@ -146,11 +146,15 @@ const unordered_map<string, string> Texture::ImageTextures {
 	{ "organic4", "tex17.jpg" },
 	{ "pebbles", "tex19.png" },
 	{ "rocktiles", "tex00.jpg" },
+	{ "rock", "tex00.jpg" },
+	{ "brick", "tex00.jpg" },
 	{ "rustymetal", "tex02.jpg" },
+	{ "metal", "tex02.jpg" },
 	{ "stars", "tex03.jpg" },
 	{ "wood", "tex05.jpg" },
 	{ "sjtu", "sjtu.jpg" },
-	{ "starr", "starr.jpg" },
+	{ "starry", "starry.jpg" },
+	{ "stars", "starry.jpg" },
 	{ "720p", "720p.jpg" },
 	{ "1080p", "1080p.jpg" },
 	{ "4k", "4k.jpg" },
@@ -177,6 +181,8 @@ const unordered_map<string, string> Texture::VolumeTextures{
 };
 const unordered_map<string, string> Texture::NoiseTextures{
 	{ "gnm", "tex12.png" },
+	{ "gnoise", "tex12.png" },
+	{ "noiseg", "tex12.png" },
 	{ "greynoise", "tex12.png" },
 	{ "graynoise", "tex12.png" },
 	{ "gns", "tex10.png" },
@@ -184,7 +190,6 @@ const unordered_map<string, string> Texture::NoiseTextures{
 	{ "noise", "tex16.png" },
 	{ "rgbans", "tex11.png" },
 };
-
 
 const unordered_map<string, string> Texture::VideoTextures {
 	{ "1961", "vid02.ogv" },

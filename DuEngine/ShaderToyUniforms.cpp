@@ -78,7 +78,7 @@ void ShaderToyUniforms::linkShaderProgram(ShaderProgram* shaderProgram) {
 	uNumBands = m_program->getUniformLocation("iNumBands");
 	uK = m_program->getUniformLocation("vK");
 #endif
-	debug("Linked with shader " + to_string(m_program->getID()));
+	//debug("Linked with shader " + to_string(m_program->getID()));
 }
 
 void ShaderToyUniforms::bindTexture(Texture* tex, GLuint channel) {
@@ -130,6 +130,7 @@ void ShaderToyUniforms::update() {
 	iGlobalTime = float(clock() - startTime) / CLOCKS_PER_SEC;
 	iDate.w = secondsOnStart + iGlobalTime; // being lazy here, suppose that the month and day does not change
 	
+	//Set(uResolution, iFrame > 0 ? iResolution : vec3(0, 0, 0)); 
 	Set(uResolution, iResolution);
 	Set(uGlobalTime, iGlobalTime);
 	Set(uTimeDelta, iTimeDelta);

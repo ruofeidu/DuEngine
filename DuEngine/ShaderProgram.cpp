@@ -32,7 +32,7 @@ GLuint ShaderProgram::InitShader(GLenum type, string filename, string uniformFil
 		string post = ReadTextFromFile(mainFileName);
 		str = str + post;
 	}
-	debug(uniformSampler); 
+	//debug(uniformSampler); 
 
 	GLchar *cstr = new GLchar[str.size() + 1];
 	const GLchar *cstr2 = cstr; // Weirdness to get a const char
