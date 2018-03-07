@@ -3,7 +3,7 @@
 #include "TextureLightField.h"
 #include "DuUtils.h"
 
-TextureLightField::TextureLightField(string fileName, int rows, int cols, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT) {
+TextureLightField::TextureLightField(string fileName, int rows, int cols, TextureFilter filter, TextureWarp warp) {
 	init(fileName, false, filter, warp);
 	for (int i = 0; i < rows; ++i) {
 		for (int j = 0; j < cols; ++j) {
