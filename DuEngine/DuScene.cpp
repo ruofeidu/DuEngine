@@ -57,6 +57,8 @@ void DuEngine::initScene() {
 			auto startFrame = m_config->GetIntWithDefault(iPrefix + "startFrame", 1);
 			auto endFrame = m_config->GetIntWithDefault(iPrefix + "endFrame", 100);
 			auto numBands = m_config->GetIntWithDefault(iPrefix + "bands", 25);
+			auto rows = 16; 
+			auto cols = 16; 
 
 			Texture* t = nullptr; 
 
@@ -88,6 +90,12 @@ void DuEngine::initScene() {
 				vFlip = m_config->GetBoolWithDefault(iPrefix + "vflip", false);
 				textureWarp = Texture::QueryWarp(m_config->GetStringWithDefault(iPrefix + "wrap", "clamp"));
 				t = m_textureManager->addTextureCubeMap(fileName, vFlip, textureFilter, textureWarp);
+				break;
+			case TextureType::LightField:
+				vFlip = m_config->GetBoolWithDefault(iPrefix + "vflip", false);
+				rows = m_config->GetIntWithDefault(iPrefix + "rows", rows);
+				cols = m_config->GetIntWithDefault(iPrefix + "cols", cols);
+				t = m_textureManager->addTextureLightField(fileName, rows, cols, textureFilter, textureWarp);
 				break;
 			case TextureType::FrameBuffer:
 				int bufferID = (int)(type[0] - 'a');

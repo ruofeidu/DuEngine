@@ -27,6 +27,9 @@ int toInt(const string &str);
 unsigned int toUInt(const string &str);
 float toFloat(const string &str);
 
+template<typename ... Args>
+string string_format(const std::string& format, Args ... args);
+
 // design pattern utilities
 class Singleton
 {
