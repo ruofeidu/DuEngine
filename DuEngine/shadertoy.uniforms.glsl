@@ -12,3 +12,8 @@ uniform vec4      iMouse;                // mouse pixel coords. xy: current (if 
 uniform vec4      iDate;                 // (year, month, day, time in seconds)
 uniform float     iSampleRate;           // sound sample rate (i.e., 44100)
 #define iGlobalTime iTime
+
+float saturate(float color) { return clamp(color, 0.0, 1.0); }
+vec2 saturate(vec2 color) { return clamp(color, 0.0, 1.0); }
+vec3 saturate(vec3 color) { return clamp(color, 0.0, 1.0); }
+vec4 saturate(vec4 color) { return clamp(color, 0.0, 1.0); }
