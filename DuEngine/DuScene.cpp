@@ -16,9 +16,11 @@ void DuEngine::initScene() {
 	
 	m_shadertoy = new ShaderToy(DuEngine::GetInstance());
 
-	auto vertexShaderName = m_path->getVertexShader();
-	auto uniformShaderName = m_path->getUniformShader();
-	auto mainShaderName = m_path->getMainShader();
+	ShaderFileParas paras;
+	paras.vert = m_path->getVertexShader();
+	paras.uniform = m_path->getUniformShader();
+	paras.main = m_path->getMainShader();
+	paras.common = m_path->getCommonShader();
 
 	// iterate through buffers; 0: the main framebuffer
 	for (int buffer = 0; buffer < 1 + m_shadertoy->getNumFrameBuffers(); ++buffer) {
@@ -26,20 +28,20 @@ void DuEngine::initScene() {
 		auto prefix = !buffer ? "" : suffix + "_";
 		auto fbo = m_shadertoy->getBuffer(buffer); 
 		ShaderToyUniforms* uniforms = (ShaderToyUniforms*)(fbo->getUniforms());
-		auto fragmentShaderName = m_path->getFragmentShader(suffix);
+		paras.frag = m_path->getFragmentShader(suffix);
 		auto channels_count = m_config->GetIntWithDefault(prefix + "channels_count", 0);
 
-		string uniformSampler = "";
+		paras.uniformAppendix = "";
 		for (int i = 0; i < channels_count; ++i) {
 			auto iPrefix = prefix + "iChannel" + to_string(i) + "_";
 			auto type = toLower(m_config->GetStringWithDefault(iPrefix + "type", "unknown"));
 			auto fileName = m_path->getResource(iPrefix + "tex");
 			Texture::QueryFileNameByType(type, fileName, m_path->getPresetPath());
 			auto textureType = Texture::QueryType(type);
-			uniformSampler += "uniform " + Texture::QuerySampler(textureType) + " iChannel" + to_string(i) + "; \n";
+			paras.uniformAppendix += "uniform " + Texture::QuerySampler(textureType) + " iChannel" + to_string(i) + "; \n";
 		}
-		//debug(uniformSampler); 
-		fbo->loadShadersLinkUniforms(vertexShaderName, fragmentShaderName, uniformShaderName, mainShaderName, uniformSampler);
+		//debug(paras.uniformAppendix); 
+		fbo->loadShadersLinkUniforms(paras);
 
 		// bind channel textures
 		for (int i = 0; i < channels_count; ++i) {

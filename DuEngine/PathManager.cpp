@@ -68,6 +68,16 @@ string PathManager::getFragmentShader(string bufferSuffix) {
 	return res; 
 }
 
+string PathManager::getCommonShader() {
+	auto res = m_config->GetStringWithDefault("shader_common", m_config->GetName() + "Common.glsl");
+	ifstream in;
+	in.open(res);
+	if (!in.is_open())
+		res = "";
+	in.close();
+	return res;
+}
+
 void PathManager::createPathIfNotExisted(const string & str) {
 	if (isPathCreated(str)) return;
 	CreateDirectory(str.c_str(), NULL);

@@ -281,6 +281,9 @@
     <ClInclude Include="TextureCamera.h">
       <Filter>Header Files\Textures</Filter>
     </ClInclude>
+    <ClInclude Include="ShaderFileParas.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Backup.txt" />

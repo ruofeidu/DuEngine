@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FrameBuffer.h"
+#include "ShaderFileParas.h"
 
 void FrameBuffer::render() {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->getID());
@@ -7,8 +8,8 @@ void FrameBuffer::render() {
 	m_geometry->render();
 }
 
-void FrameBuffer::loadShadersLinkUniforms(string vertexShaderName, string fragShaderName, string uniformShaderName, string mainFileName, string uniformSampler) {
-	m_program = new ShaderProgram(vertexShaderName, fragShaderName, uniformShaderName, mainFileName, uniformSampler);
+void FrameBuffer::loadShadersLinkUniforms(ShaderFileParas &paras) {
+	m_program = new ShaderProgram(paras);
 	m_uniforms->linkShaderProgram(m_program);
 #if VERBOSE_OUTPUT
 	debug("Frame buffer " + to_string(this->getID()) + " loaded fragment shader: " + fragShaderName);

@@ -174,6 +174,7 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="HashVec2b.h" />
     <ClInclude Include="PathManager.h" />
+    <ClInclude Include="ShaderFileParas.h" />
     <ClInclude Include="ShaderToyFrameBuffer.h" />
     <ClInclude Include="ShaderToyScreenBuffer.h" />
     <ClInclude Include="ShaderProgram.h" />

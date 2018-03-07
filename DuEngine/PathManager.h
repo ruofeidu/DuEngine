@@ -21,6 +21,7 @@ public:
 	string getMainShader();
 	// replace the fragment shader name with $Name and buffer prefix / suffix
 	string getFragmentShader(string bufferSuffix);
+	string getCommonShader();
 
 	void createPathIfNotExisted(const string &str); 
 
