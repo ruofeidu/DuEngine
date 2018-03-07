@@ -75,6 +75,11 @@ Texture * TexturesManager::addTextureCubeMap(string fileName, bool vFlip, Textur
 	return t;
 }
 
+Texture* TexturesManager::addTextureLightField(string fileName, int rows, int cols, TextureFilter filter, TextureWarp warp) {
+	auto t = new TextureLightField(fileName, rows, cols, filter, warp); 
+	return t; 
+}
+
 Texture * TexturesManager::addKeyboard() {
 	if (!m_keyboard) m_keyboard = new TextureKeyboard();
 	return m_keyboard;

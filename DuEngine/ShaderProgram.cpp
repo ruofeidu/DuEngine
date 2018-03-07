@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "ShaderProgram.h"
 
-ShaderProgram::ShaderProgram(string vertexFileName, string fragmentFileName, string uniformFileName, string mainFileName, string uniformSampler) {
-	m_vertexShader = InitShader(GL_VERTEX_SHADER, vertexFileName);
-	m_fragmentShader = InitShader(GL_FRAGMENT_SHADER, fragmentFileName, uniformFileName, mainFileName, uniformSampler);
+ShaderProgram::ShaderProgram(ShaderFileParas &paras) {
+	m_vertexShader = InitShader(GL_VERTEX_SHADER, paras);
+	m_fragmentShader = InitShader(GL_FRAGMENT_SHADER, paras);
 	m_shaderProgram = InitProgram(m_vertexShader, m_fragmentShader);
 }
 
@@ -19,26 +19,35 @@ void ShaderProgram::use() {
 	glUseProgram(m_shaderProgram);
 }
 
-GLuint ShaderProgram::InitShader(GLenum type, string filename, string uniformFileName, string mainFileName, string uniformSampler) {
-	GLuint shader = glCreateShader(type);
-	GLint compiled;
+GLuint ShaderProgram::InitShader(GLenum type, ShaderFileParas &paras) {
+	auto& filename = (type == GL_VERTEX_SHADER) ? paras.vert : paras.frag;
 	string str = ReadTextFromFile(filename);
-	if (uniformFileName.size() > 0) {
-		auto uniformCommons = ReadTextFromFile(uniformFileName);
-		str = uniformCommons + uniformSampler + str;
+
+	if (type == GL_FRAGMENT_SHADER) {
+		if (paras.uniform.size() > 0) {
+			auto uniforms = ReadTextFromFile(paras.uniform);
+			uniforms += paras.uniformAppendix;
+			if (paras.common.size() > 0) {
+				auto common = ReadTextFromFile(paras.common);
+				uniforms += common;
+			}
+			str = uniforms + str;
+		}
+		if (type == GL_FRAGMENT_SHADER && paras.main.size() > 0) {
+			string post = ReadTextFromFile(paras.main);
+			str = str + post;
+		}
 	}
 
-	if (mainFileName.size() > 0) {
-		string post = ReadTextFromFile(mainFileName);
-		str = str + post;
-	}
 	//debug(uniformSampler); 
 
 	GLchar *cstr = new GLchar[str.size() + 1];
 	const GLchar *cstr2 = cstr; // Weirdness to get a const char
 	strcpy(cstr, str.c_str());
+	GLuint shader = glCreateShader(type);
 	glShaderSource(shader, 1, &cstr2, NULL);
 	glCompileShader(shader);
+	GLint compiled;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 	if (!compiled) {
 		ReportShaderErrors(shader);
@@ -80,6 +89,7 @@ string ShaderProgram::ReadTextFromFile(string filename) {
 		warning("Unable to open file " + filename);
 		onError();
 	}
+	in.close();
 	return res;
 }
 

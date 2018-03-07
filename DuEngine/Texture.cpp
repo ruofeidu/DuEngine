@@ -160,7 +160,8 @@ const unordered_map<string, string> Texture::ImageTextures {
 	{ "4k", "4k.jpg" },
 	{ "6k", "6k.jpg" },
 	{ "8k", "8k.jpg" },
-	{ "black", "black.jpg" }
+	{ "black", "black.jpg" },
+	{ "lightfieldsingle", "lightfieldsingle.jpg" }
 };
 
 const unordered_map<string, string> Texture::CubeMapTextures{
@@ -207,6 +208,7 @@ const unordered_map<string, string> Texture::FontTextures{
 const unordered_map<string, string> Texture::CameraTextures{
 	{ "camera", "camera" },
 	{ "webcam", "camera" },
+	{ "cam", "camera" },
 };
 
 void Texture::setFiltering() {

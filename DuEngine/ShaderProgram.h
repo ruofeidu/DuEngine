@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "DuUtils.h"
+#include "ShaderFileParas.h"
 
 class ShaderProgram
 {
@@ -8,7 +9,7 @@ private:
 	GLuint m_vertexShader = 0, m_fragmentShader = 0, m_shaderProgram = 0;
 
 public:
-	ShaderProgram(string vertexFileName, string fragmentFileName, string uniformFileName, string mainFileName, string uniformAppendix = "");
+	ShaderProgram(ShaderFileParas &paras);
 
 	GLint getUniformLocation(string uniformName);
 
@@ -17,7 +18,7 @@ public:
 	void use();
 
 private:
-	static GLuint InitShader(GLenum type, string filename, string uniformFileName = "", string mainFileName = "", string uniformAppendix = "");
+	static GLuint InitShader(GLenum type, ShaderFileParas &paras);
 
 	static GLuint InitProgram(GLuint vertexshader, GLuint fragmentshader);
 

@@ -46,8 +46,7 @@ public:
 private:
 	DuEngine();
 	static DuEngine *s_Instance;
-	clock_t beginTime;
-	Camera* camera;
+	Camera* m_camera;
 	Window* m_window;
 	ShaderToy* m_shadertoy;
 	DuConfig* m_config;

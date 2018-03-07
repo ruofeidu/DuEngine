@@ -100,7 +100,7 @@ vec2 limitTo(vec2 point, int x1, int y1, int x2, int y2, int startX, int startY)
 	return clamp(point, grid(x1, y1), iResolution.xy - grid(x2, y2)) + grid(startX, startY);
 }
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-	vec3 vColour = texture(iChannel0, fragCoord.xy / iResolution.xy).rgb;
+	vec3 vColour = vec3(0.0);
 	vec2 mouse = iMouse.xy;
 
 	if (mouse.x < 10.0 && mouse.y < 10.0) {

@@ -21,7 +21,7 @@ DuEngine *DuEngine::s_Instance = new DuEngine();
 DuEngine::GC DuEngine::gc;
 
 DuEngine::DuEngine() {
-	camera = new Camera();
+	m_camera = new Camera();
 	m_window = Window::GetInstance();
 	m_textureManager = new TexturesManager();
 }

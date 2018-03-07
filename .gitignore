@@ -8,6 +8,7 @@
 *.log
 *.mp4
 *.avi
+Lightfield/bunny/
 DuEngine/*.ini
 DuEngine/*.glsl
 DuEngine/*.cmd
