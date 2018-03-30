@@ -9,6 +9,9 @@
 
 class TextureLightField : public TextureMat
 {
+private:
+	GLuint* ids;
+
 public:
 	TextureLightField() {};
 	TextureLightField(string fileName, int rows, int cols, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);

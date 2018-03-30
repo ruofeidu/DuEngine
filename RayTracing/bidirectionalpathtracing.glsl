@@ -189,6 +189,7 @@ vec3 traceEyePath( in vec3 ro, in vec3 rd, inout float seed ) {
         vec3 normal;
         
         vec2 res = intersect( ro, rd, normal );
+		
         if( res.y < -0.5 ) return col;
         if( res.y > 3.5 ) {
             return col + basecol*LIGHTCOLOR / float( j+1 ); 
