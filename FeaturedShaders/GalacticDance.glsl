@@ -11,12 +11,6 @@
 #define outerColor vec4(0.8,0.6,1.0,1.0)
 #define white vec4(1.0,1.0,1.0,1.0)
 
-
-float saturate (in float f)
-{
-    return clamp(f,0.0,1.0);
-}
-
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
     float time = iTime;
