@@ -103,7 +103,6 @@ void DuEngine::start(int argc, char* argv[]) {
 	m_recordEnd = m_config->GetIntWithDefault("record_end", m_recordEnd);
 	m_recordVideo = m_config->GetBoolWithDefault("record_video", m_recordVideo);
 
-
 	// initialize the scene, shaders, and presets
 	initScene();
 
@@ -207,14 +206,7 @@ void DuEngine::printHelp() {
 void DuEngine::takeScreenshot(string folderName) {
 	m_path->createPathIfNotExisted(folderName); 
 
-	if (m_recordVideo) {
-		if (m_video == nullptr) {
-			m_video = new cv::VideoWriter();
-			m_video->open(folderName + "/" + getTimeForFileName() + ".avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'),
-				DEFAULT_RENDER_FPS, cv::Size(m_window->width, m_window->height));
-		} 
-	}
-
+	// read from the screen buffer
 	cv::Mat img(m_window->height, m_window->width, CV_8UC3);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glPixelStorei(GL_PACK_ALIGNMENT, (img.step & 3) ? 1 : 4);
@@ -222,14 +214,20 @@ void DuEngine::takeScreenshot(string folderName) {
 	glReadPixels(0, 0, img.cols, img.rows, GL_BGR_EXT, GL_UNSIGNED_BYTE, img.data);
 	flip(img, img, 0);
 
-
+	// record to video if configured
 	if (m_recordVideo) {
+		if (m_video == nullptr) {
+			m_video = new cv::VideoWriter();
+			m_video->open(folderName + "/" + getTimeForFileName() + ".avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'),
+				DEFAULT_RENDER_FPS, cv::Size(m_window->width, m_window->height));
+		}
 		m_video->write(img);
 		if (getFrameNumber() == m_recordEnd) {
 			m_video->release(); 
 		}
-	} else {
-		cv::imwrite(folderName + "/" + m_config->GetName() + "_" + to_string(getFrameNumber()) + ".png", img);
+		return;
 	}
+	
+	cv::imwrite(folderName + "/" + m_config->GetName() + "_" + to_string(getFrameNumber()) + ".png", img);
 }
 

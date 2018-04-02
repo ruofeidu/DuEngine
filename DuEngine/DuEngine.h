@@ -50,6 +50,7 @@ private:
 	Window* m_window;
 	ShaderToy* m_shadertoy;
 	DuConfig* m_config;
+
 	bool m_fullscreen = false;
 	bool m_recording = false;
 	bool m_paused = false; 
