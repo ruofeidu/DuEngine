@@ -6,7 +6,8 @@
 
 #define OBJECT_MAP_FUNCTION map1
 
-#define calcRecursion rec3 // use n rays levels (rays1 to rays6): total  RAY_COUNT = 2^n-1
+//#define calcRecursion rec5 // use n rays levels (rays1 to rays6): total  RAY_COUNT = 2^n-1
+#define calcRecursion rec6 // use n rays levels (rays1 to rays6): total  RAY_COUNT = 2^n-1
 #define DIST_EPSILON 0.005
 
 #define ID_SKY 2.001
@@ -329,17 +330,19 @@ void rec5(inout Ray ray) {
 
 void rec6(inout Ray ray) {
     Ray r1,r2;
-    getRays(ray, r1, r2);
     
-    rec5(r1);
-    ray.col += getRayColor(r1);
-    
-    // use only first level of relfection to improve performance
-    rec1(r2);
-    ray.col += getRayColor(r2);
+	const int TOTAL = 3; 
+	for (int i = 0; i < TOTAL; ++i) {
+		getRays(ray, r1, r2);
+		rec2(r1);
+		ray.col += getRayColor(r1);
+		// use only first level of relfection to improve performance
+		rec1(r2);
+		ray.col += getRayColor(r2);
+	}
+    ray.col /= TOTAL;
+	
 }
-
-
 
 vec3 castRay(vec3 p, vec3 rd) {
     CP cp = findIntersection(p, rd);
