@@ -230,4 +230,3 @@ void DuEngine::takeScreenshot(string folderName) {
 	
 	cv::imwrite(folderName + "/" + m_config->GetName() + "_" + to_string(getFrameNumber()) + ".png", img);
 }
-

@@ -10,16 +10,32 @@ BoxGeometry::BoxGeometry(double _width, double _height, double _x0, double _y0) 
 	layoutTexCoord = 1;
 	layoutFragCoord = 2;
 
-	int scale = 2;
 	glGenBuffers(1, &VBO);
-	vertexBuffer[0] = Vertex(vec3(0.5f * scale, 0.5f * scale, 0.0f));
-	vertexBuffer[1] = Vertex(vec3(-0.5f * scale, 0.5f * scale, 0.0f));
-	vertexBuffer[2] = Vertex(vec3(-0.5f * scale, -0.5f * scale, 0.0f));
-	vertexBuffer[3] = Vertex(vec3(0.5f * scale, -0.5f * scale, 0.0f));
+
+	const float scale = 1.0f;
+	const float v = 0.5f * scale;
+	vertexBuffer[0] = Vertex(vec3(v, v, v));
+	vertexBuffer[1] = Vertex(vec3(v, v, -v));
+	vertexBuffer[2] = Vertex(vec3(v, -v, v));
+	vertexBuffer[3] = Vertex(vec3(v, -v, -v));
+	vertexBuffer[4] = Vertex(vec3(-v, v, -v));
+	vertexBuffer[5] = Vertex(vec3(-v, v, v));
+	vertexBuffer[6] = Vertex(vec3(-v, -v, -v));
+	vertexBuffer[7] = Vertex(vec3(-v, -v, v));
 
 	glGenBuffers(1, &EBO);
-	elements[0] = 0;	elements[1] = 1;	elements[2] = 3;
-	elements[3] = 1;	elements[4] = 2;	elements[5] = 3;
+	elements[0] = 0;	elements[1] = 2;	elements[2] = 1;
+	elements[3] = 2;	elements[4] = 3;	elements[5] = 1;
+	elements[6] = 4;	elements[7] = 6;	elements[8] = 5;
+	elements[9] = 6;	elements[10] = 7;	elements[11] = 5;
+	elements[12] = 4;	elements[13] = 5;	elements[14] = 1;
+	elements[15] = 5;	elements[16] = 0;	elements[17] = 1;
+	elements[18] = 7;	elements[19] = 6;	elements[20] = 2;
+	elements[21] = 6;	elements[22] = 3;	elements[23] = 2;
+	elements[24] = 5;	elements[25] = 7;	elements[26] = 0;
+	elements[27] = 7;	elements[28] = 2;	elements[29] = 0;
+	elements[30] = 1;	elements[31] = 3;	elements[32] = 4;
+	elements[33] = 3;	elements[34] = 6;	elements[35] = 4;
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);

@@ -14,7 +14,7 @@ public:
 	GLuint	FBO;
 	GLuint	layoutPosition, layoutTexCoord, layoutFragCoord;
 	Vertex  vertexBuffer[8];
-	GLuint	elements[6];
+	GLuint	elements[12];
 
 	BoxGeometry(double _width, double _height, double _x0, double _y0);
 

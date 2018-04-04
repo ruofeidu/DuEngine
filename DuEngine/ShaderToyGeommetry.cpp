@@ -10,12 +10,13 @@ ShaderToyGeometry::ShaderToyGeometry(double _width, double _height, double _x0, 
 	layoutTexCoord = 1;
 	layoutFragCoord = 2;
 
-	int scale = 2;
 	glGenBuffers(1, &VBO);
-	vertexBuffer[0] = Vertex(vec3(0.5f * scale, 0.5f * scale, 0.0f));
-	vertexBuffer[1] = Vertex(vec3(-0.5f * scale, 0.5f * scale, 0.0f));
-	vertexBuffer[2] = Vertex(vec3(-0.5f * scale, -0.5f * scale, 0.0f));
-	vertexBuffer[3] = Vertex(vec3(0.5f * scale, -0.5f * scale, 0.0f));
+	const float scale = 2.0f;
+	const float v = 0.5f * scale;
+	vertexBuffer[0] = Vertex(vec3(v, v, 0.0f));
+	vertexBuffer[1] = Vertex(vec3(-v, v, 0.0f));
+	vertexBuffer[2] = Vertex(vec3(-v, -v, 0.0f));
+	vertexBuffer[3] = Vertex(vec3(v, -v, 0.0f));
 
 	glGenBuffers(1, &EBO);
 	elements[0] = 0;	elements[1] = 1;	elements[2] = 3;

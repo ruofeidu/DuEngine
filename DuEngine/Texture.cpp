@@ -160,8 +160,10 @@ const unordered_map<string, string> Texture::ImageTextures {
 	{ "4k", "4k.jpg" },
 	{ "6k", "6k.jpg" },
 	{ "8k", "8k.jpg" },
+	{ "lightfieldsingle", "lightfieldsingle.jpg" },
+	{ "volumesingle", "bonsai.raw.png" },
 	{ "black", "black.jpg" },
-	{ "lightfieldsingle", "lightfieldsingle.jpg" }
+	{ "blank", "black.jpg" }
 };
 
 const unordered_map<string, string> Texture::CubeMapTextures{
@@ -184,11 +186,15 @@ const unordered_map<string, string> Texture::NoiseTextures{
 	{ "gnm", "tex12.png" },
 	{ "gnoise", "tex12.png" },
 	{ "noiseg", "tex12.png" },
+	{ "ng", "tex12.png" },
+	{ "gn", "tex12.png" },
 	{ "greynoise", "tex12.png" },
 	{ "graynoise", "tex12.png" },
 	{ "gns", "tex10.png" },
 	{ "rgbanm", "tex16.png" },
 	{ "noise", "tex16.png" },
+	{ "rgbn", "tex16.png" },
+	{ "rgbnoise", "tex16.png" },
 	{ "rgbans", "tex11.png" },
 };
 

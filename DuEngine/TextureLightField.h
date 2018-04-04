@@ -11,6 +11,8 @@ class TextureLightField : public TextureMat
 {
 private:
 	GLuint* ids;
+	GLsizei m_width;
+	GLsizei m_height;
 
 public:
 	TextureLightField() {};
