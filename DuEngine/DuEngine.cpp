@@ -146,7 +146,7 @@ void DuEngine::special(int key, int x, int y, bool up) {
 			break;
 
 		case GLUT_KEY_F5:
-			m_shadertoy->recompile();
+			m_shadertoy->recompile(this);
 			break; 
 		case GLUT_KEY_F6:
 			m_textureManager->togglePause(); 
@@ -229,4 +229,7 @@ void DuEngine::takeScreenshot(string folderName) {
 	}
 	
 	cv::imwrite(folderName + "/" + m_config->GetName() + "_" + to_string(getFrameNumber()) + ".png", img);
+
+	// create a preview image of the shader
+	cv::imwrite(m_config->GetName() + ".jpg", img);
 }
