@@ -162,6 +162,7 @@
     <ClCompile Include="TextureVideoLightField.cpp" />
     <ClCompile Include="TextureVideoSequence.cpp" />
     <ClCompile Include="Uniforms.cpp" />
+    <ClCompile Include="VolumeRenderer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -201,6 +202,7 @@
     <ClInclude Include="TextureVideoLightField.h" />
     <ClInclude Include="TextureVideoSequence.h" />
     <ClInclude Include="Uniforms.h" />
+    <ClInclude Include="VolumeRenderer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

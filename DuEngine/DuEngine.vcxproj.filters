@@ -177,6 +177,9 @@
     <ClCompile Include="BoxGeometry.cpp">
       <Filter>Source Files\Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="VolumeRenderer.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texture.h">
@@ -289,6 +292,9 @@
     </ClInclude>
     <ClInclude Include="BoxGeometry.h">
       <Filter>Header Files\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumeRenderer.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
