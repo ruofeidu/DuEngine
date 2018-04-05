@@ -5,10 +5,10 @@
 
 TextureLightField::TextureLightField(string fileName, int rows, int cols, TextureFilter filter, TextureWarp warp) {
 	// init(fileName, false, filter, warp);
-	ids = new int[rows * cols]; 
+	ids = new GLuint[rows * cols];
 	glGenTextures(rows * cols, ids);
 	for (int i = 0; i < rows * cols; i++) {
-		glBindTexture(GL_TEXTURE_2D, camImgTexId[i]);
+		glBindTexture(GL_TEXTURE_2D, ids[i]);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -16,7 +16,7 @@ TextureLightField::TextureLightField(string fileName, int rows, int cols, Textur
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);//GL_MODULATE);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-			texWidth, texHeight,
+			m_width, m_height,
 			0, GL_BGR, GL_UNSIGNED_BYTE,
 			NULL);
 		glBindTexture(GL_TEXTURE_2D, 0);

@@ -134,7 +134,9 @@ int DuEngine::getFrameNumber() {
 void DuEngine::render() {
 	if (!m_paused) {
 		m_textureManager->update(); 
-		m_shadertoy->render();
+
+		if (m_renderType == RendererType::SHADERTOY)
+			m_shadertoy->render();
 
 		glutSwapBuffers();
 		glutPostRedisplay();

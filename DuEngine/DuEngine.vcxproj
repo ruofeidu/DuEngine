@@ -127,6 +127,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="BoxGeometry.cpp" />
     <ClCompile Include="DebugTimer.cpp" />
     <ClCompile Include="DuConfig.cpp" />
     <ClCompile Include="DuEngine.cpp" />
@@ -161,10 +162,12 @@
     <ClCompile Include="TextureVideoLightField.cpp" />
     <ClCompile Include="TextureVideoSequence.cpp" />
     <ClCompile Include="Uniforms.cpp" />
+    <ClCompile Include="VolumeRenderer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="BoxGeometry.h" />
     <ClInclude Include="DebugTimer.h" />
     <ClInclude Include="dirent.h" />
     <ClInclude Include="DuConfig.h" />
@@ -199,6 +202,7 @@
     <ClInclude Include="TextureVideoLightField.h" />
     <ClInclude Include="TextureVideoSequence.h" />
     <ClInclude Include="Uniforms.h" />
+    <ClInclude Include="VolumeRenderer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

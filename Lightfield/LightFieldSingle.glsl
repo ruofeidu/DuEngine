@@ -56,5 +56,4 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 		pixel = 0.5 * pixel + 0.5; 
 		fragColor = texture2D(iChannel0, (minPos + pixel) * span);
 	}
-	
 }

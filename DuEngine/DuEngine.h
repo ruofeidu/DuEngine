@@ -17,9 +17,12 @@ void g_mousePress(int button, int state, int x, int y);
 void g_mouseMove(int x, int y);
 void g_reshape(int width, int height);
 
+enum class RendererType : std::int8_t { SHADERTOY, VOLUME, MESH, RAYTRACER };
+
 class DuEngine
 {
 	friend class ShaderToy;
+	friend class VolumeRenderer;
 
 public:
 	static DuEngine *GetInstance();
@@ -46,10 +49,12 @@ public:
 private:
 	DuEngine();
 	static DuEngine *s_Instance;
+	RendererType m_renderType = RendererType::SHADERTOY;
 	Camera* m_camera;
 	Window* m_window;
 	ShaderToy* m_shadertoy;
 	DuConfig* m_config;
+
 	bool m_fullscreen = false;
 	bool m_recording = false;
 	bool m_paused = false; 
