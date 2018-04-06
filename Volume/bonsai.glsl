@@ -147,33 +147,32 @@ vec3 HandleRay (in vec3 rayPos, in vec3 rayDir, in vec3 pixelColor, out float hi
 	frontPos = frontCollisionPos;
 	backPos = backCollisionPos;
 	return frontCollisionPos;
-	 
-	 
-    // refraction
-    vec3 refractRayDir = refract(frontRefractedRayDir, backNormal, 1.0 / c_refraction);
-    pixelColor = texture(iChannel0, refractRayDir).rgb;
-    
-    // reflection
-    vec3 reflectColor = texture(iChannel0, reflect(rayDir, frontNormal)).rgb * c_reflect;
-    
-    // calculate and apply absorption
-    vec3 absorb = exp(-c_absorb * (refractTimeMinMax.y - refractTimeMinMax.x));    
-    pixelColor *= absorb;
-    
-    // diffuse
-    float diffuseColorDP = clamp(dot(-c_lightDirection, frontNormal), 0.0, 1.0);
-    vec3 diffuseColor = c_lightColorDiffuse * diffuseColorDP;
-    
-    // specular
-    vec3 specularColorDir = reflect(-c_lightDirection, frontNormal);
-    float specularColorDP = clamp(dot(specularColorDir, rayDir), 0.0, 1.0);
-    vec3 specularColor = c_lightColorSpecular * specularColorDP;
-    
-    
-	pixelColor = vec3(rayPos);
-	return pixelColor; 
-    // return the color we calculated
-	return pixelColor + diffuseColor + specularColor + reflectColor;
+	
+    // // refraction
+    // vec3 refractRayDir = refract(frontRefractedRayDir, backNormal, 1.0 / c_refraction);
+    // pixelColor = texture(iChannel0, refractRayDir).rgb;
+    // 
+    // // reflection
+    // vec3 reflectColor = texture(iChannel0, reflect(rayDir, frontNormal)).rgb * c_reflect;
+    // 
+    // // calculate and apply absorption
+    // vec3 absorb = exp(-c_absorb * (refractTimeMinMax.y - refractTimeMinMax.x));    
+    // pixelColor *= absorb;
+    // 
+    // // diffuse
+    // float diffuseColorDP = clamp(dot(-c_lightDirection, frontNormal), 0.0, 1.0);
+    // vec3 diffuseColor = c_lightColorDiffuse * diffuseColorDP;
+    // 
+    // // specular
+    // vec3 specularColorDir = reflect(-c_lightDirection, frontNormal);
+    // float specularColorDP = clamp(dot(specularColorDir, rayDir), 0.0, 1.0);
+    // vec3 specularColor = c_lightColorSpecular * specularColorDP;
+    // 
+    // 
+	// pixelColor = vec3(rayPos);
+	// return pixelColor; 
+    // // return the color we calculated
+	// return pixelColor + diffuseColor + specularColor + reflectColor;
 }
 
 //=======================================================================================

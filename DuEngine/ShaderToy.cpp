@@ -147,12 +147,23 @@ void ShaderToy::recompile(DuEngine * _renderer) {
 			}
 		}
 
+		// buffer of vector 2
 		auto vec2_buffers_count = m_config->GetIntWithDefault("vec2_buffers_count", 0);
 		uniforms->intVec2Buffers(vec2_buffers_count);
 
 		for (int i = 0; i < vec2_buffers_count; ++i) {
 			auto fileName = m_path->getResource("vec2_buffers" + to_string(i) + "_file");
 			uniforms->bindVec2Buffer(i, fileName);
+		}
+
+		// transfer function
+		auto transfer_function_count = m_config->GetIntWithDefault("transfer_function_count", 0);
+		for (int i = 0; i < transfer_function_count; ++i) {
+			auto color = m_config->GetString("transfer_" + to_string(i) + "_color");
+			auto pos = m_config->GetFloat("transfer_" + to_string(i) + "_pos");
+		}
+		if (transfer_function_count > 0) {
+
 		}
 	}
 
