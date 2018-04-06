@@ -8,18 +8,20 @@
 #include "stdafx.h"
 #include "VolumeRenderer.h"
 #include "BoxGeometry.h"
+#include "ShaderToyGeometry.h"
 #include "DuUtils.h"
 
 VolumeRenderer::VolumeRenderer(DuEngine * _engine, double _width, double _height, int _x0, double _y0) {
 	auto geometry = new BoxGeometry(_width, _height, _x0, _y0);
+	auto rectGeometry = new ShaderToyGeometry(_width, _height, _x0, _y0);
 	auto numChannels = _engine->m_config->GetIntWithDefault("channels_count", 0);
-	m_screenBuffer = new ShaderToyScreenBuffer(geometry, numChannels);
+	m_screenBuffer = new ShaderToyScreenBuffer(rectGeometry, numChannels);
 
 	auto buffers_count = _engine->m_config->GetIntWithDefault("buffers_count", 0);
 	for (int i = 0; i < buffers_count; ++i) {
 		auto prefix = string(1, char('A' + i));
 		auto numChannels = _engine->m_config->GetIntWithDefault(prefix + "_channels_count", 0);
-		m_frameBuffers.push_back(new ShaderToyFrameBuffer(geometry, numChannels));
+		m_frameBuffers.push_back(new ShaderToyFrameBuffer(rectGeometry, numChannels));
 	}
 #if VERBOSE_OUTPUT
 	info("ShaderToy is inited.");

@@ -7,6 +7,7 @@
 #include "ShaderToyGeometry.h"
 #include "ShaderToyFrameBuffer.h"
 #include "ShaderToyScreenBuffer.h"
+#include "PathManager.h"
 using namespace glm;
 using namespace std;
 
@@ -28,7 +29,7 @@ public:
 
 	void reset(); 
 
-	void recompile(); 
+	void recompile(DuEngine * _renderer);
 
 	void render();
 

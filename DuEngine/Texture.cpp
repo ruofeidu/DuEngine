@@ -162,6 +162,10 @@ const unordered_map<string, string> Texture::ImageTextures {
 	{ "8k", "8k.jpg" },
 	{ "lightfieldsingle", "lightfieldsingle.jpg" },
 	{ "volumesingle", "bonsai.raw.png" },
+	{ "bonsai", "bonsai.raw.png" },
+	{ "foot", "foot.raw.png" },
+	{ "teapot", "teapot.raw.png" },
+	{ "white", "white.jpg" },
 	{ "black", "black.jpg" },
 	{ "blank", "black.jpg" }
 };
