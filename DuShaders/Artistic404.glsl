@@ -63,7 +63,6 @@ mat2 rot2D(float r)
 }
 float nsin(float a){return .5+.5*sin(a);}
 float ncos(float a){return .5+.5*cos(a);}
-vec3 saturate(vec3 a){return clamp(a,0.,1.);}
 float rand(vec2 co){
     return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
