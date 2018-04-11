@@ -142,7 +142,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
          
     // central / foveated point, iMouse.xy corresponds to longitude and latitude 
     vec2 centralPoint = iMouse.xy / iResolution.xy;
-    
+	 FoVScale = vec2(0.5, 0.5) * 1.5; 
+    centralPoint = vec2(0.5, 0.5);
+	
     // press enter to compare with recilinear projection
     vec3 dir = bool(keyPressed(KEY_SPACE))
         ? calcCubeCoordsInGnomonicProjection(q, centralPoint, FoVScale) 
@@ -158,7 +160,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
         col = vec3(sph / vec2(PI2, PI), 0.5); 
     }
     
-    col *= 0.25 + 0.75 * pow( 16.0 * q.x * q.y * (1.0 - q.x) * (1.0 - q.y), 0.15 );
+    //col *= 0.25 + 0.75 * pow( 16.0 * q.x * q.y * (1.0 - q.x) * (1.0 - q.y), 0.15 );
 
     fragColor = vec4(col, 1.0);
 }
