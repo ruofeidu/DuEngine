@@ -1,1 +1,1 @@
-"python" "../Scripts/_create.py"
+python "../Scripts/_create.py"
