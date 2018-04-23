@@ -1,7 +1,7 @@
 # DuEngine
 DuEngine is an efficient and interactive C++ graphics engine for rendering, managing, recording image and video screenshots of ShaderToy-like demos with custom 2D/3D/Video textures.
 
-![Dotted Drawing Sketch](DuShaders/DottedDrawingSketch.png)
+![LightFieldSingle](Lightfield/LightFieldSingle.jpg)
 
 ## Compilation
 Dependencies: OpenGL 4.5+, [Glew](http://glew.sourceforge.net/install.html), [OpenCV 3.0+](https://opencv.org/releases.html), [GLM](https://github.com/g-truc/glm/releases), [Freeglut](http://freeglut.sourceforge.net/index.php#download), and [Visual Studio 2015+](https://www.visualstudio.com/downloads).
@@ -130,6 +130,8 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 * [Cubemap to Gnomonic Projection](https://www.shadertoy.com/view/4sjcz1)
 	* [Blog post](http://blog.ruofeidu.com/equirectangular-gnomonic-projections-cubemaps/)
 * [Foveated Rendering via Quadtree](https://www.shadertoy.com/view/Ml3SDf)
+
+![Dotted Drawing Sketch](DuShaders/DottedDrawingSketch.png)
 * [Dotted Drawing / Sketch Effect](https://www.shadertoy.com/view/ldSyzV)
 	* [Blog post](http://blog.ruofeidu.com/dotted-drawing-sketch-effect/)
 * [Edges with Bilateral Filters](https://www.shadertoy.com/view/MlG3WG)
@@ -159,7 +161,7 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 * [Brightness, Contrast, Hue, Saturation, Vibrance](https://www.shadertoy.com/view/MdjBRy)
 	* [Blog post] (http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/)
 
-![LightFieldSingle](LightField/LightFieldSingle.jpg)
+![LightFieldSingle](Lightfield/LightFieldSingle.jpg)
 * Light Field Rendering
 ![VolumeRendering](Volume/bonsai.jpg)
 * Volume Rendering
