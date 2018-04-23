@@ -146,6 +146,9 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 * [Low-Poly Style Image](https://www.shadertoy.com/view/llGGz3)
 * [404 Not Found](http://duruofei.com/404) 
     * [Blog post](http://blog.ruofeidu.com/404-not-found-two-triangles/)
+
+![BirthdayCakeNoOcclude][DuShaders/BirthdayCakeNoOcclude.jpg]
+* [Birthday Cake No Occlude](https://www.shadertoy.com/view/ldccW7)
 * [Postprocessing Thermal](https://www.shadertoy.com/view/4dcSDH)
 * [2D Affine Transformation](https://www.shadertoy.com/view/llBSWw)
 * [Image Fade-In Effect](https://www.shadertoy.com/view/MlcSz2)
@@ -171,6 +174,8 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 ![LadyBug](Gallery/LadyBug.jpg)
 ![Venice](Gallery/Venice.jpg)
 ![WindWakerOcean](Gallery/WindWakerOcean.jpg)
+![RayTracing](RayTracing/TightCornelBox.jpg)
+![Bidirectional Path Tracing](RayTracing/bidirectionalpathtracing.jpg)
 
 
 Author
