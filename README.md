@@ -147,7 +147,7 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 * [404 Not Found](http://duruofei.com/404) 
     * [Blog post](http://blog.ruofeidu.com/404-not-found-two-triangles/)
 
-![BirthdayCakeNoOcclude][DuShaders/BirthdayCakeNoOcclude.jpg]
+![BirthdayCakeNoOcclude](DuShaders/BirthdayCakeNoOcclude.jpg)
 * [Birthday Cake No Occlude](https://www.shadertoy.com/view/ldccW7)
 * [Postprocessing Thermal](https://www.shadertoy.com/view/4dcSDH)
 * [2D Affine Transformation](https://www.shadertoy.com/view/llBSWw)
@@ -170,11 +170,14 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 * Volume Rendering
 
 ### Masterpieces from ShaderToy
+* Please refer to the GLSL code for author names.
+* Most of the code is under Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.
 ![Alps](Gallery/Alps.jpg)
 ![LadyBug](Gallery/LadyBug.jpg)
 ![Venice](Gallery/Venice.jpg)
 ![WindWakerOcean](Gallery/WindWakerOcean.jpg)
 ![RayTracing](RayTracing/TightCornelBox.jpg)
+![Bridge](ShaderOfWeek/Bridge.jpg)
 ![Bidirectional Path Tracing](RayTracing/bidirectionalpathtracing.jpg)
 
 
