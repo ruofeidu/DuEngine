@@ -39,57 +39,57 @@ DuEngine config.ini
 The config file reads like as follows:
 ```ini
 # This is a comment, $Name corresponds to the file name of the INI file.
-shader_frag		    =	$Name.glsl
+shader_frag         =   $Name.glsl
 
 # Specify the number of channels for the main framebuffer. 
-channels_count	    =	5
+channels_count      =   5
 
 # Specify the number of framebuffers for multi-pass rendering
-buffers_count	    =	4
+buffers_count       =   4
 
 # Here are some examples of the channel type.
 # We pre-define most of the ShaderToy presets. Visit *DuEngine/Texture.cpp* for a glance:
-iChannel0_type	    =	noise
-# iChannel0_type	=	key, font, stpeter, sjtu...
+iChannel0_type      =   noise
+# iChannel0_type    =   key, font, stpeter, sjtu...
 
 # For a custom texture file, you need to tell the type and filename with extension.
-iChannel1_type	    =	rgb
+iChannel1_type      =   rgb
 iChannel1_tex       =   whatever.png
 
 # The filters and wraps are loaded by default, but you can also change them.
-iChannel1_filter	 =	mipmap
-iChannel1_wrap       =   repeat
+iChannel1_filter        =  mipmap
+iChannel1_wrap          =   repeat
 
 # For videos, you can add fps, startFrame, and endFrame.
-iChannel2_type	        =	video
+iChannel2_type          =   video
 iChannel2_tex           =   whatever.mp4
-iChannel2_fps           =	25
-iChannel2_startFrame	=	1
-iChannel2_endFrame	    =	100
+iChannel2_fps           =   25
+iChannel2_startFrame    =   1
+iChannel2_endFrame      =   100
 
 # To read from a frame buffer, use A-Z.
-iChannel3_type	    =	A
+iChannel3_type      =   A
 
 # To read from a video sequence, use %d as the wildcard
-iChannel4_type	    =	videoseq
-iChannel4_tex	    =	myfolder/file%d.png
+iChannel4_type      =   videoseq
+iChannel4_tex       =   myfolder/file%d.png
 
 # Each frame buffer can have an arbitrary number of channels.
-A_channels_count	=	1
-A_iChannel0_type	=	london
-B_channels_count	=	1
-B_iChannel0_type	=	A
-C_channels_count	=	1
-C_iChannel0_type	=	B
-D_channels_count	=	1
-D_iChannel0_type	=	C
+A_channels_count    =   1
+A_iChannel0_type    =   london
+B_channels_count    =   1
+B_iChannel0_type    =   A
+C_channels_count    =   1
+C_iChannel0_type    =   B
+D_channels_count    =   1
+D_iChannel0_type    =   C
 
 # You can ignore the following default parameters starting from this line:
-window_width	=	1920
-window_height	=	1080
+window_width        =   1920
+window_height       =   1080
 
 # If your textures are located outside the presets folder, type something like
-resources_path	=	../resources/
+resources_path      =   ../resources/
 ```
 
 ### Multipass
@@ -98,22 +98,22 @@ Full-featured multipass rendering, e.g., see *ShaderOfWeek/Goo.cmd* for an examp
 ### Screenshots and Recording
 Press F2 to take a screen shot. In the configuration file, please add the following lines to record a video / sequences of images:
 ```C
-recording		=	true
-record_start	=	1
-record_end		=	500
-# Use true for MP4, and false for sequences of images
-record_video	=	true
+recording       =   true
+record_start    =   1
+record_end      =   500
+# Use true for generating a single video file; false for generating sequences of images
+record_video    =   true
 ```
 The video will be stored in *record* by default.
 
 ### Functional Keys
 ```C
-F1	=	Reset time;
-F2	=	Screenshot;
-F5	=	Reset and recompile;
-F6	=	Pause / Play all videos;
-F10	=	Debug the mouse output;
-F11	=	Toggle fullscreen mode;
+F1      =   Reset time;
+F2      =   Screenshot;
+F5      =   Reset and recompile;
+F6      =   Pause / Play all videos;
+F10     =   Debug the mouse output;
+F11     =   Toggle fullscreen mode;
 ```
 
 In the end, here stores some of my GLSL code written in Shadertoy.com
@@ -126,14 +126,14 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 
 ![Unified Gnomonic and Stereographic Projections](DuShaders/GnomonicProjection.jpg)
 * [Unified Gnomonic & Stereographic](https://www.shadertoy.com/view/ldBczm)
-	* [Blog post](http://blog.ruofeidu.com/unified-gnomonic-stereographic-projections/)
+    * [Blog post](http://blog.ruofeidu.com/unified-gnomonic-stereographic-projections/)
 * [Cubemap to Gnomonic Projection](https://www.shadertoy.com/view/4sjcz1)
-	* [Blog post](http://blog.ruofeidu.com/equirectangular-gnomonic-projections-cubemaps/)
+    * [Blog post](http://blog.ruofeidu.com/equirectangular-gnomonic-projections-cubemaps/)
 * [Foveated Rendering via Quadtree](https://www.shadertoy.com/view/Ml3SDf)
 
 ![Dotted Drawing Sketch](DuShaders/DottedDrawingSketch.png)
 * [Dotted Drawing / Sketch Effect](https://www.shadertoy.com/view/ldSyzV)
-	* [Blog post](http://blog.ruofeidu.com/dotted-drawing-sketch-effect/)
+    * [Blog post](http://blog.ruofeidu.com/dotted-drawing-sketch-effect/)
 * [Edges with Bilateral Filters](https://www.shadertoy.com/view/MlG3WG)
 
 ![Instgram Brannan Filter](DuShaders/Brannan.jpg)
@@ -155,14 +155,14 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 
 ![Code Golf: Halftone Image](DuShaders/DotScreen.jpg)
 * [Dot Screen / Halftone](https://www.shadertoy.com/view/4sBBDK)
-	* [Blog post](http://blog.ruofeidu.com/code-golf-halftone-image/)
+    * [Blog post](http://blog.ruofeidu.com/code-golf-halftone-image/)
 * [Equirectangular Fibonacci Sphere](https://www.shadertoy.com/view/Ms2yDK)
 * [Parameterized Gabor Filters](https://www.shadertoy.com/view/4sBcRV)
 * [Bilateral Filter to Look Younger](https://www.shadertoy.com/view/XtVGWG)
 
 ![Artisitc404](DuShaders/Artistic404.jpg)
 * [Brightness, Contrast, Hue, Saturation, Vibrance](https://www.shadertoy.com/view/MdjBRy)
-	* [Blog post] (http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/)
+    * [Blog post](http://blog.ruofeidu.com/postprocessing-brightness-contrast-hue-saturation-vibrance/)
 
 ![LightFieldSingle](Lightfield/LightFieldSingle.jpg)
 * Light Field Rendering
@@ -183,7 +183,7 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 
 Author
 ----
-Ruofei Du
+[Ruofei Du](http://www.duruofei.com)
 
 
 License

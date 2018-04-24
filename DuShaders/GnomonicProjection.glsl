@@ -142,8 +142,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
          
     // central / foveated point, iMouse.xy corresponds to longitude and latitude 
     vec2 centralPoint = iMouse.xy / iResolution.xy;
-	 FoVScale = vec2(0.5, 0.5) * 1.5; 
-    centralPoint = vec2(0.5, 0.5);
+	
+	//FoVScale = vec2(0.5, 0.5) * 1.5; 
+    //centralPoint = vec2(0.5, 0.5);
 	
     // press enter to compare with recilinear projection
     vec3 dir = bool(keyPressed(KEY_SPACE))
