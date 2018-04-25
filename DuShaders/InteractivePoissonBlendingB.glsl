@@ -35,8 +35,9 @@ bool getMouseDown() {
 }
 
 bool isInitialization() {
-	vec2 lastResolution = texture(iChannel0, vec2(0.0) / iResolution.xy).yz; 
-    return any(notEqual(lastResolution, iResolution.xy));
+	// vec2 lastResolution = texture(iChannel0, vec2(0.0) / iResolution.xy).yz; 
+    // return any(notEqual(lastResolution, iResolution.xy));
+	return iFrame < 5;
 }
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
