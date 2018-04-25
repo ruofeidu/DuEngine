@@ -108,12 +108,13 @@ The video will be stored in *record* by default.
 
 ### Functional Keys
 ```C
-F1      =   Reset time;
-F2      =   Screenshot;
-F5      =   Reset and recompile;
+F1      =   Reset the time and textures;
+F2      =   Take screenshot;
+F5      =   Recompile the shader;
 F6      =   Pause / Play all videos;
-F10     =   Debug the mouse output;
-F11     =   Toggle fullscreen mode;
+F9      =   (Debug) Print iFrame;
+F10     =   (Debug) Print iMouse;
+F11     =   Toggle the fullscreen mode;
 ```
 
 In the end, here stores some of my GLSL code written in Shadertoy.com
@@ -171,7 +172,8 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 
 ### Masterpieces from ShaderToy
 * Please refer to the GLSL code for author names.
-* Most of the code is under Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.
+* Most of the shaders is under Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.
+* A few of the shaders are under MIT License.
 ![Alps](Gallery/Alps.jpg)
 ![LadyBug](Gallery/LadyBug.jpg)
 ![Venice](Gallery/Venice.jpg)

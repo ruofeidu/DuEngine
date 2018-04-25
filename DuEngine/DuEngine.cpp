@@ -1,10 +1,9 @@
 /**
-* DuRenderer is a basic OpenGL-based renderer which implements most of the ShaderToy functionality
-* Ruofei Du | Augmentarium Lab | UMIACS
-* Computer Science Department | University of Maryland, College Park
-* me [at] duruofei [dot] com
-* 12/6/2017
-*/
+ * DuRenderer is an efficent OpenGL/C++ renderer which implements most of the ShaderToy functionality
+ * Ruofei Du | Augmentarium Lab | UMIACS
+ * Computer Science Department | University of Maryland, College Park
+ * me [at] duruofei [dot] com
+ */
 #include "stdafx.h"
 #include <iostream>
 #include <fstream>
@@ -128,42 +127,71 @@ void DuEngine::keyboard(unsigned char key, int x, int y, bool up) {
 			break;
 		}
 	}
+	// TODO: fix modifiers
+	// auto states = glutGetModifiers();
 	m_textureManager->updateKeyboard(key, up);
 }
 
+
+const unordered_map<int, int> DuEngine::KeyCodes{
+	{ GLUT_KEY_PAGE_UP, 33 },
+	{ GLUT_KEY_PAGE_DOWN, 34 },
+	{ GLUT_KEY_END, 35 },
+	{ GLUT_KEY_HOME, 36 },
+	{ GLUT_KEY_LEFT, 37 },
+	{ GLUT_KEY_UP, 38 },
+	{ GLUT_KEY_RIGHT, 39 },
+	{ GLUT_KEY_DOWN, 40 },
+	{ GLUT_KEY_INSERT, 45 },
+};
+
+const unordered_map<int, int> DuEngine::ModifierCodes{
+	{ GLUT_ACTIVE_SHIFT, 16 },
+	{ GLUT_ACTIVE_CTRL, 17 },
+	{ GLUT_ACTIVE_ALT, 18 },
+};
+
+/*
+F1      =   Reset the time and textures;
+F2      =   Take screenshot;
+F5      =   Recompile the shader;
+F6      =   Pause / Play all videos;
+F9      =   (Debug) Print iFrame;
+F10     =   (Debug) Print iMouse;
+F11     =   Toggle the fullscreen mode;
+*/
 void DuEngine::special(int key, int x, int y, bool up) {
 	if (up) {
 		switch (key) {
 		case GLUT_KEY_F1:
-			// Reset the time
 			m_shadertoy->reset();
 			m_textureManager->reset(); 
 			break;
-
 		case GLUT_KEY_F2:
-			// Take screenshot
 			m_takeSingleScreenShot = true; 
 			break;
-
 		case GLUT_KEY_F5:
 			m_shadertoy->recompile(this);
 			break; 
 		case GLUT_KEY_F6:
 			m_textureManager->togglePause(); 
 		case GLUT_KEY_F9:
-			// Debug iFrame
 			debug(getFrameNumber());
 			break;
-
 		case GLUT_KEY_F10:
-			// Debug Mouse
 			debug(ShaderToyUniforms::GetMouseString());
 			break;
-
 		case GLUT_KEY_F11:
 			this->toggleFullScreen(); 
 			break;
 		}
+	}
+
+	// Deal with special key press events
+	// Reference: https://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+	auto res = KeyCodes.find(key);
+	if (res != KeyCodes.end()) {
+		m_textureManager->updateKeyboard(res->second, up);
 	}
 	m_textureManager->updateKeyboard(key, up);
 }

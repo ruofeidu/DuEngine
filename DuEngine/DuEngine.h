@@ -46,6 +46,10 @@ public:
 	int getFrameNumber();
 	string getPresetsPath() { return m_path->getPresetPath(); }
 
+protected:
+	const static unordered_map<int, int> KeyCodes;
+	const static unordered_map<int, int> ModifierCodes;
+
 private:
 	DuEngine();
 	static DuEngine *s_Instance;

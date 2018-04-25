@@ -1,9 +1,4 @@
 // https://www.shadertoy.com/view/ldsSRX
-vec2 saturate(vec2 x)
-{
-	return clamp(x, 0.0, 1.0);   
-}
-
 vec2 magnify(vec2 uv)
 {
     uv *= iChannelResolution[0].xy; 

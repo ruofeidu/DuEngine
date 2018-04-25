@@ -20,22 +20,22 @@ void TexturesManager::togglePause() {
 	}
 }
 
+// Reference: https://www.asciitable.com/
 void TexturesManager::updateKeyboard(unsigned char key, bool up) {
 	if (!m_keyboard) return; 
 
-	m_keyboard->onKeyPress(key, up);
-	// hack the four arrows for ShaderToy
-	if (100 <= key && key <= 103) {
-		key -= 63;
-	} 
-	else 
-	// hack the capitalization of a-z
-	if (65 <= key && key <= 90) {
-		key += 97 - 65; 
-	}
+	// convert 'a' to 'A'
 	if (97 <= key && key <= 122) {
 		key -= 97 - 65;
 	}
+	// convert 'shift', 'ctrl, and 'alt'
+	// TODO: use glutGetModifiers()
+	if (key == 80)
+		key = 16;
+	if (key == 82)
+		key = 17;
+	if (key == 84)
+		key = 18;
 
 	m_keyboard->onKeyPress(key, up);
 }

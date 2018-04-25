@@ -42,7 +42,6 @@ public:
 	const static unordered_map<string, string> FontTextures;
 	const static unordered_map<string, string> CameraTextures;
 
-
 public:
 	Texture() {};
 	// Acquire the current texture unit id for reading and binding to shader uniforms
