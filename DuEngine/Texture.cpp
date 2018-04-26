@@ -221,6 +221,13 @@ const unordered_map<string, string> Texture::CameraTextures{
 	{ "cam", "camera" },
 };
 
+const unordered_map<string, string> Texture::SoundTextures{
+	{ "electronebulae", "music0.mp3" },
+	{ "experiment", "music1.mp3" },
+	{ "8bitmentality", "music2.mp3" },
+	{ "mostgeometricperson", "music3.mp3" },
+};
+
 void Texture::setFiltering() {
 	//glGenSamplers(1, &sampler);
 	m_wrapFilter = (m_warp == TextureWarp::REPEAT) ? GL_REPEAT : ((m_glType == GL_TEXTURE_CUBE_MAP) ? GL_CLAMP_TO_EDGE : GL_CLAMP);

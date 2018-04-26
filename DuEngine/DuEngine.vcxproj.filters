@@ -180,6 +180,9 @@
     <ClCompile Include="VolumeRenderer.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="TextureSound.cpp">
+      <Filter>Source Files\Textures</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texture.h">
@@ -295,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="VolumeRenderer.h">
       <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureSound.h">
+      <Filter>Header Files\Textures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
