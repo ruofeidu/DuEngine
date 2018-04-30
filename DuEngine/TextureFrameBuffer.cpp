@@ -1,10 +1,13 @@
 #include "stdafx.h"
 #include "TextureFrameBuffer.h"
 
-TextureFrameBuffer::TextureFrameBuffer(GLuint FBO, int width, int height, TextureFilter filter, TextureWarp warp) {
+TextureFrameBuffer::TextureFrameBuffer(GLuint FBO, int width, int height, float scale, TextureFilter filter, TextureWarp warp) {
 	type = TextureType::FrameBuffer;
 	m_filter = TextureFilter::LINEAR;
 	m_warp = TextureWarp::CLAMP;
+	m_scale = scale; 
+	m_width = width; 
+	m_height = height; 
 	glGenTextures(1, &id);
 	glActiveTexture(GL_TEXTURE0 + id);
 	reshape(width, height);
@@ -21,7 +24,7 @@ void TextureFrameBuffer::setReadingTextureID(GLuint id) {
 
 void TextureFrameBuffer::reshape(int _width, int _height) {
 	glBindTexture(GL_TEXTURE_2D, id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, _width, _height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, int(_width * m_scale), int(_height * m_scale), 0, GL_RGBA, GL_FLOAT, NULL);
 	this->generateMipmaps();
 
 	this->setFiltering();

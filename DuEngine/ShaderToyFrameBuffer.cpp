@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "ShaderToy.h"
 
-ShaderToyFrameBuffer::ShaderToyFrameBuffer(ShaderToyGeometry* _geometry, int numChannels) {
+ShaderToyFrameBuffer::ShaderToyFrameBuffer(ShaderToyGeometry* _geometry, float scale, int numChannels, TextureFilter filter, TextureWarp warp) {
 	m_geometry = _geometry;
 	m_uniforms = new ShaderToyUniforms(_geometry, numChannels);
 
 	for (int i = 0; i < 2; ++i) {
 		glGenFramebuffers(1, &m_FBO[i]);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_FBO[i]);
-		m_textures[i] = new TextureFrameBuffer(m_FBO[i], m_geometry->getWidth(), m_geometry->getHeight());
+		m_textures[i] = new TextureFrameBuffer(m_FBO[i], m_geometry->getWidth(), m_geometry->getHeight(), scale, filter, warp);
 	}
 
 	m_pointer = 0;

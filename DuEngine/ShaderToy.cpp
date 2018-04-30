@@ -18,7 +18,14 @@ ShaderToy::ShaderToy(DuEngine * _renderer, double _width, double _height, int _x
 	for (int i = 0; i < buffers_count; ++i) {
 		auto prefix = string(1, char('A' + i));
 		auto numChannels = _renderer->m_config->GetIntWithDefault(prefix + "_channels_count", 0);
-		m_frameBuffers.push_back(new ShaderToyFrameBuffer(geometry, numChannels));
+		auto scale = _renderer->m_config->GetFloatWithDefault(prefix + "_scale", 1.0f);
+		auto filter = Texture::QueryFilter(_renderer->m_config->GetStringWithDefault(prefix + "_filter", "linear"));
+		auto warp = Texture::QueryWarp(_renderer->m_config->GetStringWithDefault(prefix + "_warp", "repeat"));
+
+		if (scale < 1.0) {
+			geometry = new ShaderToyGeometry(_width * scale, _height * scale, _x0, _y0);
+		}
+		m_frameBuffers.push_back(new ShaderToyFrameBuffer(geometry, 1.0f, numChannels, filter, warp));
 	}
 #if VERBOSE_OUTPUT
 	info("ShaderToy is inited.");
