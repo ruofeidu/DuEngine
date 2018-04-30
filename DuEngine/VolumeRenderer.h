@@ -14,7 +14,7 @@ class VolumeRenderer
 	friend class DuEngine;
 
 public:
-	VolumeRenderer(DuEngine* _renderer, double _width, double _height, int _x0, double _y0);
+	VolumeRenderer(DuEngine* _renderer, double _width, double _height, float scale, int _x0, double _y0);
 
 	VolumeRenderer(DuEngine* _renderer);
 

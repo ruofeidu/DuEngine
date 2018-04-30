@@ -11,7 +11,7 @@
 #include "ShaderToyGeometry.h"
 #include "DuUtils.h"
 
-VolumeRenderer::VolumeRenderer(DuEngine * _engine, double _width, double _height, int _x0, double _y0) {
+VolumeRenderer::VolumeRenderer(DuEngine * _engine, double _width, double _height, float scale, int _x0, double _y0) {
 	auto geometry = new BoxGeometry(_width, _height, _x0, _y0);
 	auto rectGeometry = new ShaderToyGeometry(_width, _height, _x0, _y0);
 	auto numChannels = _engine->m_config->GetIntWithDefault("channels_count", 0);
@@ -21,14 +21,17 @@ VolumeRenderer::VolumeRenderer(DuEngine * _engine, double _width, double _height
 	for (int i = 0; i < buffers_count; ++i) {
 		auto prefix = string(1, char('A' + i));
 		auto numChannels = _engine->m_config->GetIntWithDefault(prefix + "_channels_count", 0);
-		m_frameBuffers.push_back(new ShaderToyFrameBuffer(rectGeometry, numChannels));
+		auto scale = _engine->m_config->GetFloatWithDefault(prefix + "_scale", 1.00);
+		auto filter = Texture::QueryFilter(_engine->m_config->GetStringWithDefault(prefix + "_filter", "linear"));
+		auto warp = Texture::QueryWarp(_engine->m_config->GetStringWithDefault(prefix + "_warp", "repeat"));
+		m_frameBuffers.push_back(new ShaderToyFrameBuffer(rectGeometry, scale, numChannels, filter, warp));
 	}
 #if VERBOSE_OUTPUT
 	info("ShaderToy is inited.");
 #endif
 }
 
-VolumeRenderer::VolumeRenderer(DuEngine *_renderer) : VolumeRenderer(_renderer, _renderer->m_window->width, _renderer->m_window->height, 0, 0) {
+VolumeRenderer::VolumeRenderer(DuEngine *_renderer) : VolumeRenderer(_renderer, _renderer->m_window->width, _renderer->m_window->height, 1.0f, 0, 0) {
 }
 
 void VolumeRenderer::reshape(int _width, int _height) {
