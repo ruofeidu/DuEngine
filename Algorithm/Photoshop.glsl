@@ -251,14 +251,15 @@ vec3 blend( vec3 s, vec3 d, int id )
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-	vec2 uv = fragCoord.xy / iResolution.xy * vec2(1.0,-1.0) + vec2(0.0, 1.0);
+	vec2 uv = fragCoord.xy / iResolution.xy;
 	int id = int(floor(uv.x * 5.0)) + int(floor(uv.y * 5.0))*5;
 	
+	vec2 p = vec2(float(id % 5), floor(float(id) / 5.0));
 	// source texture (upper layer)
-	vec3 s = texture(iChannel0, fragCoord.xy / iChannelResolution[0].xy).xyz;
+	vec3 s = texture(iChannel0, uv * 5.0 - p ).rgb;
 	
 	// destination texture (lower layer)
-	vec3 d = texture(iChannel1, fragCoord.xy / iChannelResolution[1].xy).xyz;
+	vec3 d = texture(iChannel1, uv * 5.0 - p ).rgb;
 	
 	vec3 c = blend(s,d,id);
 	
