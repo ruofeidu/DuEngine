@@ -197,6 +197,9 @@ const unordered_map<string, string> Texture::NoiseTextures{
 	{ "gns", "tex10.png" },
 	{ "rgbanm", "tex16.png" },
 	{ "noise", "tex16.png" },
+	{ "bluenoise", "bluenoise.png" },
+	{ "poisson", "bluenoise.png" },
+	{ "blue", "bluenoise.png" },
 	{ "rgbn", "tex16.png" },
 	{ "rgbnoise", "tex16.png" },
 	{ "rgbans", "tex11.png" },
@@ -204,8 +207,13 @@ const unordered_map<string, string> Texture::NoiseTextures{
 
 const unordered_map<string, string> Texture::VideoTextures {
 	{ "1961", "vid02.ogv" },
+	{ "shampoo", "vid02.ogv" },
+	{ "ads", "vid02.ogv" },
 	{ "google", "vid00.ogv" },
+	{ "ad", "vid00.ogv" },
 	{ "claude", "vid03.webm" },
+	{ "green", "vid03.webm" },
+	{ "greenscreen", "vid03.webm" },
 	{ "claudevan", "vid03.webm" },
 	{ "britney", "vid01.webm" },
 	{ "britneyspears", "vid01.webm" },
