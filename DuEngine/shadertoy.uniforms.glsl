@@ -1,5 +1,5 @@
 #version 450
-#extension GL_EXT_shader_texture_lod : require
+// #extension GL_EXT_shader_texture_lod : require
 
 uniform vec3      iResolution;           // viewport resolution (in pixels)
 uniform float     iTime;                 // shader playback time (in seconds)

@@ -39,6 +39,7 @@ string PathManager::getPreset(string str) {
 
 string PathManager::getResource(string str) {
 	auto fileName = m_config->GetStringWithDefault(str, "");
+	debug(fileName);
 	return smartPath(m_resourcesPath, fileName);
 }
 

@@ -7,8 +7,8 @@
 
 #define eps 0.00001
 #define LIGHTPATHLENGTH 2
-#define EYEPATHLENGTH 3
-#define SAMPLES 8
+#define EYEPATHLENGTH 4
+#define SAMPLES 32
 
 #define SHOWSPLITLINE
 #define FULLBOX

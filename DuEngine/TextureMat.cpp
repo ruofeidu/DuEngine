@@ -23,7 +23,7 @@ void TextureMat::init(string filename, bool vflip, TextureFilter filter, Texture
 }
 
 vec3 TextureMat::getResolution() {
-	return vec3(m_mat.cols, m_mat.rows, 0); 
+	return vec3(m_mat.cols, m_mat.rows, 1); 
 }
 
 void TextureMat::generateFromMat() {

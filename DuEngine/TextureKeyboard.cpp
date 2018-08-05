@@ -2,8 +2,8 @@
 #include "TextureKeyboard.h"
 
 /**
-* Keyboard Texture
-*/
+ * Keyboard Texture
+ */
 TextureKeyboard::TextureKeyboard() {
 	m_mat = cv::Mat::zeros(3, 256, CV_8UC1);
 	m_filter = TextureFilter::NEAREST;

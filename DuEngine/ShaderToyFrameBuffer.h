@@ -15,7 +15,7 @@ private:
 	TextureFrameBuffer* m_textures[2];
 
 public:
-	ShaderToyFrameBuffer(ShaderToyGeometry* _geometry, int numChannels);
+	ShaderToyFrameBuffer(ShaderToyGeometry* _geometry, float scale, int numChannels, TextureFilter filter, TextureWarp warp);
 	
 	GLuint getTextureID();
 	Texture* getTexture();

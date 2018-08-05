@@ -157,6 +157,7 @@
     <ClCompile Include="TextureMat.cpp" />
     <ClCompile Include="TextureSH.cpp" />
     <ClCompile Include="TexturesManager.cpp" />
+    <ClCompile Include="TextureSound.cpp" />
     <ClCompile Include="TextureVideo.cpp" />
     <ClCompile Include="TextureVideoFile.cpp" />
     <ClCompile Include="TextureVideoLightField.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="TextureMat.h" />
     <ClInclude Include="TexturesManager.h" />
     <ClInclude Include="TextureSH.h" />
+    <ClInclude Include="TextureSound.h" />
     <ClInclude Include="TextureVideo.h" />
     <ClInclude Include="TextureVideoFile.h" />
     <ClInclude Include="TextureVideoLightField.h" />

@@ -30,8 +30,9 @@ vec2 neighbors[NUM_NEIGHBORS];
 vec3 tap(sampler2D tex, vec2 uv) { return texture(tex, uv).rgb; }
 
 bool isInitialization() {
-    vec2 lastResolution = texture(iChannel1, vec2(0.5) / iResolution.xy).yz;   
-    return any(notEqual(lastResolution, iResolution.xy));
+    // vec2 lastResolution = texture(iChannel1, vec2(0.5) / iResolution.xy).yz;   
+    // return any(notEqual(lastResolution, iResolution.xy));
+	return iFrame < 5;
 }
 
 bool isMasked(vec2 uv) {

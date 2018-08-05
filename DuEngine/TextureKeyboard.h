@@ -16,7 +16,7 @@ public:
 
 private:
 	// response time for the keyPress event, by ms
-	clock_t RESPONSE_TIME = 40;
+	clock_t RESPONSE_TIME = 16;
 	// the last time when each key is pressed
 	clock_t prevTimes[256];
 private:
