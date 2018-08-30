@@ -6,9 +6,9 @@
 // https://github.com/mattdesl/glsl-fxaa
 // 
 const float FXAA_SPAN_MAX = 8.0;
-const float FXAA_REDUCE_MIN = 1.0/128.0;
-const float FXAA_SUBPIX_SHIFT = 1.0/4.0;
-const float FXAA_REDUCE_MUL = 1.0/8.0;
+const float FXAA_REDUCE_MIN = 1.0 / 128.0;
+const float FXAA_SUBPIX_SHIFT = 1.0 / 4.0;
+const float FXAA_REDUCE_MUL = 1.0 / 8.0;
 
 vec3 FXAA( vec4 uv, sampler2D tex, vec2 rcpFrame) {
     
