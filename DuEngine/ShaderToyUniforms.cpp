@@ -224,10 +224,8 @@ void ShaderToyUniforms::Set(GLint location, float value) {
 	}
 }
 
-
 void ShaderToyUniforms::Set(GLint location, int value) {
 	if (location >= 0) {
 		glUniform1i(location, value);
 	}
 }
-

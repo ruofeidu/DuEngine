@@ -104,10 +104,13 @@ string Texture::QuerySampler(TextureType type) {
 	case TextureType::CubeMap:
 		sampler = "samplerCube";
 		break;
+	case TextureType::Volume:
+	case TextureType::Bin3D:
+		sampler = "sampler3D";
+		break;
 	}
 	return sampler; 
 }
-
 
 const unordered_map<string, TextureType> Texture::TextureMaps {
 	{ "rgb", TextureType::RGB },
@@ -126,6 +129,7 @@ const unordered_map<string, TextureType> Texture::TextureMaps {
 	{ "f", TextureType::FrameBuffer },
 	{ "g", TextureType::FrameBuffer },
 	{ "volume", TextureType::Volume },
+	{ "bin3d", TextureType::Bin3D },
 	{ "light", TextureType::LightField },
 	{ "camera", TextureType::Camera },
 };
@@ -184,7 +188,8 @@ const unordered_map<string, string> Texture::CubeMapTextures{
 };
 
 const unordered_map<string, string> Texture::VolumeTextures{
-	{ "noise3d", "noise3d.bin" },
+	{ "noise3d", "volume1.bin" },
+	{ "noise3ds", "volume0.bin" },
 };
 const unordered_map<string, string> Texture::NoiseTextures{
 	{ "gnm", "tex12.png" },

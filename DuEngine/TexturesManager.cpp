@@ -70,6 +70,12 @@ Texture * TexturesManager::addTexture2D(string fileName, bool vFlip, TextureFilt
 	return t; 
 }
 
+Texture * TexturesManager::addTexture3D(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp)
+{
+	auto t = new Texture3D(fileName, vFlip, filter, warp);
+	return t;
+}
+
 Texture * TexturesManager::addTextureCubeMap(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp) {
 	auto t = new TextureCubeMap(fileName, vFlip, filter, warp);
 	return t;

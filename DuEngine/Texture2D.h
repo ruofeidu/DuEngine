@@ -14,4 +14,3 @@ public:
 	Texture2D() {};
 	Texture2D(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
 };
-

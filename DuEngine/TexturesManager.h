@@ -33,6 +33,7 @@ public:
 	Texture* addVideoSequence(string fileName, int fps, int startFrame, int endFrame, TextureFilter filter, TextureWarp warp);
 	Texture* addSphericalHarmonics(string fileName, int fps, int startFrame, int endFrame, int numBands);
 	Texture* addTexture2D(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp);
+	Texture* addTexture3D(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp);
 	Texture* addTextureCubeMap(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp);
 	Texture* addTextureLightField(string fileName, int rows, int cols, TextureFilter filter, TextureWarp warp);
 

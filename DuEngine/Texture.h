@@ -19,7 +19,7 @@ enum ETextureFiltering
 
 enum class TextureFilter : std::int8_t { NEAREST, LINEAR, MIPMAP };
 enum class TextureWarp : std::int8_t { CLAMP, REPEAT };
-enum class TextureType : std::int8_t { Unknown, RGB, Noise, VideoFile, VideoSequence, Keyboard, Font, SH, FrameBuffer, Volume, LightField, CubeMap, Camera, Sound};
+enum class TextureType : std::int8_t { Unknown, RGB, Noise, VideoFile, VideoSequence, Keyboard, Font, SH, FrameBuffer, Volume, Bin3D, LightField, CubeMap, Camera, Sound};
 
 class Texture
 {
