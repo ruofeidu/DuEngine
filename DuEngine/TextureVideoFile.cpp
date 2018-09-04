@@ -19,7 +19,7 @@ TextureVideoFile::TextureVideoFile(string filename, bool vflip, TextureFilter fi
 	this->generateFromMat();
 
 	m_fps = m_video.get(CV_CAP_PROP_FPS);
-	debug((float)m_fps);
+	debug("FPS: " + to_string(m_fps));
 
 	this->initDistribution();
 	type = TextureType::VideoFile;

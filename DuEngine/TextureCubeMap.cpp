@@ -19,8 +19,8 @@ TextureCubeMap::TextureCubeMap(string filename, bool vflip, TextureFilter filter
 		if (m_vFlip) flip(m_cubes[i], m_cubes[i], 0);
 		m_glType = m_cubeTypes[i]; 
 		this->texImage(m_cubes[i]);
+
 #if COMPILE_CHECK_GL_ERROR
-		// Check texturing errors.
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR)
 			warning("Texturing error: " + to_string(err));
@@ -30,12 +30,10 @@ TextureCubeMap::TextureCubeMap(string filename, bool vflip, TextureFilter filter
 	m_glType = GL_TEXTURE_CUBE_MAP;
 	this->setFiltering();
 	this->generateMipmaps();
+
 #if COMPILE_CHECK_GL_ERROR
-	// Check texturing errors.
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR)
 		warning("Texturing error: " + to_string(err));
 #endif
-
-	//this->generateMipmaps();
 }

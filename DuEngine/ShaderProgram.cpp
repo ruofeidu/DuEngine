@@ -39,10 +39,8 @@ GLuint ShaderProgram::InitShader(GLenum type, ShaderFileParas &paras) {
 		}
 	}
 
-	//debug(uniformSampler); 
-
 	GLchar *cstr = new GLchar[str.size() + 1];
-	const GLchar *cstr2 = cstr; // Weirdness to get a const char
+	const GLchar *cstr2 = cstr; // TODO: Weirdness to get a const char
 	strcpy(cstr, str.c_str());
 	GLuint shader = glCreateShader(type);
 	glShaderSource(shader, 1, &cstr2, NULL);
@@ -86,8 +84,7 @@ string ShaderProgram::ReadTextFromFile(string filename) {
 			getline(in, str);
 		}
 	} else {
-		warning("Unable to open file " + filename);
-		onError();
+		logerror("Unable to open file " + filename);
 	}
 	in.close();
 	return res;

@@ -54,8 +54,8 @@ void dump(char* pszFormat, ...) {
 
 void logerror(string message) {
 	cout << "!!! " << message << endl;
-	system("pause"); 
-	exit(EXIT_FAILURE); 
+	system("pause");
+	exit(EXIT_FAILURE);
 }
 
 string getTimeForFileName() {
