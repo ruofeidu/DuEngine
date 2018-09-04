@@ -1,5 +1,5 @@
 # DuEngine
-DuEngine is an efficient and interactive C++ graphics engine for rendering, managing, recording image and video screenshots of ShaderToy-like demos with custom 2D/3D/Video textures.
+**DuEngine** is an efficient and interactive C++ graphics engine for rendering, managing, recording image and video screenshots of ShaderToy-like demos with a variety of textures in real time. It contains algorithms on the GPU such as [Poisson Editing](https://www.shadertoy.com/view/4l3Xzl), **Antialiasing**, **Bilateral Filtering**, **Diffusion**, **Distrotion**, **Kernel Foveated Rendering**, and rich ray marching / tracing demos. It's mostly used for personal references and most source files are located under _DuEngine_ while the my shaders locates under _DuShaders_; algorithms are categorized under different subfolders. Currently, DuEngine supports 2D (jpg, png), 3D (binary file or grid image), video (mp4 or image sequences), lightfields (grid layout) textures. However, it only supports Windows and requires a graphics card with OpenGL 4.5+. One may mitagate the C++ code to Unix by replacing the OpenCV and Freeglut libraries.
 
 ![LightFieldSingle](Lightfield/LightFieldSingle.jpg)
 
