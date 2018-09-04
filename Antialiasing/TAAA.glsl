@@ -1,6 +1,6 @@
 // https://www.shadertoy.com/view/4dSBDt
-//#define VOLUME_TEXTURES
-#define NOISE_TEXTURES
+#define VOLUME_TEXTURES
+//#define NOISE_TEXTURES
 
 const float PI	 	= 3.141592;
 #define EPSILON_NRM (0.1 / iResolution.x)

@@ -37,6 +37,7 @@ public:
 	const static unordered_map<string, string> ImageTextures;
 	const static unordered_map<string, string> CubeMapTextures;
 	const static unordered_map<string, string> VolumeTextures;
+	const static unordered_map<string, string> Bin3DTextures;
 	const static unordered_map<string, string> NoiseTextures;
 	const static unordered_map<string, string> VideoTextures;
 	const static unordered_map<string, string> FontTextures;

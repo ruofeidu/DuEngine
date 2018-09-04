@@ -2,19 +2,23 @@
 #include "Texture3D.h"
 #include "DuUtils.h"
 
-Texture3D::Texture3D(string filename, bool vflip, TextureFilter filter, TextureWarp warp) {
-	type = TextureType::Volume;
+Texture3D::Texture3D(string filename, TextureFilter filter, TextureWarp warp) {
+	type = TextureType::Bin3D;
 	m_glType = GL_TEXTURE_3D;
 	m_filter = filter;
 	m_warp = warp;
 
 	auto fp = fopen(filename.c_str(), "rb");
+	if (!fp)
+		logerror("Cannot open file " + filename); 
 	char _header[4];
 	auto count = fread(&_header, sizeof(decltype(_header)), 1, fp);
 	count = fread(&m_resolution, sizeof(decltype(m_resolution)), 1, fp);
 	
 	m_volume.resize(m_resolution[0] * m_resolution[1] * m_resolution[2] * m_resolution[3]);
 	count = fread(&m_volume[0], m_volume.size(), 1, fp);
+	fclose(fp);
+	//debug("Read: " + to_string(count) + " ; total bytes: " + to_string(m_resolution[0] * m_resolution[1] * m_resolution[2] * m_resolution[3]));
 
 	switch (m_resolution[3]) {
 	case 1: 
@@ -36,7 +40,6 @@ Texture3D::Texture3D(string filename, bool vflip, TextureFilter filter, TextureW
 	default:
 		logerror("Unknown channels of volume");
 	}
-
 	glTexImage3D(m_glType,
 		0,					     // Pyramid level (for mip-mapping) - 0 is the top level
 		m_openGLFormat,
@@ -48,7 +51,6 @@ Texture3D::Texture3D(string filename, bool vflip, TextureFilter filter, TextureW
 		m_dataType,
 		&m_volume[0]			 // The actual volume data itself
 	);
-
 	this->generateMipmaps(); 
 	this->setFiltering();
 

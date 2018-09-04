@@ -70,9 +70,9 @@ Texture * TexturesManager::addTexture2D(string fileName, bool vFlip, TextureFilt
 	return t; 
 }
 
-Texture * TexturesManager::addTexture3D(string fileName, bool vFlip, TextureFilter filter, TextureWarp warp)
+Texture * TexturesManager::addTexture3D(string fileName, TextureFilter filter, TextureWarp warp)
 {
-	auto t = new Texture3D(fileName, vFlip, filter, warp);
+	auto t = new Texture3D(fileName, filter, warp);
 	return t;
 }
 

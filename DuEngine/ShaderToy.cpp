@@ -136,6 +136,9 @@ void ShaderToy::recompile(DuEngine * _renderer) {
 				cols = m_config->GetIntWithDefault(iPrefix + "cols", cols);
 				t = m_textureManager->addTextureLightField(fileName, rows, cols, textureFilter, textureWarp);
 				break;
+			case TextureType::Bin3D:
+				t = m_textureManager->addTexture3D(fileName, textureFilter, textureWarp);
+				break;
 			case TextureType::FrameBuffer:
 				int bufferID = (int)(type[0] - 'a');
 				auto bindedFbo = this->getFrameBuffer(bufferID);

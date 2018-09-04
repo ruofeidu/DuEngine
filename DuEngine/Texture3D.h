@@ -5,7 +5,7 @@ class Texture3D : public Texture
 {
 public:
 	Texture3D() {};
-	Texture3D(string filename, bool vflip = true, TextureFilter filter = TextureFilter::LINEAR, TextureWarp warp = TextureWarp::REPEAT);
+	Texture3D(string filename, TextureFilter filter = TextureFilter::MIPMAP, TextureWarp warp = TextureWarp::REPEAT);
 	vec3 getResolution();
 
 private:

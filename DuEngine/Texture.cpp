@@ -89,6 +89,13 @@ void Texture::QueryFileNameByType(string & type, string & fileName, string & pre
 			break;
 		}
 	}
+	for (const auto& key : Texture::Bin3DTextures) {
+		if (!type.compare(key.first)) {
+			type = "bin3d";
+			fileName = presetsPath + key.second;
+			break;
+		}
+	}
 	for (const auto& key : Texture::CameraTextures) {
 		if (!type.compare(key.first)) {
 			type = "camera";
@@ -188,9 +195,17 @@ const unordered_map<string, string> Texture::CubeMapTextures{
 };
 
 const unordered_map<string, string> Texture::VolumeTextures{
-	{ "noise3d", "volume1.bin" },
-	{ "noise3ds", "volume0.bin" },
+	//{ "noise3d", "volume1.bin" },
+	{ "teapotvol", "volume0.bin" },
 };
+
+const unordered_map<string, string> Texture::Bin3DTextures{
+	{ "noise3d", "volume1.bin" },
+	{ "3dnoise", "volume1.bin" },
+	{ "noise3ds", "volume0.bin" },
+	{ "3dnoises", "volume0.bin" },
+};
+
 const unordered_map<string, string> Texture::NoiseTextures{
 	{ "gnm", "tex12.png" },
 	{ "gnoise", "tex12.png" },
@@ -268,7 +283,7 @@ void Texture::setFiltering() {
 		m_magFilter == GL_LINEAR_MIPMAP_NEAREST ||
 		m_magFilter == GL_NEAREST_MIPMAP_LINEAR ||
 		m_magFilter == GL_NEAREST_MIPMAP_NEAREST) {
-		warning("! You can't use MIPMAPs for magnification - setting filter to GL_LINEAR");
+		warning("You can't use MIPMAPs for magnification - setting filter to GL_LINEAR");
 		m_magFilter = GL_LINEAR;
 	}
 #endif
@@ -279,7 +294,7 @@ void Texture::setFiltering() {
 	// Set texture clamping methodw
 	glTexParameteri(m_glType, GL_TEXTURE_WRAP_S, m_wrapFilter);
 	glTexParameteri(m_glType, GL_TEXTURE_WRAP_T, m_wrapFilter);
-	if (m_glType == GL_TEXTURE_CUBE_MAP)
+	if (m_glType == GL_TEXTURE_CUBE_MAP || m_glType == GL_TEXTURE_3D)
 		glTexParameteri(m_glType, GL_TEXTURE_WRAP_R, m_wrapFilter);
 }
 
