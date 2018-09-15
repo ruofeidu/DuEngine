@@ -125,9 +125,10 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 * [Interactive Poisson Blending](https://www.shadertoy.com/view/4l3Xzl)
     * [Blog post](http://blog.ruofeidu.com/interactive-poisson-blending)
 
-![Unified Gnomonic and Stereographic Projections](DuShaders/GnomonicProjection.jpg)
+![Unified Gnomonic and Stereographic Projections](DuShaders/UnifiedGnomonicStereographic.jpg)
 * [Unified Gnomonic & Stereographic](https://www.shadertoy.com/view/ldBczm)
     * [Blog post](http://blog.ruofeidu.com/unified-gnomonic-stereographic-projections/)
+![Cubemap to Gnomonic Projection](DuShaders/GnomonicProjection.jpg)
 * [Cubemap to Gnomonic Projection](https://www.shadertoy.com/view/4sjcz1)
     * [Blog post](http://blog.ruofeidu.com/equirectangular-gnomonic-projections-cubemaps/)
 * [Foveated Rendering via Quadtree](https://www.shadertoy.com/view/Ml3SDf)
@@ -135,6 +136,7 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 ![Dotted Drawing Sketch](DuShaders/DottedDrawingSketch.png)
 * [Dotted Drawing / Sketch Effect](https://www.shadertoy.com/view/ldSyzV)
     * [Blog post](http://blog.ruofeidu.com/dotted-drawing-sketch-effect/)
+![PencilVsCamera](DuShaders/PencilVsCamera.jpg)
 * [Edges with Bilateral Filters](https://www.shadertoy.com/view/MlG3WG)
 
 ![Instgram Brannan Filter](DuShaders/Brannan.jpg)
@@ -181,6 +183,8 @@ In the end, here stores some of my GLSL code written in Shadertoy.com
 ![RayTracing](RayTracing/TightCornelBox.jpg)
 ![Bridge](ShaderOfWeek/Bridge.jpg)
 ![Bidirectional Path Tracing](RayTracing/bidirectionalpathtracing.jpg)
+![GameOfLife](Games/GameOfLife.jpg)
+![CrossPenguin](Games/CrossPenguin.jpg)
 
 
 Author
