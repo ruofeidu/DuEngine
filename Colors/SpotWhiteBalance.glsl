@@ -1,5 +1,3 @@
-// https://www.shadertoy.com/view/Mtjczz
-
 struct transfer {
 	float power;
 	float off;
@@ -78,45 +76,48 @@ const int r = 1;
 const rgb_space from = Srgb;
 
 
-vec4 toLinear(vec4 color, transfer trc)
+vec4 toLinear(in vec4 color, in transfer trc)
 {
+	vec4 c = color;
 	if (trc.tvRange) {
-		color = color*85.0/73.0 - 16.0/219.0;
+		c = c*85.0/73.0 - 16.0/219.0;
 	}
 
-	bvec4 cutoff = lessThan(color, vec4(trc.cutoffToLinear));
-	bvec4 negCutoff = lessThanEqual(color, vec4(-1.0*trc.cutoffToLinear));
-	vec4 higher = pow((color + trc.off)/(1.0 + trc.off), vec4(trc.power));
-	vec4 lower = color/trc.slope;
-	vec4 neg = -1.0*pow((color - trc.off)/(-1.0 - trc.off), vec4(trc.power));
+	bvec4 cutoff = lessThan(c, vec4(trc.cutoffToLinear));
+	bvec4 negCutoff = lessThanEqual(c, vec4(-1.0*trc.cutoffToLinear));
+	vec4 higher = pow((c + trc.off)/(1.0 + trc.off), vec4(trc.power));
+	vec4 lower = c/trc.slope;
+	vec4 neg = -1.0*pow((c - trc.off)/(-1.0 - trc.off), vec4(trc.power));
 
-	color = mix(higher, lower, cutoff);
-	color = mix(color, neg, negCutoff);
+	c = mix(higher, lower, cutoff);
+	c = mix(c, neg, negCutoff);
 
-	return color;
+	return c;
 }
 
-vec4 toGamma(vec4 color, transfer trc)
+vec4 toGamma(in vec4 color, in transfer trc)
 {
-	bvec4 cutoff = lessThan(color, vec4(trc.cutoffToGamma));
-	bvec4 negCutoff = lessThanEqual(color, vec4(-1.0*trc.cutoffToGamma));
-	vec4 higher = (1.0 + trc.off)*pow(color, vec4(1.0/trc.power)) - trc.off;
-	vec4 lower = color*trc.slope;
-	vec4 neg = (-1.0 - trc.off)*pow(-1.0*color, vec4(1.0/trc.power)) + trc.off;
+	vec4 c = color;
+	bvec4 cutoff = lessThan(c, vec4(trc.cutoffToGamma));
+	bvec4 negCutoff = lessThanEqual(c, vec4(-1.0*trc.cutoffToGamma));
+	vec4 higher = (1.0 + trc.off)*pow(c, vec4(1.0/trc.power)) - trc.off;
+	vec4 lower = c*trc.slope;
+	vec4 neg = (-1.0 - trc.off)*pow(-1.0*c, vec4(1.0/trc.power)) + trc.off;
 
-	color = mix(higher, lower, cutoff);
-	color = mix(color, neg, negCutoff);
+	c = mix(higher, lower, cutoff);
+	c = mix(c, neg, negCutoff);
 
 	if (trc.tvRange) {
-		color = color*73.0/85.0 + 16.0/255.0;
+		c = c*73.0/85.0 + 16.0/255.0;
 	}
 
-	return color;
+	return c;
 }
 
 // Scales a color to the closest in-gamut representation of that color
 vec4 gamutScale(vec4 color, float luma)
 {
+
 	float low = min(color.r, min(color.g, min(color.b, 0.0)));
 	float high = max(color.r, max(color.g, max(color.b, 1.0)));
 
@@ -129,17 +130,17 @@ vec4 gamutScale(vec4 color, float luma)
 }
 
 // Converts from one RGB colorspace to another
-vec4 convert(vec4 color, rgb_space from, rgb_space to)
+vec4 convert(in vec4 color, in rgb_space from, in rgb_space to)
 {
-	color = toLinear(color, from.trc);
+	vec4 c = toLinear(color, from.trc);
 
-	color.xyz = rgbToXyz(from)*color.rgb;
-	float luma = color.y;
+	c.xyz = rgbToXyz(from)*c.rgb;
+	float luma = c.y;
 
-	color.rgb = xyzToRgb(to)*color.rgb;
-	color = gamutScale(color, luma);
+	c.rgb = xyzToRgb(to)*c.rgb;
+	c = gamutScale(c, luma);
 
-	return toGamma(color, to.trc);
+	return toGamma(c, to.trc);
 }
 
 

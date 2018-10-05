@@ -194,4 +194,7 @@ Author
 
 License
 ----
+DuEngine, DuShaders
 Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.
+
+Please refer to GLSL files for License of Third-Party Shaders.

@@ -1,6 +1,9 @@
 /**
- * This shader is a minimum demonstration of the Kernel Foveated Rendering paper
+ * This shader is a minimum demonstration of the Kernel Foveated Rendering paper.
+ * Full screen on GTX 1080+ for best performance!
+ *
  * However, this pilot demo has NOT dealed with x=0 artifacts and removed TAA, FXAA etc.
+ * In fullscreen and Windows, there is almost no artifact even without filtering.
  * Link to demo: https://www.shadertoy.com/view/lsdfWn
  * License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License. 
  * For more details, please visit: http://duruofei.com/Public/papers/Meng_KernelFoveatedRendering_PACM_2018.pdf
@@ -10,6 +13,14 @@
  * This is minimum demo without anti-aliasing nor deferred shading. Please refer to the paper for more details.
  * https://goo.gl/1noXYE
  *
+ * To further complete this demo, you need to:
+ * 1. Have one pixel or 1+eps vertical margin in the quad of vertex shader, so uv coordinates will be continuous from bottom to top.
+ * 2. Apply Gaussian filters to the log-polar & postprocessed buffers.
+ * 3. TAA, refer to the code for more details.
+ * 4. Use FOVE or other eye tracking HMDs
+ *
+ * In ShaderToy, this could also be hacked by fragment shader tricks...
+ *
  * Courtesy of iq's LadyBug shader
  * https://www.shadertoy.com/view/4tByz3
  * License Creative Commons Attribution-NonCommercial-ShareAlike 3.0
@@ -18,7 +29,10 @@
  *
  */
 
-vec3 performGaussBlur(vec2 pos) // perform gaussian blur
+// perform gaussian blur, disabled for now for performance issue
+// Gaussian blur should be done in two passes rather than one...
+// See my shader for two-pass Gaussian vs. one: https://www.shadertoy.com/view/ltBXRh
+vec3 performGaussBlur(vec2 pos) 
 {
 	const float PARA1 = 0.2042, PARA2 = 0.1238, PARA3 = 0.0751;
 	vec3 fragColor11 = texture(logTexture, pos - PIXEL_SIZE).xyz;
@@ -109,7 +123,9 @@ float sinFunc(float lr) {
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 	float SCALE_RATIO = iMouse.z > 0.0 ? 1.0 : DEFAULT_SIGMA;
     vec2 iRes = iResolution.xy, foveal = FOVEAL, foveal2 = FOVEAL2;
-    
+    if (iMouse.x < 1.0) {
+        foveal = FOVEAL2;
+    }
     // Equation (12) and (13)
 	float maxL = max(
 		max(length((vec2(1, 1) - foveal) * iRes),
@@ -121,12 +137,12 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 		);
 	float L = log(maxL * 0.5);
 	vec2 uv = fragCoord / iRes; // [0, 1]
-	vec2 pq = uv * 2.0 - 1.0 - foveal;
+    vec2 pq = uv * 2.0 - 1.0 - foveal;
 	float r = length(pq * iRes * 0.5); // [-1, 1] * length(iResolution.xy * 0.5)
-	float lr = log(r);
+	float lr = log(r) / L;
 	float theta = atan(pq.y * iRes.y, pq.x * iRes.x) + step(pq.y, 0.0) * TWOPI;
-
-	lr /= L;
+	float theta2 = atan(pq.y * iRes.y, -abs(pq.x) * iRes.x) + step(pq.y, 0.0) * TWOPI;
+    
 	if (KERNEL_FUNCTION_TYPE < 1.0)
 		lr = lr;
 	else if (KERNEL_FUNCTION_TYPE < 2.0)
@@ -137,11 +153,21 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 		lr = powFunc(lr);
 
 	theta /= MAX_THETA;
+    theta2 /= MAX_THETA;
+        
 	vec2 logCoord = vec2(lr, theta) / SCALE_RATIO;
+    vec2 logCoordGrad = vec2(lr, theta2) / SCALE_RATIO;
+    
     if (!iApplyLogMap2)
         logCoord = uv;
 
-	vec3 col = texture(logTexture, logCoord, 2.0).rgb;
+	vec3 col = textureGrad(logTexture, logCoord, dFdx(logCoordGrad), dFdy(logCoordGrad)).rgb;
+    //col = vec3(dFdx(logCoordGrad), 0.0);
+    // http://www.iquilezles.org/www/articles/tunnel/tunnel.htm
+    //col = textureGrad(logTexture, logCoord, dFdx(logCoord), dFdy(logCoord)).rgb;
+    //col = vec3((dFdx(logCoord)*500.0 + vec2(1.0)) * 0.5, 0.0);
+    //col = vec3((dFdx(logCoordGrad)*500.0 + vec2(1.0)) * 0.5, 0.0);
+    //col = texture(logTexture, logCoord).rgb;
     
 #if USE_FXAA
 	if (AdjustRegion > 1 && newCoord.y < 0.995 / SCALE_RATIO)
@@ -150,17 +176,20 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 		col = performGaussBlur(logCoord);
 #endif
 
-	// Usually if the size of framebuffer is scaled with SCALE_RATIO correctly, 
-    // the mipmap filtering and mirror wraping could solve the polar issue
-    // alternative trick is to enlarge the rect geometry with one extra pixel for mirror wraping.
-    // float y = logCoord.y * SCALE_RATIO * iRes.y;
-    //if (y > iRes.y - 1.0) {
-    //    col = texelFetch(logTexture, ivec2(logCoord*iResolution.xy), 0).rgb;
-        // col = FXAA(logCoord);
-       // col = vec3(1.0);
-       // mainShader(fragColor, fragCoord);
-   //}
+    // In KFR paper, we enlarge the rect geometry with one extra pixel for mirror wraping.
+    // This trick eliminates the artifacts very well.
 
+	// Usually if the size of framebuffer is scaled with SCALE_RATIO correctly, 
+    // the mipmap filtering and mirror wraping could solve the polar issue.
+        
+    // In ShaderToy, we have to use the following trick:
+    float y = logCoord.y * SCALE_RATIO * iRes.y;
+    if (y > iRes.y - 1.0) {
+        col = texelFetch(logTexture, ivec2(logCoord*iResolution.xy), 0).rgb;
+        //col = FXAA(logCoord);
+        //mainShader(fragColor, fragCoord);
+    }
+	//col = FXAA(logCoord);
 	vec2 uv2 = uv * 2.0 - 1.0;
     uv2.x *= iResolution.x / iResolution.y;
     foveal.x *= iResolution.x / iResolution.y;
@@ -169,6 +198,3 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
 	fragColor = vec4(col, 1.0);
 }
-
-
-// Hack for 

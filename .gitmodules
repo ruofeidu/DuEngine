@@ -1,0 +1,3 @@
+[submodule "ImageQualityCompare"]
+	path = ImageQualityCompare
+	url = https://github.com/ruofeidu/ImageQualityCompare
