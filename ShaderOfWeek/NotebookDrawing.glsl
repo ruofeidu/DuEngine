@@ -109,6 +109,6 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     karo-=.5*vec3(.25,.1,.1)*dot(exp(-s*s*80.),vec2(1));
     float r=length(pos-iResolution.xy*.5)/iResolution.x;
     float vign=1.-r*r*r;
-	fragColor = vec4(vec3(col.x*col2*karo*vign),1);
+	fragColor = vec4(vec3(col.x*col2*vign),1);
     //fragColor=getCol(fragCoord);
 }
