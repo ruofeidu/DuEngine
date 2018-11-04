@@ -35,7 +35,7 @@ vec3 FXAA( vec4 uv, sampler2D tex, vec2 rcpFrame) {
     float dirReduce = max(
         (lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * FXAA_REDUCE_MUL),
         FXAA_REDUCE_MIN);
-    float rcpDirMin = 1.0/(min(abs(dir.x), abs(dir.y)) + dirReduce);
+    float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
     
     dir = min(vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
           max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
@@ -50,18 +50,18 @@ vec3 FXAA( vec4 uv, sampler2D tex, vec2 rcpFrame) {
     
     float lumaB = dot(rgbB, luma);
 
-    if((lumaB < lumaMin) || (lumaB > lumaMax)) return rgbA;
+    if((lumaB < lumaMin) || (lumaB > lumaMax))
+		return rgbA;
     
     return rgbB; 
 }
-
     
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
     vec2 uv = fragCoord / iResolution.xy;
     float splitCoord = (iMouse.x == 0.0) ? iResolution.x/2. + iResolution.x*cos(iTime*.5) : iMouse.x;
     if ( uv.x < splitCoord/iResolution.x ) {
-        vec2 rcpFrame = vec2(1.0/iResolution.x, 1.0/iResolution.y);
+        vec2 rcpFrame = vec2(1.0) / iResolution.xy;
         fragColor = vec4(FXAA(vec4(uv, uv - rcpFrame * (0.5 + FXAA_SUBPIX_SHIFT)), iChannel0, rcpFrame), 1.0);
     } else {
         fragColor = texture( iChannel0, uv );
