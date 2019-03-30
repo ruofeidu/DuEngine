@@ -1,44 +1,45 @@
 #pragma once
-// stdafx.h is a common header used by every other cpp file to accelerate the compilation speed
+// stdafx.h is a common header used by every other cpp file to accelerate the
+// compilation speed
 
 #define _CRT_SECURE_NO_WARNINGS
-#pragma warning(disable:4996)
+#pragma warning(disable : 4996)
 
-#ifdef _DEBUG 
+#ifdef _DEBUG
 #pragma comment(lib, "opencv_world331d.lib")
-#else 
+#else
 #pragma comment(lib, "opencv_world331.lib")
 #endif
 #pragma comment(lib, "glew32.lib")
 
-#include <iostream>
-#include <fstream>
+#include <algorithm>
 #include <chrono>
+#include <fstream>
 #include <iomanip>
-#include <string>
-#include <vector>
-#include <thread>
+#include <iostream>
 #include <map>
+#include <string>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
-#include <algorithm>
+#include <vector>
 
-#include <cstdlib>
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/videoio.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
 
 #if _WIN64 | _WIN32
-#include "windows.h"
 #include "dirent.h"
+#include "windows.h"
 #endif
 
 #define GLUT_KEY_ESC '\x1b'
@@ -64,4 +65,3 @@ const float PI = 3.14159265359f;
 #if COMPILE_WITH_TIMER
 #include "DebugTimer.h"
 #endif
-

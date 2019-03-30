@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-// debug utilities
+// Debug utilities.
 void debug(string message);
 void debug(int message);
 void debug(unsigned int message);
@@ -14,11 +14,11 @@ void logerror(string message);
 void dump(char* pszFormat, ...);
 void onError();
 
-// file systems
+// OS
 bool dirExists(const string& dirName_in);
 string getTimeForFileName();
 
-// string utilities
+// String utilities.
 string repeatstring(string s, int cnt);
 
 string toLower(const string &value);
@@ -35,7 +35,7 @@ string string_format(const std::string& format, Args ... args) {
 	return string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
 
-// design pattern utilities
+// Design pattern utilities.
 class Singleton
 {
 public:
