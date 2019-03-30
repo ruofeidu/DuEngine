@@ -225,4 +225,9 @@ In the end, here stores some of my GLSL code written in Shadertoy.com [My Shader
 
 DuEngine, DuShaders Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License with 996 ICU clause: [![996.ICU](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu/#/en_US)
 
+The above license is only granted to entities that act in concordance with local labor laws. In addition, the following requirements must be observed:
+
+- The licensee must not, explicitly or implicitly, request or schedule their employees to work more than 45 hours in any single week.
+- The licensee must not, explicitly or implicitly, request or schedule their employees to be at work consecutively for 10 hours.
+
 Please refer to individual GLSL files (.glsl) for License of Third-Party Shaders.
