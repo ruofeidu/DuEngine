@@ -1,4 +1,4 @@
 #pragma once
-#include "stdafx.h"
-#include "DuEngine.h"
 #include "Geometry.h"
+#include "DuEngine.h"
+#include "stdafx.h"
