@@ -19,73 +19,71 @@ void g_reshape(int width, int height);
 
 enum class RendererType : std::int8_t { SHADERTOY, VOLUME, MESH, RAYTRACER };
 
-class DuEngine
-{
-	friend class ShaderToy;
-	friend class VolumeRenderer;
+class DuEngine {
+  friend class ShaderToy;
+  friend class VolumeRenderer;
 
-public:
-	static DuEngine *GetInstance();
-	void start(int argc, char* argv[]);
-	void initScene();
+ public:
+  static DuEngine* GetInstance();
+  void start(int argc, char* argv[]);
+  void initScene();
 
-protected:
-	TexturesManager* m_textureManager; 
-	PathManager* m_path;
+ protected:
+  TexturesManager* m_textureManager;
+  PathManager* m_path;
 
-public:
-	void render();
-	void updateFPS(float timeDelta, float averageTimeDelta);
-	void takeScreenshot(string folderName = "snapshots");
-	void keyboard(unsigned char key, int x, int y, bool up = false);
-	void special(int key, int x, int y, bool up = false);
-	void mousePress(int button, int state, int x, int y);
-	void mouseMove(int x, int y);
-	void reshape(int width, int height);
+ public:
+  void render();
+  void updateFPS(float timeDelta, float averageTimeDelta);
+  void takeScreenshot(string folderName = "snapshots");
+  void keyboard(unsigned char key, int x, int y, bool up = false);
+  void special(int key, int x, int y, bool up = false);
+  void mousePress(int button, int state, int x, int y);
+  void mouseMove(int x, int y);
+  void reshape(int width, int height);
 
-	int getFrameNumber();
-	string getPresetsPath() { return m_path->getPresetPath(); }
+  int getFrameNumber();
+  string getPresetsPath() { return m_path->getPresetPath(); }
 
-protected:
-	const static unordered_map<int, int> KeyCodes;
-	const static unordered_map<int, int> ModifierCodes;
+ protected:
+  const static unordered_map<int, int> KeyCodes;
+  const static unordered_map<int, int> ModifierCodes;
 
-private:
-	DuEngine();
-	static DuEngine *s_Instance;
-	RendererType m_renderType = RendererType::SHADERTOY;
-	Camera* m_camera;
-	Window* m_window;
-	ShaderToy* m_shadertoy;
-	DuConfig* m_config;
+ private:
+  DuEngine();
+  static DuEngine* s_Instance;
+  RendererType m_renderType = RendererType::SHADERTOY;
+  Camera* m_camera;
+  Window* m_window;
+  ShaderToy* m_shadertoy;
+  DuConfig* m_config;
 
-	bool m_fullscreen = false;
-	bool m_recording = false;
-	bool m_paused = false; 
+  bool m_fullscreen = false;
+  bool m_recording = false;
+  bool m_paused = false;
 
-	string m_recordPath = "";
-	int m_recordStart = 0;
-	int m_recordEnd = 100;
-	bool m_recordVideo = false;
-	cv::VideoWriter* m_video = nullptr;
-	int m_defaultWidth = 1280;
-	int m_defaultHeight = 720;
-	bool m_takeSingleScreenShot = false; 
+  string m_recordPath = "";
+  int m_recordStart = 0;
+  int m_recordEnd = 100;
+  bool m_recordVideo = false;
+  cv::VideoWriter* m_video = nullptr;
+  int m_defaultWidth = 1280;
+  int m_defaultHeight = 720;
+  bool m_takeSingleScreenShot = false;
 
-private:
-	void toggleFullScreen();
+ private:
+  void toggleFullScreen();
 
-	void printHelp(); 
+  void printHelp();
 
-	class GC
-	{
-	public:
-		~GC() {
-			if (s_Instance != NULL) {
-				delete s_Instance;
-				s_Instance = NULL;
-			}
-		}
-	};
-	static GC gc;
+  class GC {
+   public:
+    ~GC() {
+      if (s_Instance != NULL) {
+        delete s_Instance;
+        s_Instance = NULL;
+      }
+    }
+  };
+  static GC gc;
 };

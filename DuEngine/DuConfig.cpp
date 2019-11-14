@@ -40,7 +40,7 @@ bool DuConfig::Load(string filename) {
     // '#' denotes a comment until the end of the line.
     if (strchr(linebuf, '#') != NULL) *strchr(linebuf, '#') = '\0';
     if (strchr(linebuf, ';') != NULL) *strchr(linebuf, ';') = '\0';
-    
+
     string line = linebuf;
     // Gets name and value, separated by "=" symbol.
     size_t eq = line.find('=');

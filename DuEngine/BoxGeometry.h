@@ -2,12 +2,11 @@
 #include "stdafx.h"
 #include "Geometry.h"
 
-class BoxGeometry : public Geometry
-{
-public:
+class BoxGeometry : public Geometry {
+ public:
   double geometry[4]; /* width, height, x0, y0 (top left) */
 
-public:
+ public:
   GLuint VBO;
   GLuint VAO;
   GLuint EBO;
@@ -24,7 +23,7 @@ public:
 
   void render();
 
-public:
+ public:
   int getWidth() const { return (int)geometry[0]; }
   int getHeight() const { return (int)geometry[1]; }
 };

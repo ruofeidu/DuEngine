@@ -25,9 +25,9 @@ If the compilation fails, please fix the following five environment variables:
 
 Dependency: Python
 
-To create a new ShaderToy demo, just click __create.cmd_ in any category folder like "Ray Tracing". In the console, please input your desired shader name, like "Test". The Python script will automatically generate _Test.glsl_, _Test.ini_, and _Test.cmd_ files. Note that the _GLSL file_ is the main Shadertoy alike GLSL code, the _INI file_ is the config file which defines the input channels, and the _CMD file_ is a shortcut for you to run the demo.
+To create a new ShaderToy demo, just click \__create.cmd_ in any category folder like "Ray Tracing". In the console, please input your desired shader name, like "Test". The Python script will automatically generate _Test.glsl_, _Test.ini_, and _Test.cmd_ files. Note that the _GLSL file_ is the main Shadertoy alike GLSL code, the _INI file_ is the config file which defines the input channels, and the _CMD file_ is a shortcut for you to run the demo.
 
-The detailed input format for __create.cmd_ is:
+The detailed input format for \__create.cmd_ is:
 
 ```bash
 _create [FILE_NAME] [NUM_CHANNELS, 1 by default] [NUM_BUFFERS, 0 by default] [LINK_TO_SHADERTOY_FOR_REFERENCE]
@@ -51,7 +51,7 @@ The config file reads like as follows:
 # This is a comment, $Name corresponds to the file name of the INI file.
 shader_frag         =   $Name.glsl
 
-# Specify the number of channels for the main framebuffer. 
+# Specify the number of channels for the main framebuffer.
 channels_count      =   5
 
 # Specify the number of framebuffers for multi-pass rendering

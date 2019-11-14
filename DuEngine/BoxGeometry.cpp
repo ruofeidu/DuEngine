@@ -1,5 +1,8 @@
 #include "BoxGeometry.h"
 #include "stdafx.h"
+#ifndef kUseTextureCoordinates
+#define kUseTextureCoordinates 0
+#endif
 
 BoxGeometry::BoxGeometry(double _width, double _height, double _x0,
                          double _y0) {
@@ -64,16 +67,24 @@ BoxGeometry::BoxGeometry(double _width, double _height, double _x0,
 
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, vertexLength, vertexBuffer, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, /*bytes=*/vertexLength, vertexBuffer,
+               GL_STATIC_DRAW);
 
   glGenVertexArrays(1, &VAO);
   glBindVertexArray(VAO);
   glEnableVertexAttribArray(layoutPosition);
-  glVertexAttribPointer(layoutPosition, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        NULL);
-  // glEnableVertexAttribArray(layoutTexCoord);
-  // glVertexAttribPointer(layoutTexCoord, 2, GL_FLOAT, GL_FALSE,
-  // sizeof(Vertex), (void*)(sizeof(vec3)));
+  glVertexAttribPointer(/*attribute_index=*/layoutPosition,
+                        /*number_of_components_per_vertex=*/3,
+                        /*type=*/GL_FLOAT,
+                        /*normalized=*/GL_FALSE,
+                        /*stride=*/sizeof(Vertex),
+                        /*offset=*/nullptr);
+
+#if kUseTextureCoordinates
+  glEnableVertexAttribArray(layoutTexCoord);
+  glVertexAttribPointer(layoutTexCoord, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        (void*)(sizeof(vec3)));
+#endif
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements,

@@ -1,9 +1,16 @@
-/**
- * DuRenderer is a basic OpenGL-based renderer which implements most of the
- * ShaderToy functionality Ruofei Du | Augmentarium Lab | UMIACS Computer
- * Science Department | University of Maryland, College Park me [at] duruofei
- * [dot] com 12/6/2017
- */
+// DuEngine: Real-time Rendering Engine and Shader Testbed
+// Ruofei Du | http://www.duruofei.com
+//
+// Creative Commons Attribution-ShareAlike 3.0 License with 996 ICU clause:
+//
+// The above license is only granted to entities that act in concordance with
+// local labor laws. In addition, the following requirements must be observed:
+// The licensee must not, explicitly or implicitly, request or schedule their
+// employees to work more than 45 hours in any single week. The licensee must
+// not, explicitly or implicitly, request or schedule their employees to be at
+// work consecutively for 10 hours. For more information about this protest, see
+// http://996.icu
+
 #include "TextureMat.h"
 #include "DuUtils.h"
 #include "stdafx.h"
@@ -36,7 +43,7 @@ void TextureMat::updateFromMat() {
                   m_format,                // GLenum format,
                   m_dataType,              // GLenum type,
                   m_mat.ptr()              // const GLvoid * pixels
-  );
+                  );
   generateMipmaps();
 }
 
@@ -51,7 +58,7 @@ void TextureMat::texImage(cv::Mat& mat, uchar* pointer) {
                0,         // Border width in pixels (can either be 1 or 0)
                m_format, m_dataType,
                pointer  // The actual image data itself
-  );
+               );
 }
 
 void TextureMat::generateFromMat(cv::Mat& mat) {

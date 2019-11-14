@@ -10,7 +10,7 @@
 
 // I first made this number printing code in https://www.shadertoy.com/view/4sf3RN
 // It started as a silly way of representing digits with rectangles.
-// As people started actually using this in a number of places I thought I would try to condense the 
+// As people started actually using this in a number of places I thought I would try to condense the
 // useful function a little so that it can be dropped into other shaders more easily,
 // just snip between the perforations below.
 // Also, the licence on the previous shader was a bit restrictive for utility code.
@@ -18,7 +18,7 @@
 // Note that the values printed are not always accurate!
 
 // ---- 8< ---- GLSL Number Printing - @P_Malin ---- 8< ----
-// Creative Commons CC0 1.0 Universal (CC-0) 
+// Creative Commons CC0 1.0 Universal (CC-0)
 // https://www.shadertoy.com/view/4sBSWW
 
 float DigitBin(const in int x) {
@@ -52,11 +52,11 @@ float PrintValue00(const in vec2 fragCoord, const in vec2 vPixelCoords, const in
 
 // Improved version
 //
-// Most important change is dropping everything left of the decimal point ASAP 
+// Most important change is dropping everything left of the decimal point ASAP
 // when printing the fractional digits. This is done to bring the magnitule down
 // for the following division and modulo.
 //
-// Another change is to replace the logarithm with a power-of-ten value 
+// Another change is to replace the logarithm with a power-of-ten value
 // calculation that is needed later anyway.
 // This change is optional, either one works.
 float PrintValue(vec2 fragCoord, vec2 pixelCoord, vec2 fontSize, float value,
@@ -120,7 +120,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 	float fSetPixel = fDistanceToCurve - 1.0; // Add more thickness
 	vColour = mix(vec3(1.0, 0.0, 0.0), vColour, clamp(fSetPixel, 0.0, 1.0));
 
-	// Draw Sin Value	
+	// Draw Sin Value
 	float fValue4 = GetCurve(mouse.x / iResolution.x);
 	float fPixelYCoord = (fValue4 * 0.25 + 0.5) * iResolution.y;
 

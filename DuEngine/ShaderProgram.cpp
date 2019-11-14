@@ -1,114 +1,122 @@
+// DuEngine: Real-time Rendering Engine and Shader Testbed
+// Ruofei Du | http://www.duruofei.com
+//
+// Creative Commons Attribution-ShareAlike 3.0 License with 996 ICU clause:
+//
+// The above license is only granted to entities that act in concordance with
+// local labor laws. In addition, the following requirements must be observed:
+// The licensee must not, explicitly or implicitly, request or schedule their
+// employees to work more than 45 hours in any single week. The licensee must
+// not, explicitly or implicitly, request or schedule their employees to be at
+// work consecutively for 10 hours. For more information about this protest, see
+// http://996.icu
+
 #include "stdafx.h"
 #include "ShaderProgram.h"
 
 ShaderProgram::ShaderProgram(ShaderFileParas &paras) {
-	m_vertexShader = InitShader(GL_VERTEX_SHADER, paras);
-	m_fragmentShader = InitShader(GL_FRAGMENT_SHADER, paras);
-	m_shaderProgram = InitProgram(m_vertexShader, m_fragmentShader);
+  m_vertexShader = InitShader(GL_VERTEX_SHADER, paras);
+  m_fragmentShader = InitShader(GL_FRAGMENT_SHADER, paras);
+  m_shaderProgram = InitProgram(m_vertexShader, m_fragmentShader);
 }
 
 GLint ShaderProgram::getUniformLocation(string uniformName) {
-	return glGetUniformLocation(m_shaderProgram, uniformName.c_str());
+  return glGetUniformLocation(m_shaderProgram, uniformName.c_str());
 }
 
-GLuint ShaderProgram::getID() {
-	return m_shaderProgram;
-}
+GLuint ShaderProgram::getID() { return m_shaderProgram; }
 
-void ShaderProgram::use() {
-	glUseProgram(m_shaderProgram);
-}
+void ShaderProgram::use() { glUseProgram(m_shaderProgram); }
 
 GLuint ShaderProgram::InitShader(GLenum type, ShaderFileParas &paras) {
-	auto& filename = (type == GL_VERTEX_SHADER) ? paras.vert : paras.frag;
-	string str = ReadTextFromFile(filename);
+  auto &filename = (type == GL_VERTEX_SHADER) ? paras.vert : paras.frag;
+  string str = ReadTextFromFile(filename);
 
-	if (type == GL_FRAGMENT_SHADER) {
-		if (paras.uniform.size() > 0) {
-			auto uniforms = ReadTextFromFile(paras.uniform);
-			uniforms += paras.uniformAppendix;
-			if (paras.common.size() > 0) {
-				auto common = ReadTextFromFile(paras.common);
-				uniforms += common;
-			}
-			str = uniforms + str;
-		}
-		if (type == GL_FRAGMENT_SHADER && paras.main.size() > 0) {
-			string post = ReadTextFromFile(paras.main);
-			str = str + post;
-		}
-	}
+  if (type == GL_FRAGMENT_SHADER) {
+    if (paras.uniform.size() > 0) {
+      auto uniforms = ReadTextFromFile(paras.uniform);
+      uniforms += paras.uniformAppendix;
+      if (paras.common.size() > 0) {
+        auto common = ReadTextFromFile(paras.common);
+        uniforms += common;
+      }
+      str = uniforms + str;
+    }
+    if (type == GL_FRAGMENT_SHADER && paras.main.size() > 0) {
+      string post = ReadTextFromFile(paras.main);
+      str = str + post;
+    }
+  }
 
-	GLchar *cstr = new GLchar[str.size() + 1];
-	const GLchar *cstr2 = cstr; // TODO: Weirdness to get a const char
-	strcpy(cstr, str.c_str());
-	GLuint shader = glCreateShader(type);
-	glShaderSource(shader, 1, &cstr2, NULL);
-	glCompileShader(shader);
-	GLint compiled;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-	if (!compiled) {
-		ReportShaderErrors(shader);
-		onError();
-	}
-	return shader;
+  GLchar *cstr = new GLchar[str.size() + 1];
+  const GLchar *cstr2 = cstr;  // TODO: Weirdness to get a const char
+  strcpy(cstr, str.c_str());
+  GLuint shader = glCreateShader(type);
+  glShaderSource(shader, 1, &cstr2, NULL);
+  glCompileShader(shader);
+  GLint compiled;
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+  if (!compiled) {
+    ReportShaderErrors(shader);
+    onError();
+  }
+  return shader;
 }
 
 GLuint ShaderProgram::InitProgram(GLuint vertexshader, GLuint fragmentshader) {
-	GLuint program = glCreateProgram();
-	GLint linked;
-	glAttachShader(program, vertexshader);
-	glAttachShader(program, fragmentshader);
-	glLinkProgram(program);
-	glGetProgramiv(program, GL_LINK_STATUS, &linked);
-	if (!linked) {
-		ReportProgramErrors(program);
-		onError();
-	}
-	glUseProgram(program);
-	return program;
+  GLuint program = glCreateProgram();
+  GLint linked;
+  glAttachShader(program, vertexshader);
+  glAttachShader(program, fragmentshader);
+  glLinkProgram(program);
+  glGetProgramiv(program, GL_LINK_STATUS, &linked);
+  if (!linked) {
+    ReportProgramErrors(program);
+    onError();
+  }
+  glUseProgram(program);
+  return program;
 }
 
 string ShaderProgram::ReadTextFromFile(string filename) {
-	using std::cout;
-	using std::endl;
-	using std::string;
-	using std::ifstream;
-	string str, res = "";
-	ifstream in;
-	in.open(filename);
-	if (in.is_open()) {
-		getline(in, str);
-		while (in) {
-			res += str + "\n";
-			getline(in, str);
-		}
-	} else {
-		logerror("Unable to open file " + filename);
-	}
-	in.close();
-	return res;
+  using std::cout;
+  using std::endl;
+  using std::string;
+  using std::ifstream;
+  string str, res = "";
+  ifstream in;
+  in.open(filename);
+  if (in.is_open()) {
+    getline(in, str);
+    while (in) {
+      res += str + "\n";
+      getline(in, str);
+    }
+  } else {
+    logerror("Unable to open file " + filename);
+  }
+  in.close();
+  return res;
 }
 
 void ShaderProgram::ReportShaderErrors(const GLint shader) {
-	GLint length;
-	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-	GLchar* log = new GLchar[length + 1];
-	glGetShaderInfoLog(shader, length, &length, log);
-	string s(log);
-	logerror("Shader compile error, see log below\n" + s + "\n");
-	delete[] log;
-	onError();
+  GLint length;
+  glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+  GLchar *log = new GLchar[length + 1];
+  glGetShaderInfoLog(shader, length, &length, log);
+  string s(log);
+  logerror("Shader compile error, see log below\n" + s + "\n");
+  delete[] log;
+  onError();
 }
 
-
 void ShaderProgram::ReportProgramErrors(const GLint program) {
-	GLint length;
-	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-	GLchar* log = new GLchar[length + 1];
-	glGetProgramInfoLog(program, length, &length, log);
-	string s(log);
-	logerror("Program linking error, see log below\n" + s + "\n");
-	delete[] log;
-	onError();
+  GLint length;
+  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+  GLchar *log = new GLchar[length + 1];
+  glGetProgramInfoLog(program, length, &length, log);
+  string s(log);
+  logerror("Program linking error, see log below\n" + s + "\n");
+  delete[] log;
+  onError();
 }

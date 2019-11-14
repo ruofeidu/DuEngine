@@ -138,9 +138,7 @@ const unordered_map<int, int> DuEngine::KeyCodes{
 };
 
 const unordered_map<int, int> DuEngine::ModifierCodes{
-    {GLUT_ACTIVE_SHIFT, 16},
-    {GLUT_ACTIVE_CTRL, 17},
-    {GLUT_ACTIVE_ALT, 18},
+    {GLUT_ACTIVE_SHIFT, 16}, {GLUT_ACTIVE_CTRL, 17}, {GLUT_ACTIVE_ALT, 18},
 };
 
 /*

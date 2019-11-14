@@ -1,13 +1,26 @@
+// DuEngine: Real-time Rendering Engine and Shader Testbed
+// Ruofei Du | http://www.duruofei.com
+//
+// Creative Commons Attribution-ShareAlike 3.0 License with 996 ICU clause:
+//
+// The above license is only granted to entities that act in concordance with
+// local labor laws. In addition, the following requirements must be observed:
+// The licensee must not, explicitly or implicitly, request or schedule their
+// employees to work more than 45 hours in any single week. The licensee must
+// not, explicitly or implicitly, request or schedule their employees to be at
+// work consecutively for 10 hours. For more information about this protest, see
+// http://996.icu
+
 #include "PathManager.h"
 #include "DuUtils.h"
 #include "stdafx.h"
 
 PathManager::PathManager(string executionPath, DuConfig* config) {
-  // setup shaders path and presets path
+  // Sets shaders path and presets path.
   m_shadersPath = executionPath;
   m_config = config;
 
-  // automatically search the default shader path from the upper-level folders
+  // Automatically searches the default shader path from upper-level folders.
   for (int i = 3; i >= 0; --i) {
     if (i == 0) {
       m_shadersPath = "";
